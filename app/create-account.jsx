@@ -295,12 +295,13 @@ export default function CreateAccount() {
           style={[styles.continueButton, !canContinue && { opacity: 0.5 }]}
           activeOpacity={0.85}
           disabled={!canContinue}
-          onPress={() =>
-            router.push({
-              pathname: "/create-account",
-              params: { type, step: "profile" },
-            })
-          }
+          onPress={() => {
+            if (isCollector) {
+              router.replace("/collector/home");
+            } else {
+              router.replace("/household/home");
+            }
+          }}
         >
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
@@ -308,7 +309,7 @@ export default function CreateAccount() {
         {/* Login link */}
         <View style={styles.loginRow}>
           <Text style={styles.loginText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/sign-in")}>
+          <TouchableOpacity onPress={() => router.push("/login")}>
             <Text style={styles.loginLink}>Log in</Text>
           </TouchableOpacity>
         </View>
