@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import {
   Image,
   ScrollView,
@@ -18,8 +17,16 @@ const MENU = [
   { id: "account", label: "Account Details", icon: "person-outline" },
   { id: "vehicle", label: "Vehicle Info", icon: "car-outline" },
   { id: "bank", label: "Bank Account", icon: "card-outline" },
-  { id: "notifications", label: "Notifications", icon: "notifications-outline" },
-  { id: "privacy", label: "Privacy & Security", icon: "shield-checkmark-outline" },
+  {
+    id: "notifications",
+    label: "Notifications",
+    icon: "notifications-outline",
+  },
+  {
+    id: "privacy",
+    label: "Privacy & Security",
+    icon: "shield-checkmark-outline",
+  },
   { id: "help", label: "Help & Support", icon: "help-circle-outline" },
   { id: "terms", label: "Terms & Conditions", icon: "document-text-outline" },
 ];
@@ -39,7 +46,7 @@ export default function CollectorProfile() {
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
-              source={require("../../assets/images/user.png")}
+              source={require("../../assets/images/image 7.png")}
               style={styles.avatar}
               resizeMode="cover"
             />
@@ -85,15 +92,27 @@ export default function CollectorProfile() {
           <Text style={styles.badgesTitle}>Verification</Text>
           <View style={styles.badgesRow}>
             <View style={styles.badge}>
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={COLORS.primary}
+              />
               <Text style={styles.badgeText}>ID Verified</Text>
             </View>
             <View style={styles.badge}>
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={COLORS.primary}
+              />
               <Text style={styles.badgeText}>Car Verified</Text>
             </View>
             <View style={styles.badge}>
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={COLORS.primary}
+              />
               <Text style={styles.badgeText}>Bank Linked</Text>
             </View>
           </View>

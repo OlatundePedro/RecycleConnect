@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -63,11 +63,15 @@ export default function CollectorHome() {
           </View>
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.bellBtn}>
-              <Ionicons name="notifications-outline" size={22} color={COLORS.textPrimary} />
+              <Ionicons
+                name="notifications-outline"
+                size={22}
+                color={COLORS.textPrimary}
+              />
             </TouchableOpacity>
             <View style={styles.avatarSmall}>
               <Image
-                source={require("../../assets/images/user.png")}
+                source={require("../../assets/images/image 7.png")}
                 style={styles.avatarSmallImg}
                 resizeMode="cover"
               />
@@ -141,7 +145,11 @@ export default function CollectorHome() {
                 <Text style={styles.requestAddr}>{req.address}</Text>
               </View>
               <View style={styles.distanceBadge}>
-                <Ionicons name="location-outline" size={12} color={COLORS.muted} />
+                <Ionicons
+                  name="location-outline"
+                  size={12}
+                  color={COLORS.muted}
+                />
                 <Text style={styles.distanceText}>{req.distance}</Text>
               </View>
             </View>
@@ -162,7 +170,11 @@ export default function CollectorHome() {
                 <Text style={styles.metaText}>{req.time}</Text>
               </View>
               <View style={styles.metaItem}>
-                <Ionicons name="cash-outline" size={14} color={COLORS.primary} />
+                <Ionicons
+                  name="cash-outline"
+                  size={14}
+                  color={COLORS.primary}
+                />
                 <Text style={[styles.metaText, { color: COLORS.primary }]}>
                   {req.reward}
                 </Text>

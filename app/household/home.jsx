@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Clipboard } from "expo-clipboard";
 import { useRouter } from "expo-router";
-import React from "react";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -14,31 +15,80 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-const IMPACT = [
-  { value: "120 kg", label: "Recycled" },
-  { value: "18", label: "Trees Saved" },
-  { value: "500 kg", label: "CO₂ Reduced" },
+// Swap for the logged-in household's real data.
+const HOUSEHOLD = {
+  firstName: "Juliet",
+  avatarUrl: "https://i.pravatar.cc/150?img=32",
+  code: "JULIET-6674",
+};
+
+const NEXT_COLLECTION = {
+  date: "Saturday, May 15",
+  time: "9:00 AM - 12:30 PM",
+};
+
+const PARTNER = {
+  name: "GreenCycle Lagos",
+  location: "Ikorodu, Lagos",
+};
+
+const BUYING_PRICES = [
+  { id: "plastic", label: "Plastic", price: "₦300.00/kg" },
+  { id: "paper", label: "Paper", price: "₦200.00/kg" },
+  { id: "metal", label: "Metal", price: "₦1,000.00/kg" },
+  { id: "glass", label: "Glass", price: "₦500.00/kg" },
 ];
 
 const RECENT = [
   {
     id: "1",
-    title: "Pickup Completed",
-    subtitle: "Mixed Plastics",
-    date: "13 May, 2024",
-    amount: "+₦350.00",
+    icon: "cube-outline",
+    title: "Plastic Collection",
+    subtitle: "1.2kg collected on Oct 12",
+    points: "+25 pts",
+    positive: true,
   },
   {
     id: "2",
-    title: "Pickup Completed",
-    subtitle: "Paper & Cardboard",
-    date: "08 May, 2024",
-    amount: "+₦210.00",
+    icon: "gift-outline",
+    title: "Reward Redeemed",
+    subtitle: "Data Top-up (500MB)",
+    points: "-150 pts",
+    positive: false,
+  },
+];
+
+const TABS = [
+  { id: "home", label: "Home", icon: "home-outline", route: "/household/home" },
+  {
+    id: "history",
+    label: "History",
+    icon: "alarm-outline",
+    route: "/household/track",
+  },
+  {
+    id: "wallet",
+    label: "Wallet",
+    icon: "wallet-outline",
+    route: "/household/wallet",
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    icon: "person-outline",
+    route: "/household/profile",
   },
 ];
 
 export default function HouseholdHome() {
   const router = useRouter();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = async () => {
+    await Clipboard.setStringAsync(HOUSEHOLD.code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -49,280 +99,410 @@ export default function HouseholdHome() {
       >
         {/* ─── Header ─── */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>Home</Text>
-            <Text style={styles.greeting}>
-              Good Morning, Samuel 👋
+          <Image source={{ uri: HOUSEHOLD.avatarUrl }} style={styles.avatar} />
+          <View style={styles.headerText}>
+            <Text style={styles.helloText}>Hello,</Text>
+            <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
+          </View>
+        </View>
+        <Text style={styles.subGreeting}>What would you like to do?</Text>
+
+        {/* ─── Household Code ─── */}
+        <View style={styles.codeCard}>
+          <View style={styles.codeCardTextWrap}>
+            <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
+            <Text style={styles.codeValue}>{HOUSEHOLD.code}</Text>
+            <Text style={styles.codeHint}>
+              Share this for your pickup or drop-off collection
             </Text>
           </View>
-          <TouchableOpacity style={styles.bellBtn}>
-            <Ionicons name="notifications-outline" size={24} color={COLORS.textPrimary} />
-            <View style={styles.bellDot} />
+          <TouchableOpacity onPress={handleCopyCode} hitSlop={10}>
+            <Ionicons
+              name={copied ? "checkmark" : "copy-outline"}
+              size={20}
+              color={COLORS.textSecondary}
+            />
           </TouchableOpacity>
         </View>
 
-        {/* ─── Wallet Balance Card ─── */}
-        <View style={styles.walletCard}>
-          <View style={styles.walletTop}>
-            <Text style={styles.walletLabel}>Wallet Balance</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
-          </View>
-          <Text style={styles.walletAmount}>₦8,750.00</Text>
-          <TouchableOpacity
-            style={styles.viewWalletBtn}
-            onPress={() => router.navigate("/household/wallet")}
-          >
-            <Text style={styles.viewWalletText}>View Wallet &gt;</Text>
-          </TouchableOpacity>
+        {/* ─── Next Collection ─── */}
+        <View style={styles.nextCollectionCard}>
+          <Text style={styles.mutedLabel}>Next Collection</Text>
+          <Text style={styles.nextCollectionDate}>{NEXT_COLLECTION.date}</Text>
+          <Text style={styles.nextCollectionTime}>{NEXT_COLLECTION.time}</Text>
         </View>
 
-        {/* ─── Impact Summary ─── */}
-        <Text style={styles.sectionTitle}>Impact Summary</Text>
-        <View style={styles.impactRow}>
-          {IMPACT.map((item, i) => (
-            <View key={i} style={styles.impactBox}>
-              <Text style={styles.impactValue}>{item.value}</Text>
-              <Text style={styles.impactLabel}>{item.label}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* ─── Schedule Pickup Button ─── */}
+        {/* ─── Partner Card ─── */}
         <TouchableOpacity
-          style={styles.scheduleBtn}
-          onPress={() => router.navigate("/household/pickup")}
+          style={styles.partnerCard}
+          onPress={() => router.push("/household/partners")}
           activeOpacity={0.85}
         >
-          <Ionicons name="repeat-outline" size={20} color={COLORS.white} style={{ marginRight: 8 }} />
-          <Text style={styles.scheduleBtnText}>Schedule Pickup</Text>
+          <View style={styles.partnerCardTop}>
+            <Text style={styles.partnerName}>{PARTNER.name}</Text>
+            <Ionicons name="chevron-forward" size={20} color={COLORS.white} />
+          </View>
+          <View style={styles.verifiedRow}>
+            <Ionicons name="star" size={13} color={COLORS.white} />
+            <Text style={styles.verifiedText}>Verified Partner</Text>
+          </View>
+          <Text style={styles.partnerLocation}>
+            Your Collection Partner - {PARTNER.location}
+          </Text>
         </TouchableOpacity>
 
-        {/* ─── Nearby Collector ─── */}
-        <Text style={styles.sectionTitle}>Nearby Collector</Text>
-        <View style={styles.collectorCard}>
-          <View style={styles.collectorAvatar}>
-            <Image
-              source={require("../../assets/images/user.png")}
-              style={styles.avatarImg}
-              resizeMode="cover"
-            />
+        {/* ─── Mark as Ready ─── */}
+        <View style={styles.readyCard}>
+          <Text style={styles.mutedLabel}>Mark your materials as</Text>
+          <Text style={styles.readyHeading}>Ready for Collection</Text>
+          <Text style={styles.readySubtext}>
+            Let your collector know you have materials ready
+          </Text>
+          <TouchableOpacity
+            style={styles.markReadyBtn}
+            onPress={() => router.push("/household/pickup")}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.markReadyBtnText}>Mark as Ready</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* ─── Find Drop-off Location ─── */}
+        <View style={styles.dropoffCard}>
+          <Text style={styles.dropoffHeading}>Find a Drop-off Location</Text>
+          <Text style={styles.dropoffSubtext}>
+            Drop-off your materials at a nearby collection hub
+          </Text>
+          <TouchableOpacity onPress={() => router.push("/household/dropoff")}>
+            <Text style={styles.dropoffLink}>Find Collection hub</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* ─── Today's Buying Prices ─── */}
+        <View style={styles.pricesCard}>
+          <View style={styles.pricesHeader}>
+            <Text style={styles.pricesHeading}>Today's buying prices</Text>
+            <Text style={styles.pricesUpdated}>UPDATED 1H AGO</Text>
           </View>
-          <View style={styles.collectorInfo}>
-            <Text style={styles.collectorName}>John A.</Text>
-            <View style={styles.ratingRow}>
-              <Ionicons name="star" size={13} color={COLORS.accent} />
-              <Text style={styles.ratingText}> 4.3</Text>
+          {BUYING_PRICES.map((item) => (
+            <View key={item.id} style={styles.priceRow}>
+              <Text style={styles.priceLabel}>{item.label}</Text>
+              <Text style={styles.priceValue}>{item.price}</Text>
             </View>
-            <Text style={styles.distanceText}>2.1 km away</Text>
-          </View>
-          <View style={styles.carIconWrap}>
-            <Ionicons name="car-outline" size={32} color={COLORS.primary} />
-          </View>
+          ))}
         </View>
 
         {/* ─── Recent Activity ─── */}
         <View style={styles.recentHeader}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
           <TouchableOpacity onPress={() => router.navigate("/household/track")}>
-            <Text style={styles.viewAllText}>View all</Text>
+            <Text style={styles.viewAllText}>View History</Text>
           </TouchableOpacity>
         </View>
 
         {RECENT.map((item) => (
           <View key={item.id} style={styles.activityCard}>
             <View style={styles.activityIconWrap}>
-              <Ionicons name="checkmark-circle" size={22} color={COLORS.primary} />
+              <Ionicons name={item.icon} size={20} color={COLORS.textPrimary} />
             </View>
             <View style={styles.activityInfo}>
               <Text style={styles.activityTitle}>{item.title}</Text>
               <Text style={styles.activitySub}>{item.subtitle}</Text>
-              <Text style={styles.activityDate}>{item.date}</Text>
             </View>
-            <Text style={styles.activityAmount}>{item.amount}</Text>
+            <Text
+              style={[
+                styles.activityPoints,
+                { color: item.positive ? COLORS.primary : COLORS.danger },
+              ]}
+            >
+              {item.points}
+            </Text>
           </View>
         ))}
       </ScrollView>
+
+      {/* ─── Bottom Tab Bar ───
+          Only needed here if this screen isn't already inside an
+          expo-router Tabs layout. If app/household/_layout.jsx uses
+          <Tabs>, delete this block — it'll duplicate the real tab bar. */}
+      <View style={styles.tabBar}>
+        {TABS.map((tab) => {
+          const active = tab.id === "home";
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={styles.tabItem}
+              onPress={() => router.push(tab.route)}
+            >
+              <Ionicons
+                name={tab.icon}
+                size={22}
+                color={active ? COLORS.primary : COLORS.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: active ? COLORS.primary : COLORS.textSecondary },
+                ]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 },
+  scroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24 },
 
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  headerTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
-  },
-  greeting: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  bellBtn: { position: "relative", padding: 4 },
-  bellDot: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.danger,
-  },
-
-  walletCard: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-  },
-  walletTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
   },
-  walletLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.8)",
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    marginRight: 14,
+    backgroundColor: COLORS.surface,
   },
-  walletAmount: {
+  headerText: { justifyContent: "center" },
+  helloText: {
+    fontFamily: FONTS.regular,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+  },
+  nameText: {
     fontFamily: FONTS.bold,
-    fontSize: 32,
-    color: COLORS.white,
-    marginBottom: 14,
+    fontSize: 24,
+    color: COLORS.textPrimary,
   },
-  viewWalletBtn: { alignSelf: "flex-start" },
-  viewWalletText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.9)",
+  subGreeting: {
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    marginBottom: 20,
   },
 
-  sectionTitle: {
+  // Household code
+  codeCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+  },
+  codeCardTextWrap: { flex: 1, paddingRight: 12 },
+  codeLabel: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    letterSpacing: 0.6,
+    marginBottom: 6,
+  },
+  codeValue: {
+    fontFamily: FONTS.bold,
+    fontSize: 20,
+    color: COLORS.textPrimary,
+    marginBottom: 6,
+  },
+  codeHint: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+
+  // Next collection
+  nextCollectionCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+  },
+  mutedLabel: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 10,
+  },
+  nextCollectionDate: {
+    fontFamily: FONTS.bold,
+    fontSize: 20,
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+  },
+  nextCollectionTime: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.textPrimary,
-    marginBottom: 12,
   },
 
-  impactRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 20,
-  },
-  impactBox: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  impactValue: {
-    fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: COLORS.primary,
-    marginBottom: 4,
-  },
-  impactLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 11,
-    color: COLORS.primaryMid,
-    textAlign: "center",
-  },
-
-  scheduleBtn: {
+  // Partner card
+  partnerCard: {
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+  },
+  partnerCardTop: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
+    justifyContent: "space-between",
+    marginBottom: 6,
   },
-  scheduleBtnText: {
+  partnerName: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.white,
+  },
+  verifiedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  verifiedText: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.white,
+  },
+  partnerLocation: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: "rgba(255,255,255,0.85)",
+  },
+
+  // Mark as ready
+  readyCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 16,
+  },
+  readyHeading: {
+    fontFamily: FONTS.bold,
+    fontSize: 22,
+    color: COLORS.textPrimary,
+    marginBottom: 6,
+  },
+  readySubtext: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 16,
+  },
+  markReadyBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: "center",
+  },
+  markReadyBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.white,
   },
 
-  collectorCard: {
-    flexDirection: "row",
-    alignItems: "center",
+  // Drop-off
+  dropoffCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 14,
-    marginBottom: 24,
+    padding: 18,
+    marginBottom: 16,
   },
-  collectorAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.border,
-    overflow: "hidden",
-    marginRight: 12,
+  dropoffHeading: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.textPrimary,
+    marginBottom: 6,
   },
-  avatarImg: { width: "100%", height: "100%" },
-  collectorInfo: { flex: 1 },
-  collectorName: {
+  dropoffSubtext: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 12,
+  },
+  dropoffLink: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.primary,
+    textDecorationLine: "underline",
+  },
+
+  // Buying prices
+  pricesCard: {
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 20,
+  },
+  pricesHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  pricesHeading: {
+    fontFamily: FONTS.bold,
+    fontSize: 17,
+    color: COLORS.textPrimary,
+  },
+  pricesUpdated: {
+    fontFamily: FONTS.medium,
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    letterSpacing: 0.4,
+  },
+  priceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+  },
+  priceLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+  },
+  priceValue: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
   },
-  ratingRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
-  ratingText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  distanceText: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.muted,
-    marginTop: 2,
-  },
-  carIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: COLORS.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
 
+  // Recent activity
   recentHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
   },
+  sectionTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.textPrimary,
+  },
   viewAllText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.primary,
   },
   activityCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 10,
+    paddingVertical: 12,
   },
   activityIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primaryLight,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -330,24 +510,36 @@ const styles = StyleSheet.create({
   activityInfo: { flex: 1 },
   activityTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
   activitySub: {
     fontFamily: FONTS.regular,
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
-  activityDate: {
-    fontFamily: FONTS.regular,
-    fontSize: 11,
-    color: COLORS.muted,
-    marginTop: 2,
-  },
-  activityAmount: {
+  activityPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: COLORS.primary,
+    fontSize: 15,
+  },
+
+  // Tab bar
+  tabBar: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.background,
+    paddingTop: 8,
+    paddingBottom: 6,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 3,
+  },
+  tabLabel: {
+    fontFamily: FONTS.medium,
+    fontSize: 11,
   },
 });

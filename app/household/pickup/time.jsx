@@ -1,49 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import StepIndicator from "../../../components/StepIndicator";
 import { COLORS } from "../../../constants/colors";
 import { FONTS } from "../../../constants/typography";
 
-const DATES = ["May 18", "May 19", "May 20", "May 21", "May 22", "May 23"];
-const TIME_SLOTS = [
-  "8:00 AM – 10:00 AM",
-  "10:00 AM – 12:00 PM",
-  "12:00 PM – 2:00 PM",
-  "2:00 PM – 4:00 PM",
-  "4:00 PM – 6:00 PM",
-];
-
-export default function PickupStep3() {
+export default function CollectionDay() {
   const router = useRouter();
-  const { materials, address } = useLocalSearchParams();
-  const [selectedDate, setSelectedDate] = useState("May 20");
-  const [selectedTime, setSelectedTime] = useState("10:00 AM – 12:00 PM");
-  const [note, setNote] = useState("");
-  const [photoAdded, setPhotoAdded] = useState(false);
-
-  const handleNext = () => {
-    router.push({
-      pathname: "/household/pickup/confirm",
-      params: {
-        materials,
-        address,
-        date: selectedDate + ", 2024",
-        time: selectedTime,
-        note,
-      },
-    });
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -54,121 +25,113 @@ export default function PickupStep3() {
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Pickup</Text>
+        <Text style={styles.headerTitle}>Collection Day</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <StepIndicator currentStep={3} />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Preferred Date */}
-        <Text style={styles.fieldLabel}>Preferred Date</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.dateScroll}
-        >
-          {DATES.map((d) => (
-            <TouchableOpacity
-              key={d}
-              style={[styles.dateChip, selectedDate === d && styles.dateChipActive]}
-              onPress={() => setSelectedDate(d)}
-            >
-              <Text
-                style={[
-                  styles.dateChipText,
-                  selectedDate === d && styles.dateChipTextActive,
-                ]}
-              >
-                {d}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={styles.selectedDateDisplay}>
-          <Ionicons name="calendar-outline" size={18} color={COLORS.primary} />
-          <Text style={styles.selectedDateText}>{selectedDate}, 2024</Text>
+        {/* Status banner */}
+        <View style={styles.statusBanner}>
+          <View style={styles.liveDot} />
+          <View style={styles.statusInfo}>
+            <Text style={styles.statusTitle}>Collector is on the way</Text>
+            <Text style={styles.statusEta}>Arriving in 15 min</Text>
+          </View>
         </View>
 
-        {/* Preferred Time */}
-        <Text style={styles.fieldLabel}>Preferred Time</Text>
-        {TIME_SLOTS.map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.timeSlot, selectedTime === t && styles.timeSlotActive]}
-            onPress={() => setSelectedTime(t)}
-          >
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color={selectedTime === t ? COLORS.primary : COLORS.muted}
-            />
-            <Text
-              style={[
-                styles.timeSlotText,
-                selectedTime === t && styles.timeSlotTextActive,
-              ]}
-            >
-              {t}
-            </Text>
-            {selectedTime === t && (
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.primary} />
-            )}
-          </TouchableOpacity>
-        ))}
-
-        {/* Upload Photos */}
-        <Text style={styles.fieldLabel}>Upload Photos (Optional)</Text>
-        <Text style={styles.fieldSub}>Add photos of your recyclables</Text>
-        <View style={styles.photoRow}>
-          {photoAdded && (
-            <View style={styles.photoThumb}>
-              <Ionicons name="image" size={28} color={COLORS.primary} />
+        {/* Map placeholder */}
+        <View style={styles.mapBox}>
+          <View style={styles.mapInner}>
+            {[...Array(6)].map((_, row) => (
+              <View key={row} style={styles.mapRow}>
+                {[...Array(6)].map((_, col) => (
+                  <View key={col} style={styles.mapCell} />
+                ))}
+              </View>
+            ))}
+            {/* Collector pin */}
+            <View style={[styles.mapPin, { top: "30%", left: "30%" }]}>
+              <Ionicons name="car" size={16} color={COLORS.white} />
             </View>
-          )}
-          <TouchableOpacity
-            style={styles.photoAddBtn}
-            onPress={() => setPhotoAdded(true)}
-          >
-            <Ionicons name="add" size={28} color={COLORS.muted} />
-          </TouchableOpacity>
+            {/* Home pin */}
+            <View style={[styles.mapPin, styles.mapPinHome, { top: "55%", left: "55%" }]}>
+              <Ionicons name="home" size={14} color={COLORS.white} />
+            </View>
+          </View>
         </View>
 
-        {/* Note */}
-        <Text style={styles.fieldLabel}>Add Note (Optional)</Text>
-        <TextInput
-          style={styles.noteInput}
-          value={note}
-          onChangeText={setNote}
-          placeholder="E.g., gate code, landmark..."
-          placeholderTextColor={COLORS.muted}
-          multiline
-          numberOfLines={3}
-        />
-      </ScrollView>
+        {/* Collector card */}
+        <View style={styles.collectorCard}>
+          <View style={styles.collectorAvatar}>
+            <Ionicons name="person" size={28} color={COLORS.white} />
+          </View>
+          <View style={styles.collectorInfo}>
+            <Text style={styles.collectorName}>Emeka Johnson</Text>
+            <View style={styles.ratingRow}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Ionicons
+                  key={s}
+                  name={s <= 4 ? "star" : "star-half"}
+                  size={13}
+                  color="#F9C74F"
+                />
+              ))}
+              <Text style={styles.ratingText}> 4.9 · 1,738 trips</Text>
+            </View>
+          </View>
+          <View style={styles.collectorActions}>
+            <TouchableOpacity style={styles.contactBtn}>
+              <Ionicons name="call-outline" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contactBtn}>
+              <Ionicons name="chatbubble-outline" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
+        {/* Collection details */}
+        <View style={styles.detailsCard}>
+          <Text style={styles.detailsTitle}>Collection Details</Text>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="calendar-outline" size={16} color={COLORS.primary} />
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Scheduled</Text>
+              <Text style={styles.detailValue}>Saturday, May 18 · 9:00 AM – 1:00 PM</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailDivider} />
+
+          <View style={styles.detailRow}>
+            <Ionicons name="location-outline" size={16} color={COLORS.primary} />
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Address</Text>
+              <Text style={styles.detailValue}>Ikorodu, Lagos</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailDivider} />
+
+          <View style={styles.detailRow}>
+            <Ionicons name="leaf-outline" size={16} color={COLORS.primary} />
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Materials</Text>
+              <Text style={styles.detailValue}>Plastic, Paper, Metal, Glass</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* View details button */}
         <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.backBtnText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.nextBtn}
-          onPress={handleNext}
+          style={styles.viewBtn}
+          onPress={() => router.push("/household/pickup/confirm")}
           activeOpacity={0.85}
         >
-          <Text style={styles.nextBtnText}>Next</Text>
+          <Text style={styles.viewBtnText}>View Collection Details</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -189,152 +152,150 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: COLORS.textPrimary,
   },
-  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 32 },
 
-  fieldLabel: {
+  statusBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    gap: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary,
+  },
+  liveDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+  },
+  statusInfo: { flex: 1 },
+  statusTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.primary,
+  },
+  statusEta: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.primaryMid,
+    marginTop: 2,
+  },
+
+  mapBox: {
+    height: 180,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 16,
+    backgroundColor: "#e8f5e9",
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  mapInner: { flex: 1, position: "relative" },
+  mapRow: { flexDirection: "row", flex: 1 },
+  mapCell: {
+    flex: 1,
+    borderWidth: 0.5,
+    borderColor: "rgba(24,138,90,0.12)",
+  },
+  mapPin: {
+    position: "absolute",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  mapPinHome: { backgroundColor: COLORS.primaryDark },
+
+  collectorCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 16,
+    gap: 12,
+  },
+  collectorAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  collectorInfo: { flex: 1 },
+  collectorName: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
-    marginBottom: 8,
-    marginTop: 16,
+    marginBottom: 4,
   },
-  fieldSub: {
+  ratingRow: { flexDirection: "row", alignItems: "center" },
+  ratingText: {
     fontFamily: FONTS.regular,
     fontSize: 12,
     color: COLORS.textSecondary,
-    marginBottom: 10,
-    marginTop: -6,
+    marginLeft: 2,
+  },
+  collectorActions: { flexDirection: "row", gap: 8 },
+  contactBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primaryLight,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
-  dateScroll: { marginBottom: 12 },
-  dateChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 20,
-    borderWidth: 1.5,
+  detailsCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
     borderColor: COLORS.border,
-    marginRight: 10,
-    backgroundColor: COLORS.white,
+    marginBottom: 20,
+    gap: 12,
   },
-  dateChipActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  detailsTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    marginBottom: 4,
   },
-  dateChipText: {
+  detailRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  detailContent: { flex: 1 },
+  detailLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 11,
+    color: COLORS.muted,
+    marginBottom: 2,
+  },
+  detailValue: {
     fontFamily: FONTS.medium,
     fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  dateChipTextActive: { color: COLORS.white },
-
-  selectedDateDisplay: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 8,
-    marginBottom: 4,
-  },
-  selectedDateText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.primary,
-  },
-
-  timeSlot: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 8,
-    backgroundColor: COLORS.white,
-  },
-  timeSlotActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryLight,
-  },
-  timeSlotText: {
-    flex: 1,
-    fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  timeSlotTextActive: { color: COLORS.primary },
-
-  photoRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 4,
-  },
-  photoThumb: {
-    width: 72,
-    height: 72,
-    borderRadius: 10,
-    backgroundColor: COLORS.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  photoAddBtn: {
-    width: 72,
-    height: 72,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderStyle: "dashed",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.surface,
-  },
-
-  noteInput: {
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    textAlignVertical: "top",
-    minHeight: 80,
-    backgroundColor: COLORS.white,
-  },
-
-  footer: {
-    flexDirection: "row",
-    gap: 12,
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
-  },
-  backBtn: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: 15,
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-  },
-  backBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 15,
     color: COLORS.textPrimary,
   },
-  nextBtn: {
-    flex: 2,
+  detailDivider: { height: 1, backgroundColor: COLORS.border },
+
+  viewBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: "center",
   },
-  nextBtnText: {
+  viewBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.white,

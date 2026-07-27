@@ -45,9 +45,9 @@ export default function HouseholdLayout() {
       <Tabs.Screen
         name="track"
         options={{
-          title: "Track",
+          title: "History",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="location-outline" size={size} color={color} />
+            <Ionicons name="time-outline" size={size} color={color} />
           ),
         }}
       />
@@ -67,6 +67,19 @@ export default function HouseholdLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
+        }}
+      />
+      {/* Hidden routes - accessible via router.push but not shown in tab bar */}
+      <Tabs.Screen
+        name="partners"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="dropoff"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

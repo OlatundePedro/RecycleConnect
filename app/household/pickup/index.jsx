@@ -12,18 +12,46 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../../constants/colors";
 import { FONTS } from "../../../constants/typography";
-import StepIndicator from "../../../components/StepIndicator";
 
 const MATERIALS = [
-  { id: "plastic", label: "Plastic", icon: "water-outline" },
-  { id: "paper", label: "Paper", icon: "document-text-outline" },
-  { id: "metal", label: "Metal", icon: "hardware-chip-outline" },
-  { id: "glass", label: "Glass", icon: "wine-outline" },
-  { id: "electronics", label: "Electronics", icon: "phone-portrait-outline" },
-  { id: "organic", label: "Organic", icon: "leaf-outline" },
+  {
+    id: "plastic",
+    label: "Plastic",
+    sub: "Bottles, containers",
+    icon: "water-outline",
+    price: "₦150/kg",
+  },
+  {
+    id: "paper",
+    label: "Paper",
+    sub: "Newspapers, cardboard",
+    icon: "document-text-outline",
+    price: "₦100/kg",
+  },
+  {
+    id: "metal",
+    label: "Metal",
+    sub: "Cans, tins",
+    icon: "hardware-chip-outline",
+    price: "₦80/kg",
+  },
+  {
+    id: "glass",
+    label: "Glass",
+    sub: "Bottles, jars",
+    icon: "wine-outline",
+    price: "₦80/kg",
+  },
+  {
+    id: "others",
+    label: "Others",
+    sub: "Other recyclables",
+    icon: "ellipsis-horizontal-circle-outline",
+    price: "Varies",
+  },
 ];
 
-export default function PickupStep1() {
+export default function MarkAsReady() {
   const router = useRouter();
   const [selected, setSelected] = useState([]);
 
@@ -32,7 +60,7 @@ export default function PickupStep1() {
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
 
-  const handleNext = () => {
+  const handleConfirm = () => {
     router.push({
       pathname: "/household/pickup/address",
       params: { materials: selected.join(",") },
@@ -48,77 +76,92 @@ export default function PickupStep1() {
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Pickup</Text>
+        <Text style={styles.headerTitle}>Mark as Ready</Text>
         <View style={{ width: 24 }} />
       </View>
-
-      <StepIndicator currentStep={1} />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Select Materials</Text>
-        <Text style={styles.sectionSub}>Choose one or more</Text>
+        <Text style={styles.sectionTitle}>What materials do you have?</Text>
+        <Text style={styles.sectionSub}>Select all that apply.</Text>
 
-        {/* Material grid */}
-        <View style={styles.grid}>
-          {MATERIALS.map((m) => {
+        {/* Prices per kg note */}
+        <View style={styles.priceNote}>
+          <Ionicons name="information-circle-outline" size={16} color={COLORS.primary} />
+          <Text style={styles.priceNoteText}>Prices per kg shown. Final amount depends on actual weight.</Text>
+        </View>
+
+        {/* Material list */}
+        <View style={styles.materialList}>
+          {MATERIALS.map((m, i) => {
             const active = selected.includes(m.id);
             return (
               <TouchableOpacity
                 key={m.id}
-                style={[styles.materialCard, active && styles.materialCardActive]}
+                style={[
+                  styles.materialRow,
+                  active && styles.materialRowActive,
+                  i < MATERIALS.length - 1 && styles.materialRowBorder,
+                ]}
                 onPress={() => toggle(m.id)}
                 activeOpacity={0.75}
               >
-                <View
-                  style={[
-                    styles.materialIconWrap,
-                    active && styles.materialIconWrapActive,
-                  ]}
-                >
+                {/* Left icon */}
+                <View style={[styles.materialIconWrap, active && styles.materialIconWrapActive]}>
                   <Ionicons
                     name={m.icon}
-                    size={28}
+                    size={20}
                     color={active ? COLORS.white : COLORS.primary}
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.materialLabel,
-                    active && styles.materialLabelActive,
-                  ]}
-                >
-                  {m.label}
-                </Text>
-                {active && (
-                  <View style={styles.checkBadge}>
-                    <Ionicons name="checkmark" size={10} color={COLORS.white} />
+
+                {/* Label + sub */}
+                <View style={styles.materialTextWrap}>
+                  <Text style={[styles.materialLabel, active && styles.materialLabelActive]}>
+                    {m.label}
+                  </Text>
+                  <Text style={styles.materialSub}>{m.sub}</Text>
+                </View>
+
+                {/* Price + checkbox */}
+                <View style={styles.materialRight}>
+                  <Text style={[styles.materialPrice, active && styles.materialPriceActive]}>
+                    {m.price}
+                  </Text>
+                  <View style={[styles.checkbox, active && styles.checkboxActive]}>
+                    {active && (
+                      <Ionicons name="checkmark" size={14} color={COLORS.white} />
+                    )}
                   </View>
-                )}
+                </View>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* Estimated reward */}
-        <View style={styles.rewardBox}>
-          <Text style={styles.rewardTitle}>Estimated Reward</Text>
-          <Text style={styles.rewardAmount}>₦350 – ₦500</Text>
-          <Text style={styles.rewardNote}>Based on estimated weight</Text>
-        </View>
+        {/* Estimated weight */}
+        {selected.length > 0 && (
+          <View style={styles.weightBox}>
+            <View style={styles.weightLeft}>
+              <Ionicons name="scale-outline" size={18} color={COLORS.primary} />
+              <Text style={styles.weightLabel}>Estimated Total Weight</Text>
+            </View>
+            <Text style={styles.weightValue}>~2.5 kg</Text>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Next button */}
+      {/* Confirm button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.nextBtn, selected.length === 0 && styles.nextBtnDisabled]}
-          onPress={handleNext}
+          style={[styles.confirmBtn, selected.length === 0 && styles.confirmBtnDisabled]}
+          onPress={handleConfirm}
           disabled={selected.length === 0}
           activeOpacity={0.85}
         >
-          <Text style={styles.nextBtnText}>Next</Text>
+          <Text style={styles.confirmBtnText}>Confirm</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -152,96 +195,126 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: 13,
     color: COLORS.textSecondary,
+    marginBottom: 14,
+  },
+  priceNote: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 10,
+    padding: 12,
     marginBottom: 20,
   },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 24,
+  priceNoteText: {
+    flex: 1,
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: COLORS.primary,
+    lineHeight: 17,
   },
-  materialCard: {
-    width: "30%",
-    aspectRatio: 1,
-    backgroundColor: COLORS.surface,
+
+  materialList: {
+    backgroundColor: COLORS.white,
     borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: COLORS.border,
-    position: "relative",
+    overflow: "hidden",
+    marginBottom: 20,
   },
-  materialCardActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryLight,
+  materialRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 12,
+    backgroundColor: COLORS.white,
+  },
+  materialRowActive: { backgroundColor: COLORS.primaryLight },
+  materialRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   materialIconWrap: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: COLORS.primaryLight,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
+    flexShrink: 0,
   },
-  materialIconWrapActive: {
-    backgroundColor: COLORS.primary,
-  },
+  materialIconWrapActive: { backgroundColor: COLORS.primary },
+  materialTextWrap: { flex: 1 },
   materialLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: COLORS.textPrimary,
-  },
-  materialLabelActive: { color: COLORS.primary },
-  checkBadge: {
-    position: "absolute",
-    top: 6,
-    right: 6,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  rewardBox: {
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 14,
-    padding: 18,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
-  },
-  rewardTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 14,
     color: COLORS.textPrimary,
-    marginBottom: 4,
   },
-  rewardAmount: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.primary,
-    marginBottom: 4,
-  },
-  rewardNote: {
+  materialLabelActive: { color: COLORS.primary },
+  materialSub: {
     fontFamily: FONTS.regular,
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.muted,
+    marginTop: 2,
   },
+  materialRight: { alignItems: "flex-end", gap: 6 },
+  materialPrice: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 12,
+    color: COLORS.muted,
+  },
+  materialPriceActive: { color: COLORS.primary },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+
+  weightBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 12,
+    padding: 14,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary,
+  },
+  weightLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
+  weightLabel: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.primary,
+  },
+  weightValue: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: COLORS.primary,
+  },
+
   footer: {
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     backgroundColor: COLORS.white,
   },
-  nextBtn: {
+  confirmBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
   },
-  nextBtnDisabled: { opacity: 0.45 },
-  nextBtnText: {
+  confirmBtnDisabled: { opacity: 0.45 },
+  confirmBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.white,

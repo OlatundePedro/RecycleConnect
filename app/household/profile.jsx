@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import {
   Image,
   ScrollView,
@@ -15,21 +14,24 @@ import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
 const MENU = [
-  { id: "account", label: "Account Details", icon: "person-outline" },
-  { id: "address", label: "Saved Addresses", icon: "location-outline" },
+  { id: "personal", label: "Personal Information", icon: "person-outline" },
+  { id: "addresses", label: "Addresses", icon: "location-outline" },
   { id: "payments", label: "Payment Methods", icon: "card-outline" },
-  { id: "notifications", label: "Notifications", icon: "notifications-outline" },
-  { id: "privacy", label: "Privacy & Security", icon: "shield-checkmark-outline" },
+  {
+    id: "notifications",
+    label: "Notification Settings",
+    icon: "notifications-outline",
+  },
   { id: "help", label: "Help & Support", icon: "help-circle-outline" },
-  { id: "terms", label: "Terms & Conditions", icon: "document-text-outline" },
+  {
+    id: "about",
+    label: "About RecycleConnect",
+    icon: "information-circle-outline",
+  },
 ];
 
 export default function HouseholdProfile() {
   const router = useRouter();
-
-  const handleLogout = () => {
-    router.replace("/");
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -44,7 +46,7 @@ export default function HouseholdProfile() {
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
-              source={require("../../assets/images/user.png")}
+              source={require("../../assets/images/image 7.png")}
               style={styles.avatar}
               resizeMode="cover"
             />
@@ -52,29 +54,11 @@ export default function HouseholdProfile() {
               <Ionicons name="camera" size={14} color={COLORS.white} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.userName}>Samuel Adeyemi</Text>
-          <Text style={styles.userEmail}>samuel@email.com</Text>
+          <Text style={styles.userName}>Ngozi Okafor</Text>
+          <Text style={styles.userPhone}>+234 801 234 5678</Text>
           <View style={styles.userTypeBadge}>
             <Ionicons name="home-outline" size={13} color={COLORS.primary} />
             <Text style={styles.userTypeText}>Household</Text>
-          </View>
-        </View>
-
-        {/* Stats row */}
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>24</Text>
-            <Text style={styles.statLabel}>Pickups</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>₦9,750</Text>
-            <Text style={styles.statLabel}>Earned</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>120 kg</Text>
-            <Text style={styles.statLabel}>Recycled</Text>
           </View>
         </View>
 
@@ -93,19 +77,18 @@ export default function HouseholdProfile() {
                 <Ionicons name={item.icon} size={20} color={COLORS.primary} />
               </View>
               <Text style={styles.menuLabel}>{item.label}</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={COLORS.muted}
-              />
+              <Ionicons name="chevron-forward" size={18} color={COLORS.muted} />
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Logout */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+        <TouchableOpacity
+          style={styles.logoutBtn}
+          onPress={() => router.replace("/")}
+        >
           <Ionicons name="log-out-outline" size={20} color={COLORS.danger} />
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
 
         <Text style={styles.version}>RecycleConnect v1.0.0</Text>
@@ -116,22 +99,19 @@ export default function HouseholdProfile() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
+  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
   headerTitle: {
     fontFamily: FONTS.bold,
     fontSize: 22,
     color: COLORS.textPrimary,
   },
-  avatarSection: { alignItems: "center", paddingBottom: 20 },
+
+  avatarSection: { alignItems: "center", paddingBottom: 24 },
   avatarWrap: { position: "relative", marginBottom: 12 },
   avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: COLORS.border,
   },
   editBadge: {
@@ -153,7 +133,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
-  userEmail: {
+  userPhone: {
     fontFamily: FONTS.regular,
     fontSize: 14,
     color: COLORS.muted,
@@ -174,39 +154,11 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  statsRow: {
-    flexDirection: "row",
-    marginHorizontal: 20,
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  statItem: { flex: 1, alignItems: "center" },
-  statNum: {
-    fontFamily: FONTS.bold,
-    fontSize: 16,
-    color: COLORS.textPrimary,
-    marginBottom: 3,
-  },
-  statLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.muted,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: COLORS.border,
-    marginHorizontal: 4,
-  },
-
   menuSection: {
     marginHorizontal: 20,
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 4,
+    overflow: "hidden",
     marginBottom: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -214,7 +166,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 14,
+    padding: 16,
   },
   menuItemBorder: {
     borderBottomWidth: 1,

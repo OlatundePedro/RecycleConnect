@@ -1,33 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import StepIndicator from "../../../components/StepIndicator";
 import { COLORS } from "../../../constants/colors";
 import { FONTS } from "../../../constants/typography";
 
-export default function PickupStep2() {
+export default function ReadyConfirmed() {
   const router = useRouter();
   const { materials } = useLocalSearchParams();
-  const [address, setAddress] = useState(
-    "15 Adeniran Ogunsanya St, Surulere, Lagos, Nigeria"
-  );
-
-  const handleNext = () => {
-    router.push({
-      pathname: "/household/pickup/time",
-      params: { materials, address },
-    });
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -38,94 +25,71 @@ export default function PickupStep2() {
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Pickup</Text>
+        <Text style={styles.headerTitle}>Ready Confirmed</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <StepIndicator currentStep={2} />
-
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.sectionTitle}>Pickup Address</Text>
-
-        {/* Address input */}
-        <View style={styles.addressInputWrap}>
-          <Ionicons
-            name="location-outline"
-            size={20}
-            color={COLORS.primary}
-            style={{ marginRight: 10 }}
-          />
-          <TextInput
-            style={styles.addressInput}
-            value={address}
-            onChangeText={setAddress}
-            placeholder="Enter your address"
-            placeholderTextColor={COLORS.muted}
-            multiline
-          />
-          <TouchableOpacity onPress={() => setAddress("")}>
-            <Ionicons name="close-circle" size={18} color={COLORS.muted} />
-          </TouchableOpacity>
+      <View style={styles.container}>
+        {/* Success icon */}
+        <View style={styles.successIconWrap}>
+          <Ionicons name="checkmark-circle" size={72} color={COLORS.primary} />
         </View>
 
-        {/* Map placeholder */}
-        <View style={styles.mapBox}>
-          <View style={styles.mapInner}>
-            {/* Simulated map grid */}
-            {[...Array(6)].map((_, row) => (
-              <View key={row} style={styles.mapRow}>
-                {[...Array(6)].map((_, col) => (
-                  <View key={col} style={styles.mapCell} />
-                ))}
+        <Text style={styles.successTitle}>You're all set!</Text>
+        <Text style={styles.successSub}>
+          Your materials are marked as ready for the next collection.
+        </Text>
+
+        {/* Next Collection card */}
+        <View style={styles.collectionCard}>
+          <Text style={styles.collectionCardLabel}>Next Collection</Text>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="person-outline" size={16} color={COLORS.primary} />
+            <View style={styles.detailText}>
+              <Text style={styles.detailValue}>GreenCycle Ikorodu</Text>
+              <View style={styles.verifiedRow}>
+                <Ionicons name="checkmark-circle" size={12} color={COLORS.primary} />
+                <Text style={styles.verifiedText}> Verified Partner</Text>
               </View>
-            ))}
-            {/* Map pin */}
-            <View style={styles.mapPinWrap}>
-              <View style={styles.mapPin}>
-                <Ionicons name="location" size={28} color={COLORS.white} />
-              </View>
-              <View style={styles.mapPinShadow} />
             </View>
           </View>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="calendar-outline" size={16} color={COLORS.primary} />
+            <Text style={styles.detailValue}>Saturday, May 18</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="time-outline" size={16} color={COLORS.primary} />
+            <Text style={styles.detailValue}>9:00 AM – 1:00 PM</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Ionicons name="location-outline" size={16} color={COLORS.primary} />
+            <Text style={styles.detailValue}>Ikorodu, Lagos</Text>
+          </View>
+
+          <Text style={styles.collectionNote}>
+            We'll notify you when your collector is on the way.
+          </Text>
         </View>
 
-        {/* Use my location */}
+        {/* Buttons */}
         <TouchableOpacity
-          style={styles.locationBtn}
-          onPress={() =>
-            setAddress("15 Adeniran Ogunsanya St, Surulere, Lagos, Nigeria")
-          }
-        >
-          <Ionicons
-            name="navigate-circle-outline"
-            size={20}
-            color={COLORS.primary}
-            style={{ marginRight: 8 }}
-          />
-          <Text style={styles.locationBtnText}>Use my current location</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => router.back()}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.backBtnText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.nextBtn, !address.trim() && styles.nextBtnDisabled]}
-          onPress={handleNext}
-          disabled={!address.trim()}
+          style={styles.partnerBtn}
+          onPress={() => router.push("/household/partners")}
           activeOpacity={0.85}
         >
-          <Text style={styles.nextBtnText}>Next</Text>
+          <Text style={styles.partnerBtnText}>View Collection Partner</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.homeBtn}
+          onPress={() => router.replace("/household/home")}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.homeBtnText}>Go to Home</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -148,126 +112,106 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: COLORS.textPrimary,
   },
-  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 },
-  sectionTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.textPrimary,
-    marginBottom: 16,
-  },
-  addressInputWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: COLORS.white,
-    marginBottom: 16,
-  },
-  addressInput: {
+  container: {
     flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 32,
+    alignItems: "center",
+  },
+
+  successIconWrap: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.primaryLight,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  successTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 24,
+    color: COLORS.textPrimary,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  successSub: {
     fontFamily: FONTS.regular,
     fontSize: 14,
-    color: COLORS.textPrimary,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    lineHeight: 21,
+    marginBottom: 28,
+    paddingHorizontal: 10,
   },
 
-  mapBox: {
+  collectionCard: {
+    width: "100%",
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 16,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.border,
-    height: 200,
-    backgroundColor: "#e8f5e9",
+    marginBottom: 24,
+    gap: 12,
   },
-  mapInner: {
-    flex: 1,
-    position: "relative",
-  },
-  mapRow: { flexDirection: "row", flex: 1 },
-  mapCell: {
-    flex: 1,
-    borderWidth: 0.5,
-    borderColor: "rgba(24,138,90,0.15)",
-    backgroundColor: "transparent",
-  },
-  mapPinWrap: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -32,
-    marginLeft: -16,
-    alignItems: "center",
-  },
-  mapPin: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  mapPinShadow: {
-    width: 12,
-    height: 6,
-    borderRadius: 6,
-    backgroundColor: "rgba(0,0,0,0.2)",
-    marginTop: 2,
-  },
-
-  locationBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryLight,
-  },
-  locationBtnText: {
+  collectionCardLabel: {
     fontFamily: FONTS.semiBold,
+    fontSize: 12,
+    color: COLORS.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+    marginBottom: 4,
+  },
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  detailText: { flex: 1 },
+  detailValue: {
+    fontFamily: FONTS.medium,
     fontSize: 14,
+    color: COLORS.textPrimary,
+    flex: 1,
+  },
+  verifiedRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
+  verifiedText: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
     color: COLORS.primary,
   },
-
-  footer: {
-    flexDirection: "row",
-    gap: 12,
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
+  collectionNote: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: COLORS.muted,
+    fontStyle: "italic",
+    marginTop: 4,
   },
-  backBtn: {
-    flex: 1,
+
+  partnerBtn: {
+    width: "100%",
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: "center",
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.primary,
+    marginBottom: 12,
   },
-  backBtnText: {
+  partnerBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
-    color: COLORS.textPrimary,
+    color: COLORS.primary,
   },
-  nextBtn: {
-    flex: 2,
+  homeBtn: {
+    width: "100%",
     backgroundColor: COLORS.primary,
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: "center",
   },
-  nextBtnDisabled: { opacity: 0.45 },
-  nextBtnText: {
+  homeBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.white,

@@ -1,144 +1,46 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import {
-  Dimensions,
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FONTS } from "../constants/typography";
+import { useEffect } from "react";
+import { Image, StatusBar, StyleSheet, View } from "react-native";
 
-const { width } = Dimensions.get("window");
+// Sampled from the image — a near-black forest green. Used as the
+// container background so "contain" never shows a mismatched-color edge.
+const BACKGROUND_COLOR = "#01150B";
 
-// ---- Design tokens (from RecycleConnect design system) ----
-const COLORS = {
-  primary: "#188A5A",
-  primaryLight: "#38826C",
-  primaryDark: "#10382F",
-  background: "#FFFFFF",
-  accent: "#F9C74F",
-  white: "#FFFFFF",
-};
+// How long the splash stays up before handing off to onboarding.
+const SPLASH_DURATION_MS = 5000;
 
-export default function Index() {
+// Where the app goes once the splash finishes.
+const NEXT_ROUTE = "/shared-onboarding";
+
+export default function Splash() {
   const router = useRouter();
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace(NEXT_ROUTE);
+    }, SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-
-      {/* Logo */}
-      <View style={styles.logoWrap}>
-        <Image
-          source={require("../assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
-      {/* Illustration */}
-      <View style={styles.illustrationWrap}>
-        <Image
-          source={require("../assets/images/mothe & Child.png")}
-          style={styles.illustration}
-          resizeMode="cover"
-        />
-      </View>
-
-      {/* Copy + Actions */}
-      <View style={styles.bottomWrap}>
-        <Text style={styles.headline}>
-          Recycle smarter,{"\n"}Earn rewards,{"\n"}Protect the environment.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.primaryButton}
-          activeOpacity={0.85}
-          onPress={() => router.push("/create-account")}
-        >
-          <Text style={styles.primaryButtonText}>Get Started</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          activeOpacity={0.7}
-          onPress={() => router.push("/login")}
-        >
-          <Text style={styles.secondaryButtonText}>Log in</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={BACKGROUND_COLOR} />
+      <Image
+        source={require("../assets/images/splash-full (1).png")}
+        style={styles.image}
+        resizeMode="contain"
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: BACKGROUND_COLOR,
   },
-  logoWrap: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 5,
-    paddingBottom: 8,
-  },
-  logo: {
-    // Fixed box + resizeMode "contain" lets the logo scale to fit without
-    // ever being cropped, regardless of its actual width/height ratio.
-    width: width * 0.55,
-    height: 150,
-  },
-  illustrationWrap: {
-    width: "100%",
-    height: width * 1.0,
-    overflow: "hidden",
-  },
-  illustration: {
+  image: {
     width: "100%",
     height: "100%",
-  },
-  bottomWrap: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 28,
-  },
-  headline: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    lineHeight: 30,
-    color: COLORS.primaryDark,
-    textAlign: "center",
-    marginBottom: 28,
-  },
-  primaryButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-  },
-  primaryButtonText: {
-    fontFamily: FONTS.semiBold,
-    color: COLORS.white,
-    fontSize: 16,
-  },
-  secondaryButton: {
-    backgroundColor: COLORS.white,
-    borderWidth: 1.5,
-    borderColor: "#E2E8E5",
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButtonText: {
-    fontFamily: FONTS.semiBold,
-    color: COLORS.primary,
-    fontSize: 16,
   },
 });
