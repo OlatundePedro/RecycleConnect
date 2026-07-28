@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useMemo, useState } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -12,122 +14,182 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-const TABS = ["All", "Collections", "Drop-offs"];
+// Swap for the real totals/level from the household's account.
+const IMPACT = {
+  totalPoints: 1240,
+  level: "Level 4: Eco Hero",
+};
+
+const FILTERS = [
+  { id: "all", label: "All" },
+  { id: "collections", label: "Collections" },
+  { id: "rewards", label: "Rewards" },
+];
 
 const HISTORY = [
   {
-    id: "h1",
-    type: "Collection",
-    partner: "GreenCycle Ikorodu",
-    date: "May 19, 2024",
-    weight: "3.2 kg",
-    amount: "+₦310.00",
+    id: "1",
+    category: "collections",
+    icon: "reload-outline",
+    iconBg: COLORS.primaryLight,
+    iconColor: COLORS.primaryDark,
+    title: "Plastic Collection",
+    subtitle: "4.2 kg • Oct 24, 2023",
+    points: 120,
+    status: { label: "VERIFIED", tone: "neutral" },
   },
   {
-    id: "h2",
-    type: "Drop-off",
-    partner: "GreenCycle Center",
-    date: "May 10, 2024",
-    weight: "5.1 kg",
-    amount: "+₦605.00",
+    id: "2",
+    category: "rewards",
+    icon: "gift-outline",
+    iconBg: COLORS.accent,
+    iconColor: COLORS.primaryDark,
+    title: "Data Bundle (MTN)",
+    subtitle: "2GB Pack • Oct 21, 2023",
+    points: -500,
+    status: { label: "SUCCESS", tone: "success" },
   },
   {
-    id: "h3",
-    type: "Collection",
-    partner: "GreenCycle Ikorodu",
-    date: "Apr 27, 2024",
-    weight: "2.9 kg",
-    amount: "+₦270.00",
+    id: "3",
+    category: "collections",
+    icon: "hardware-chip-outline",
+    iconBg: COLORS.primaryLight,
+    iconColor: COLORS.primaryDark,
+    title: "Metal Collection",
+    subtitle: "12.5 kg • Oct 18, 2023",
+    points: 340,
+    status: { label: "VERIFIED", tone: "neutral" },
   },
   {
-    id: "h4",
-    type: "Drop-off",
-    partner: "EcoCollect Hub Ikorodu",
-    date: "Apr 13, 2024",
-    weight: "4.3 kg",
-    amount: "+₦450.00",
+    id: "4",
+    category: "collections",
+    icon: "document-text-outline",
+    iconBg: COLORS.primaryLight,
+    iconColor: COLORS.primaryDark,
+    title: "Paper & Cardboard",
+    subtitle: "3.1 kg • Oct 15, 2023",
+    points: 85,
+    status: { label: "VERIFIED", tone: "neutral" },
   },
   {
-    id: "h5",
-    type: "Collection",
-    partner: "GreenCycle Ikorodu",
-    date: "Apr 2, 2024",
-    weight: "2.3 kg",
-    amount: "+₦230.00",
+    id: "5",
+    category: "rewards",
+    icon: "bag-handle-outline",
+    iconBg: COLORS.accent,
+    iconColor: COLORS.primaryDark,
+    title: "Eco-Bag Set",
+    subtitle: "Physical Item • Oct 10, 2023",
+    points: -300,
+    status: { label: "PICKED UP", tone: "success" },
   },
 ];
 
 export default function History() {
-  const [activeTab, setActiveTab] = useState("All");
+  const router = useRouter();
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const filtered =
-    activeTab === "All"
-      ? HISTORY
-      : HISTORY.filter((h) => h.type === activeTab.slice(0, -1)); // "Collections" → "Collection"
+  const filteredHistory = useMemo(() => {
+    if (activeFilter === "all") return HISTORY;
+    return HISTORY.filter((item) => item.category === activeFilter);
+  }, [activeFilter]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
 
+      {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
+          <Ionicons name="chevron-back" size={26} color={COLORS.textPrimary} />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>History</Text>
+        <TouchableOpacity hitSlop={12}>
+          <Ionicons name="ellipsis-vertical" size={22} color={COLORS.primary} />
+        </TouchableOpacity>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabRow}>
-        {TABS.map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.tab, activeTab === t && styles.tabActive]}
-            onPress={() => setActiveTab(t)}
-          >
-            <Text style={[styles.tabText, activeTab === t && styles.tabTextActive]}>
-              {t}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Total impact card */}
+        <LinearGradient
+          colors={[COLORS.primaryDark, COLORS.primary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.impactCard}
+        >
+          <Text style={styles.impactLabel}>Total Impact</Text>
+          <Text style={styles.impactPoints}>
+            {IMPACT.totalPoints.toLocaleString()} Points
+          </Text>
+          <View style={styles.levelPill}>
+            <Text style={styles.levelPillText}>{IMPACT.level}</Text>
+          </View>
+        </LinearGradient>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {filtered.map((item) => (
-          <View key={item.id} style={styles.historyRow}>
-            {/* Icon */}
-            <View style={[
-              styles.historyIcon,
-              item.type === "Drop-off" && styles.historyIconDropoff,
-            ]}>
-              <Ionicons
-                name={item.type === "Drop-off" ? "location" : "leaf"}
-                size={18}
-                color={COLORS.primary}
-              />
+        {/* Filter tabs */}
+        <View style={styles.filterTrack}>
+          {FILTERS.map((filter) => {
+            const active = filter.id === activeFilter;
+            return (
+              <TouchableOpacity
+                key={filter.id}
+                style={[styles.filterPill, active && styles.filterPillActive]}
+                onPress={() => setActiveFilter(filter.id)}
+              >
+                <Text
+                  style={[styles.filterText, active && styles.filterTextActive]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* History list */}
+        {filteredHistory.map((item) => (
+          <View key={item.id} style={styles.historyCard}>
+            <View style={[styles.iconWrap, { backgroundColor: item.iconBg }]}>
+              <Ionicons name={item.icon} size={22} color={item.iconColor} />
             </View>
-
-            {/* Info */}
-            <View style={styles.historyInfo}>
-              <Text style={styles.historyPartner}>{item.partner}</Text>
-              <View style={styles.historyMeta}>
-                <View style={[
-                  styles.typeBadge,
-                  item.type === "Drop-off" && styles.typeBadgeDropoff,
-                ]}>
-                  <Text style={styles.typeBadgeText}>{item.type}</Text>
-                </View>
-                <Text style={styles.historyDate}>{item.date}</Text>
+            <View style={styles.historyText}>
+              <Text style={styles.historyTitle}>{item.title}</Text>
+              <Text style={styles.historySubtitle}>{item.subtitle}</Text>
+            </View>
+            <View style={styles.historyRight}>
+              <Text
+                style={[
+                  styles.historyPoints,
+                  { color: item.points >= 0 ? COLORS.primary : COLORS.danger },
+                ]}
+              >
+                {item.points >= 0 ? "+" : ""}
+                {item.points} pts
+              </Text>
+              <View
+                style={[
+                  styles.statusBadge,
+                  item.status.tone === "success" && styles.statusBadgeSuccess,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusBadgeText,
+                    item.status.tone === "success" &&
+                      styles.statusBadgeTextSuccess,
+                  ]}
+                >
+                  {item.status.label}
+                </Text>
               </View>
-              <Text style={styles.historyWeight}>{item.weight}</Text>
             </View>
-
-            {/* Amount */}
-            <Text style={styles.historyAmount}>{item.amount}</Text>
           </View>
         ))}
 
-        {filtered.length === 0 && (
-          <View style={styles.emptyState}>
-            <Ionicons name="time-outline" size={48} color={COLORS.border} />
-            <Text style={styles.emptyText}>No history yet</Text>
-          </View>
+        {filteredHistory.length === 0 && (
+          <Text style={styles.emptyText}>Nothing here yet.</Text>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -137,91 +199,138 @@ export default function History() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: COLORS.surface,
   },
   headerTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
+    fontFamily: FONTS.semiBold,
+    fontSize: 19,
+    color: COLORS.primary,
   },
+  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 },
 
-  tabRow: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    gap: 8,
-    marginBottom: 8,
+  impactCard: {
+    borderRadius: 18,
+    padding: 22,
+    marginBottom: 20,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 9,
+  impactLabel: {
+    fontFamily: FONTS.medium,
+    fontSize: 15,
+    color: "rgba(255,255,255,0.7)",
+    marginBottom: 6,
+  },
+  impactPoints: {
+    fontFamily: FONTS.black,
+    fontSize: 32,
+    color: COLORS.white,
+    marginBottom: 16,
+  },
+  levelPill: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORS.accent,
     borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 8,
   },
-  tabActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  tabText: { fontFamily: FONTS.medium, fontSize: 12, color: COLORS.muted },
-  tabTextActive: { color: COLORS.white },
+  levelPillText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.primaryDark,
+  },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32 },
-
-  historyRow: {
+  filterTrack: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-    gap: 12,
+    backgroundColor: COLORS.border,
+    borderRadius: 24,
+    padding: 4,
+    marginBottom: 20,
   },
-  historyIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.primaryLight,
+  filterPill: {
+    flex: 1,
+    borderRadius: 20,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  filterPillActive: {
+    backgroundColor: "#8FE3A4",
+  },
+  filterText: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  filterTextActive: {
+    fontFamily: FONTS.semiBold,
+    color: COLORS.primaryDark,
+  },
+
+  historyCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  iconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    flexShrink: 0,
+    marginRight: 14,
   },
-  historyIconDropoff: { backgroundColor: "#EEF6FF" },
-  historyInfo: { flex: 1 },
-  historyPartner: {
+  historyText: { flex: 1, paddingRight: 8 },
+  historyTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 16,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
-  historyMeta: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 3 },
-  typeBadge: {
-    backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  typeBadgeDropoff: { backgroundColor: "#EEF6FF" },
-  typeBadgeText: {
-    fontFamily: FONTS.medium,
-    fontSize: 11,
-    color: COLORS.primary,
-  },
-  historyDate: {
+  historySubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.muted,
-  },
-  historyWeight: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
-  historyAmount: {
+  historyRight: { alignItems: "flex-end", gap: 8 },
+  historyPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: COLORS.primary,
-    flexShrink: 0,
+    fontSize: 16,
+  },
+  statusBadge: {
+    backgroundColor: COLORS.border,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  statusBadgeSuccess: {
+    backgroundColor: "#8FE3A4",
+  },
+  statusBadgeText: {
+    fontFamily: FONTS.bold,
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    textAlign: "right",
+  },
+  statusBadgeTextSuccess: {
+    color: COLORS.primaryDark,
   },
 
-  emptyState: { alignItems: "center", paddingTop: 60, gap: 12 },
-  emptyText: { fontFamily: FONTS.medium, fontSize: 15, color: COLORS.muted },
+  emptyText: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginTop: 20,
+  },
 });

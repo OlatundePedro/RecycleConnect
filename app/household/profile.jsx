@@ -10,66 +10,135 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-const MENU = [
-  { id: "personal", label: "Personal Information", icon: "person-outline" },
-  { id: "addresses", label: "Addresses", icon: "location-outline" },
-  { id: "payments", label: "Payment Methods", icon: "card-outline" },
+const COLORS = {
+  primary: "#188A5A",
+  primaryDark: "#0F3D2A",
+  textPrimary: "#111111",
+  textSecondary: "#6B7A75",
+  background: "#FFFFFF",
+  headerBg: "#F7F9F8",
+  cardBg: "#F5F7F6",
+  trackBg: "rgba(255,255,255,0.25)",
+  progressFill: "#8FE3A6",
+  levelBg: "#F5C445",
+  danger: "#E14434",
+  white: "#FFFFFF",
+};
+
+// Placeholder profile data — swap for the real signed-in user once wired
+// up to the backend/auth state.
+const USER = {
+  name: "Chidi Adebayo",
+  phone: "+234 803 123 4567",
+  co2Kg: 124,
+  treesEquivalent: 6,
+  level: 4,
+  progressPercent: 78,
+  kgUntilNextReward: 15,
+};
+
+const MENU_ITEMS = [
+  { key: "account", icon: "person-circle-outline", label: "Account Settings" },
   {
-    id: "notifications",
-    label: "Notification Settings",
+    key: "notifications",
     icon: "notifications-outline",
+    label: "Notification Preferences",
   },
-  { id: "help", label: "Help & Support", icon: "help-circle-outline" },
-  {
-    id: "about",
-    label: "About RecycleConnect",
-    icon: "information-circle-outline",
-  },
+  { key: "help", icon: "help-circle-outline", label: "Help & Support" },
 ];
 
 export default function HouseholdProfile() {
   const router = useRouter();
 
+  const handleEditAvatar = () => {
+    // TODO: hook this up to expo-image-picker
+  };
+
+  const handleLogout = () => {
+    // TODO: clear auth/session state before navigating
+    router.replace("/login");
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-        </View>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-        {/* Avatar & info */}
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.backRow}
+        >
+          <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
+          <Text style={styles.headerTitle}>Profile</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Avatar + name */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
-              source={require("../../assets/images/image 7.png")}
+              source={require("../../assets/images/Ellipse 51.png")}
               style={styles.avatar}
-              resizeMode="cover"
             />
-            <TouchableOpacity style={styles.editBadge}>
-              <Ionicons name="camera" size={14} color={COLORS.white} />
+            <TouchableOpacity
+              style={styles.editBadge}
+              activeOpacity={0.8}
+              onPress={handleEditAvatar}
+            >
+              <Ionicons name="pencil" size={14} color={COLORS.white} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.userName}>Ngozi Okafor</Text>
-          <Text style={styles.userPhone}>+234 801 234 5678</Text>
-          <View style={styles.userTypeBadge}>
-            <Ionicons name="home-outline" size={13} color={COLORS.primary} />
-            <Text style={styles.userTypeText}>Household</Text>
+          <Text style={styles.name}>{USER.name}</Text>
+          <Text style={styles.phone}>{USER.phone}</Text>
+        </View>
+
+        {/* Environmental impact card */}
+        <View style={styles.impactCard}>
+          <View style={styles.impactTopRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.impactLabel}>ENVIRONMENTAL IMPACT</Text>
+              <Text style={styles.impactValue}>
+                {USER.co2Kg}kg CO<Text style={styles.subscript}>2</Text>
+              </Text>
+              <Text style={styles.impactSubtext}>
+                Equivalent to planting {USER.treesEquivalent} trees
+              </Text>
+            </View>
+            <View style={styles.levelBadge}>
+              <Ionicons name="leaf" size={18} color={COLORS.primaryDark} />
+              <Text style={styles.levelText}>Level {USER.level}</Text>
+            </View>
           </View>
+
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${USER.progressPercent}%` },
+              ]}
+            />
+          </View>
+          <Text style={styles.progressCaption}>
+            {USER.kgUntilNextReward}kg away from your next reward
+          </Text>
         </View>
 
         {/* Menu */}
-        <View style={styles.menuSection}>
-          {MENU.map((item, i) => (
+        <View style={styles.menuCard}>
+          {MENU_ITEMS.map((item, index) => (
             <TouchableOpacity
-              key={item.id}
+              key={item.key}
               style={[
-                styles.menuItem,
-                i < MENU.length - 1 && styles.menuItemBorder,
+                styles.menuRow,
+                index < MENU_ITEMS.length - 1 && styles.menuRowDivider,
               ]}
               activeOpacity={0.7}
             >
@@ -77,7 +146,11 @@ export default function HouseholdProfile() {
                 <Ionicons name={item.icon} size={20} color={COLORS.primary} />
               </View>
               <Text style={styles.menuLabel}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.muted} />
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={COLORS.textSecondary}
+              />
             </TouchableOpacity>
           ))}
         </View>
@@ -85,13 +158,12 @@ export default function HouseholdProfile() {
         {/* Logout */}
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() => router.replace("/")}
+          activeOpacity={0.8}
+          onPress={handleLogout}
         >
           <Ionicons name="log-out-outline" size={20} color={COLORS.danger} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-
-        <Text style={styles.version}>RecycleConnect v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -99,118 +171,174 @@ export default function HouseholdProfile() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
-  headerTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
+  header: {
+    backgroundColor: COLORS.headerBg,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
-
-  avatarSection: { alignItems: "center", paddingBottom: 24 },
-  avatarWrap: { position: "relative", marginBottom: 12 },
+  backRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
+    color: COLORS.primary,
+    marginLeft: 4,
+  },
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
+  },
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 28,
+  },
+  avatarWrap: {
+    width: 132,
+    height: 132,
+    marginBottom: 16,
+  },
   avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: COLORS.border,
+    width: 132,
+    height: 132,
+    borderRadius: 66,
+    borderWidth: 3,
+    borderColor: COLORS.progressFill,
   },
   editBadge: {
     position: "absolute",
-    bottom: 0,
     right: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.primary,
+    bottom: 0,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primaryDark,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
     borderColor: COLORS.white,
   },
-  userName: {
+  name: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 24,
     color: COLORS.textPrimary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
-  userPhone: {
+  phone: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.muted,
-    marginBottom: 10,
+    fontSize: 16,
+    color: COLORS.textSecondary,
   },
-  userTypeBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+  impactCard: {
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 20,
-  },
-  userTypeText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 12,
-    color: COLORS.primary,
-  },
-
-  menuSection: {
-    marginHorizontal: 20,
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
+    padding: 24,
+    marginBottom: 24,
     overflow: "hidden",
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
-  menuItem: {
+  impactTopRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
+  impactLabel: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 13,
+    letterSpacing: 0.5,
+    color: COLORS.progressFill,
+    marginBottom: 8,
+  },
+  impactValue: {
+    fontFamily: FONTS.bold,
+    fontSize: 32,
+    color: COLORS.white,
+    marginBottom: 8,
+  },
+  subscript: {
+    fontSize: 18,
+  },
+  impactSubtext: {
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.progressFill,
+  },
+  levelBadge: {
+    backgroundColor: COLORS.levelBg,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    alignItems: "center",
+    gap: 4,
+  },
+  levelText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.primaryDark,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.trackBg,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 4,
+    backgroundColor: COLORS.progressFill,
+  },
+  progressCaption: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.progressFill,
+  },
+  menuCard: {
+    backgroundColor: COLORS.cardBg,
+    borderRadius: 16,
+    marginBottom: 24,
+    overflow: "hidden",
+  },
+  menuRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
   },
-  menuItemBorder: {
+  menuRowDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: "#E4E9E7",
   },
   menuIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primaryLight,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginRight: 14,
   },
   menuLabel: {
     flex: 1,
-    fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontFamily: FONTS.regular,
+    fontSize: 17,
     color: COLORS.textPrimary,
   },
-
   logoutBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    marginHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: "#FECACA",
-    backgroundColor: "#FEF2F2",
-    marginBottom: 16,
+    borderColor: "#F3C4BC",
+    borderRadius: 14,
+    paddingVertical: 16,
   },
   logoutText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 16,
     color: COLORS.danger,
-  },
-  version: {
-    textAlign: "center",
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.muted,
-    paddingBottom: 24,
   },
 });

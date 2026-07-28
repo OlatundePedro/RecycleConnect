@@ -3,6 +3,37 @@ import { Tabs } from "expo-router";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
+const TABS = [
+  {
+    id: "home",
+    label: "Home",
+    icon: "home-outline",
+    name: "home",
+  },
+  {
+    id: "history",
+    label: "History",
+    icon: "alarm-outline",
+    name: "track",
+  },
+  {
+    id: "rewards",
+    label: "Rewards",
+    icon: "wallet-outline",
+    name: "rewards",
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    icon: "person-outline",
+    name: "profile",
+  },
+];
+
+// Maps a TABS route ("/household/home") to its expo-router screen
+// name ("home") — Tabs.Screen wants just the segment, not the full path.
+const routeToScreenName = (route) => route.split("/").pop();
+
 export default function HouseholdLayout() {
   return (
     <Tabs
@@ -14,7 +45,7 @@ export default function HouseholdLayout() {
           backgroundColor: COLORS.white,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 64,
+          height: 75,
           paddingBottom: 8,
           paddingTop: 6,
         },
@@ -24,64 +55,23 @@ export default function HouseholdLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="pickup"
-        options={{
-          title: "Pickup",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="repeat-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="track"
-        options={{
-          title: "History",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="time-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="wallet"
-        options={{
-          title: "Wallet",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="wallet-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      />
+      {TABS.map((tab) => (
+        <Tabs.Screen
+          key={tab.id}
+          name={tab.name}
+          options={{
+            title: tab.label,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name={tab.icon} size={size} color={color} />
+            ),
+          }}
+        />
+      ))}
+
       {/* Hidden routes - accessible via router.push but not shown in tab bar */}
-      <Tabs.Screen
-        name="partners"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="dropoff"
-        options={{
-          href: null,
-        }}
-      />
+
+      <Tabs.Screen name="partners" options={{ href: null }} />
+      <Tabs.Screen name="dropoff" options={{ href: null }} />
     </Tabs>
   );
 }

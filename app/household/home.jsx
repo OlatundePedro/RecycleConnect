@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Clipboard } from "expo-clipboard";
+import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -18,7 +18,7 @@ import { FONTS } from "../../constants/typography";
 // Swap for the logged-in household's real data.
 const HOUSEHOLD = {
   firstName: "Juliet",
-  avatarUrl: "https://i.pravatar.cc/150?img=32",
+  avatar: require("../../assets/images/Ellipse 51.png"),
   code: "JULIET-6674",
 };
 
@@ -58,28 +58,6 @@ const RECENT = [
   },
 ];
 
-const TABS = [
-  { id: "home", label: "Home", icon: "home-outline", route: "/household/home" },
-  {
-    id: "history",
-    label: "History",
-    icon: "alarm-outline",
-    route: "/household/track",
-  },
-  {
-    id: "wallet",
-    label: "Wallet",
-    icon: "wallet-outline",
-    route: "/household/wallet",
-  },
-  {
-    id: "profile",
-    label: "Profile",
-    icon: "person-outline",
-    route: "/household/profile",
-  },
-];
-
 export default function HouseholdHome() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -99,13 +77,13 @@ export default function HouseholdHome() {
       >
         {/* ─── Header ─── */}
         <View style={styles.header}>
-          <Image source={{ uri: HOUSEHOLD.avatarUrl }} style={styles.avatar} />
+          <Image source={HOUSEHOLD.avatar} style={styles.avatar} />
           <View style={styles.headerText}>
             <Text style={styles.helloText}>Hello,</Text>
             <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
           </View>
         </View>
-        <Text style={styles.subGreeting}>What would you like to do?</Text>
+        <Text style={styles.subText}>What would you like to do?</Text>
 
         {/* ─── Household Code ─── */}
         <View style={styles.codeCard}>
@@ -160,7 +138,7 @@ export default function HouseholdHome() {
           </Text>
           <TouchableOpacity
             style={styles.markReadyBtn}
-            onPress={() => router.push("/household/pickup")}
+            onPress={() => router.push("/(pickup)/mark-as-ready")}
             activeOpacity={0.85}
           >
             <Text style={styles.markReadyBtnText}>Mark as Ready</Text>
@@ -220,37 +198,6 @@ export default function HouseholdHome() {
           </View>
         ))}
       </ScrollView>
-
-      {/* ─── Bottom Tab Bar ───
-          Only needed here if this screen isn't already inside an
-          expo-router Tabs layout. If app/household/_layout.jsx uses
-          <Tabs>, delete this block — it'll duplicate the real tab bar. */}
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
-          const active = tab.id === "home";
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={styles.tabItem}
-              onPress={() => router.push(tab.route)}
-            >
-              <Ionicons
-                name={tab.icon}
-                size={22}
-                color={active ? COLORS.primary : COLORS.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  { color: active ? COLORS.primary : COLORS.textSecondary },
-                ]}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
     </SafeAreaView>
   );
 }
@@ -274,17 +221,17 @@ const styles = StyleSheet.create({
   headerText: { justifyContent: "center" },
   helloText: {
     fontFamily: FONTS.regular,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textSecondary,
   },
   nameText: {
     fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontSize: 22,
     color: COLORS.textPrimary,
   },
-  subGreeting: {
+  subText: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textSecondary,
     marginBottom: 20,
   },
@@ -296,27 +243,33 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 18,
-    marginBottom: 16,
+    padding: 14,
+    marginBottom: 13,
   },
   codeCardTextWrap: { flex: 1, paddingRight: 12 },
   codeLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 12,
     color: COLORS.textSecondary,
-    letterSpacing: 0.6,
-    marginBottom: 6,
+    marginBottom: 5,
   },
   codeValue: {
-    fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
     color: COLORS.textPrimary,
-    marginBottom: 6,
+    marginBottom: 5,
   },
   codeHint: {
     fontFamily: FONTS.regular,
     fontSize: 13,
     color: COLORS.textSecondary,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    marginRight: 14,
+    backgroundColor: COLORS.surface,
   },
 
   // Next collection
@@ -334,21 +287,21 @@ const styles = StyleSheet.create({
   },
   nextCollectionDate: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
   nextCollectionTime: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
-    color: COLORS.textPrimary,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 
   // Partner card
   partnerCard: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    padding: 18,
+    padding: 15,
     marginBottom: 16,
   },
   partnerCardTop: {
@@ -360,7 +313,7 @@ const styles = StyleSheet.create({
   partnerName: {
     fontFamily: FONTS.bold,
     fontSize: 18,
-    color: COLORS.white,
+    color: COLORS.black,
   },
   verifiedRow: {
     flexDirection: "row",
@@ -370,12 +323,12 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 10,
     color: COLORS.white,
   },
   partnerLocation: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: "rgba(255,255,255,0.85)",
   },
 
@@ -383,30 +336,30 @@ const styles = StyleSheet.create({
   readyCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 18,
+    padding: 15,
     marginBottom: 16,
   },
   readyHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 20,
     color: COLORS.textPrimary,
-    marginBottom: 6,
+    marginBottom: 2,
   },
   readySubtext: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 16,
   },
   markReadyBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 10,
+    borderRadius: 14,
     paddingVertical: 15,
     alignItems: "center",
   },
   markReadyBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.white,
   },
 
@@ -425,13 +378,13 @@ const styles = StyleSheet.create({
   },
   dropoffSubtext: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 12,
   },
   dropoffLink: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.primary,
     textDecorationLine: "underline",
   },
@@ -440,14 +393,14 @@ const styles = StyleSheet.create({
   pricesCard: {
     backgroundColor: COLORS.primaryLight,
     borderRadius: 14,
-    padding: 18,
+    padding: 16,
     marginBottom: 20,
   },
   pricesHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   pricesHeading: {
     fontFamily: FONTS.bold,
@@ -456,7 +409,7 @@ const styles = StyleSheet.create({
   },
   pricesUpdated: {
     fontFamily: FONTS.medium,
-    fontSize: 11,
+    fontSize: 10,
     color: COLORS.textSecondary,
     letterSpacing: 0.4,
   },
@@ -467,12 +420,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
   priceValue: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
 
@@ -481,11 +434,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 17,
     color: COLORS.textPrimary,
   },
   viewAllText: {
@@ -510,36 +463,17 @@ const styles = StyleSheet.create({
   activityInfo: { flex: 1 },
   activityTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
   activitySub: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
   activityPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
-  },
-
-  // Tab bar
-  tabBar: {
-    flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.background,
-    paddingTop: 8,
-    paddingBottom: 6,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 3,
-  },
-  tabLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 11,
+    fontSize: 14,
   },
 });

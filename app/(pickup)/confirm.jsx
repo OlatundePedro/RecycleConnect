@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -10,8 +10,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS } from "../../../constants/colors";
-import { FONTS } from "../../../constants/typography";
+import { COLORS } from "../../constants/colors";
+import { FONTS } from "../../constants/typography";
 
 const MATERIALS_BREAKDOWN = [
   { label: "Plastic", weight: "1.5 kg", amount: "₦225.00" },
@@ -31,10 +31,17 @@ export default function CollectionCompleted() {
   if (cashReceived) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={COLORS.background}
+        />
         <View style={styles.thanksContainer}>
           <View style={styles.successIconWrap}>
-            <Ionicons name="checkmark-circle" size={72} color={COLORS.primary} />
+            <Ionicons
+              name="checkmark-circle"
+              size={72}
+              color={COLORS.primary}
+            />
           </View>
           <Text style={styles.thanksTitle}>Awesome!</Text>
           <Text style={styles.thanksSub}>
@@ -64,12 +71,18 @@ export default function CollectionCompleted() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Success */}
         <View style={styles.successSection}>
           <View style={styles.successIconWrap}>
-            <Ionicons name="checkmark-circle" size={64} color={COLORS.primary} />
+            <Ionicons
+              name="checkmark-circle"
+              size={64}
+              color={COLORS.primary}
+            />
           </View>
           <Text style={styles.successTitle}>Collection Complete!</Text>
           <Text style={styles.successSub}>
@@ -92,7 +105,9 @@ export default function CollectionCompleted() {
           <View style={styles.breakdownDivider} />
 
           <View style={styles.breakdownRow}>
-            <Text style={styles.breakdownTotalLabel}>Total ({totalWeight})</Text>
+            <Text style={styles.breakdownTotalLabel}>
+              Total ({totalWeight})
+            </Text>
             <Text style={styles.breakdownTotalWeight}></Text>
             <Text style={styles.breakdownTotalAmount}>{totalAmount}</Text>
           </View>
@@ -101,7 +116,9 @@ export default function CollectionCompleted() {
         {/* Payment received label */}
         <View style={styles.paymentBadge}>
           <Ionicons name="cash-outline" size={18} color={COLORS.primary} />
-          <Text style={styles.paymentBadgeText}>Cash in hand · {totalAmount}</Text>
+          <Text style={styles.paymentBadgeText}>
+            Cash in hand · {totalAmount}
+          </Text>
         </View>
 
         {/* Rate your experience */}
@@ -109,7 +126,11 @@ export default function CollectionCompleted() {
           <Text style={styles.ratingTitle}>Rate your experience</Text>
           <View style={styles.starsRow}>
             {[1, 2, 3, 4, 5].map((s) => (
-              <TouchableOpacity key={s} onPress={() => setRating(s)} hitSlop={8}>
+              <TouchableOpacity
+                key={s}
+                onPress={() => setRating(s)}
+                hitSlop={8}
+              >
                 <Ionicons
                   name={s <= rating ? "star" : "star-outline"}
                   size={32}
@@ -253,7 +274,11 @@ const styles = StyleSheet.create({
     width: 70,
     textAlign: "right",
   },
-  breakdownDivider: { height: 1, backgroundColor: COLORS.border, marginVertical: 10 },
+  breakdownDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 10,
+  },
   breakdownTotalLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 14,
