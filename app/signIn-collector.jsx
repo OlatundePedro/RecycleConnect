@@ -70,7 +70,7 @@ export default function LoginCollector() {
         {/* Illustration — collector-specific, in place of household's lock icon */}
         <View style={styles.illustrationWrap}>
           <Image
-            source={require("../assets/images/welcome-collector.png")}
+            source={require("../assets/images/collector-home.png")}
             style={styles.illustration}
             resizeMode="contain"
           />

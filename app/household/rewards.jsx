@@ -173,6 +173,18 @@ export default function HouseholdRewards() {
               key={action.key}
               style={styles.quickActionItem}
               activeOpacity={0.8}
+              onPress={() => {
+                if (action.key === "withdraw") {
+                  router.push("/(redeem)/withdraw");
+                } else {
+                  router.push({
+                    pathname: "/(redeem)/coming-soon",
+                    params: {
+                      feature: action.label,
+                    },
+                  });
+                }
+              }}
             >
               <View
                 style={[styles.quickActionIcon, { backgroundColor: action.bg }]}
@@ -260,10 +272,9 @@ export default function HouseholdRewards() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   header: {
-    backgroundColor: COLORS.headerBg,
     paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   backRow: {
     flexDirection: "row",
@@ -271,9 +282,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 18,
+    fontSize: 17,
     color: COLORS.primary,
     marginLeft: 4,
+    paddingLeft: 130,
   },
   scroll: {
     paddingHorizontal: 24,
@@ -282,9 +294,9 @@ const styles = StyleSheet.create({
   },
   walletCard: {
     backgroundColor: COLORS.primaryDark,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 28,
+    borderRadius: 14,
+    padding: 20,
+    marginBottom: 18,
   },
   walletTopRow: {
     flexDirection: "row",
@@ -300,15 +312,15 @@ const styles = StyleSheet.create({
   },
   walletBalance: {
     fontFamily: FONTS.bold,
-    fontSize: 34,
+    fontSize: 30,
     color: COLORS.white,
   },
   walletBalanceDecimals: {
-    fontSize: 20,
+    fontSize: 18,
   },
   walletIcon: {
-    width: 110,
-    height: 110,
+    width: 100,
+    height: 100,
   },
   walletBottomRow: {
     flexDirection: "row",
@@ -319,8 +331,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   pointsDot: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -334,28 +346,28 @@ const styles = StyleSheet.create({
   historyPill: {
     backgroundColor: COLORS.pillBg,
     borderRadius: 20,
-    paddingHorizontal: 22,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   historyPillText: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
+    fontSize: 12,
     color: COLORS.primaryDark,
   },
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 25,
     color: COLORS.primaryDark,
   },
   viewAllText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.primary,
   },
   quickActionsRow: {
@@ -377,24 +389,24 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textPrimary,
     textAlign: "center",
   },
   featuredTitle: {
-    fontSize: 24,
+    fontSize: 20,
     marginBottom: 16,
   },
   featuredRow: {
     flexDirection: "row",
     gap: 14,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   featuredCard: {
     flex: 1,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.cardBorder,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 16,
   },
   featuredTopRow: {
@@ -404,8 +416,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   featuredIconWrap: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 12,
     backgroundColor: COLORS.ecoCardBg,
     alignItems: "center",
@@ -419,32 +431,32 @@ const styles = StyleSheet.create({
   },
   ptsPillText: {
     fontFamily: FONTS.bold,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.primaryDark,
   },
   featuredCardTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
   featuredCardSubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   voucherCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.voucherCardBg,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 24,
   },
   voucherImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+    width: 54,
+    height: 54,
+    borderRadius: 14,
     marginRight: 16,
     backgroundColor: COLORS.white,
   },
@@ -453,13 +465,13 @@ const styles = StyleSheet.create({
   },
   voucherTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 17,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
   voucherSubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textSecondary,
   },
   voucherPointsWrap: {
@@ -467,19 +479,19 @@ const styles = StyleSheet.create({
   },
   voucherPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.primaryDark,
   },
   voucherPointsLabel: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   ecoCard: {
     backgroundColor: COLORS.ecoCardBg,
     borderWidth: 1.5,
     borderColor: COLORS.ecoCardBorder,
-    borderRadius: 18,
+    borderRadius: 14,
     padding: 20,
   },
   ecoTopRow: {
@@ -488,8 +500,8 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   ecoStarWrap: {
-    width: 48,
-    height: 48,
+    width: 38,
+    height: 38,
     borderRadius: 24,
     backgroundColor: COLORS.primary,
     alignItems: "center",
@@ -498,17 +510,17 @@ const styles = StyleSheet.create({
   },
   ecoTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 19,
+    fontSize: 17,
     color: COLORS.primaryDark,
     marginBottom: 4,
   },
   ecoSubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   ecoProgressTrack: {
-    height: 10,
+    height: 8,
     borderRadius: 5,
     backgroundColor: COLORS.trackBg,
     overflow: "hidden",

@@ -24,7 +24,7 @@ const REWARD = {
   code: "GC087",
 };
 
-const NEXT_ROUTE = "/household/pickup/confirm";
+const NEXT_ROUTE = "/(pickup)/confirm";
 const HELP_URL = "https://recycleconnect.example.com/help";
 
 export default function ConfirmCollectionReward() {
@@ -46,7 +46,7 @@ export default function ConfirmCollectionReward() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={26} color={COLORS.textPrimary} />
+          <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Confirm Collection Reward</Text>
         <View style={{ width: 26 }} />
@@ -138,33 +138,32 @@ export default function ConfirmCollectionReward() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: { flex: 1, backgroundColor: COLORS.background, paddingTop: 15 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.surface,
   },
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 19,
     color: COLORS.textPrimary,
     flex: 1,
     textAlign: "center",
   },
-  scroll: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 20, paddingTop: 28, paddingBottom: 24 },
 
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 19,
     color: COLORS.textPrimary,
     marginBottom: 8,
   },
   sectionSub: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     lineHeight: 20,
     marginBottom: 24,
@@ -172,13 +171,13 @@ const styles = StyleSheet.create({
 
   rewardCard: {
     backgroundColor: COLORS.surface,
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 14,
+    padding: 15,
     marginBottom: 32,
   },
   rewardCardLabel: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 10,
   },
@@ -190,19 +189,19 @@ const styles = StyleSheet.create({
   },
   rewardWeight: {
     fontFamily: FONTS.bold,
-    fontSize: 26,
+    fontSize: 24,
     color: COLORS.textPrimary,
   },
   rewardAmount: {
     fontFamily: FONTS.bold,
-    fontSize: 26,
+    fontSize: 24,
     color: COLORS.textPrimary,
   },
   rewardBreakdown: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   rewardMeta: {
     fontFamily: FONTS.medium,
@@ -216,8 +215,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   checkbox: {
-    width: 26,
-    height: 26,
+    width: 24,
+    height: 24,
     borderRadius: 6,
     borderWidth: 2,
     borderColor: COLORS.border,
@@ -232,7 +231,7 @@ const styles = StyleSheet.create({
   checkLabel: {
     flex: 1,
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
 
@@ -251,12 +250,12 @@ const styles = StyleSheet.create({
   confirmBtnDisabled: { opacity: 0.45 },
   confirmBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 14,
     color: COLORS.white,
   },
   helpText: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     textAlign: "center",
   },

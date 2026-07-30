@@ -100,10 +100,10 @@ export default function History() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={26} color={COLORS.textPrimary} />
+          <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>History</Text>
-        <TouchableOpacity hitSlop={12}>
+        <TouchableOpacity hitSlop={10}>
           <Ionicons name="ellipsis-vertical" size={22} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
@@ -197,38 +197,37 @@ export default function History() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: { flex: 1, backgroundColor: COLORS.background, paddingTop: 5 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.surface,
   },
   headerTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 19,
+    fontSize: 17,
     color: COLORS.primary,
   },
-  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 24 },
 
   impactCard: {
-    borderRadius: 18,
-    padding: 22,
-    marginBottom: 20,
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 15,
   },
   impactLabel: {
     fontFamily: FONTS.medium,
     fontSize: 15,
     color: "rgba(255,255,255,0.7)",
-    marginBottom: 6,
+    marginBottom: 3,
   },
   impactPoints: {
     fontFamily: FONTS.black,
-    fontSize: 32,
+    fontSize: 25,
     color: COLORS.white,
-    marginBottom: 16,
+    marginBottom: 13,
   },
   levelPill: {
     alignSelf: "flex-start",
@@ -239,7 +238,7 @@ const styles = StyleSheet.create({
   },
   levelPillText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.primaryDark,
   },
 
@@ -248,12 +247,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
     borderRadius: 24,
     padding: 4,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   filterPill: {
     flex: 1,
     borderRadius: 20,
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: "center",
   },
   filterPillActive: {
@@ -261,7 +260,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
   filterTextActive: {
@@ -293,7 +292,7 @@ const styles = StyleSheet.create({
   historyText: { flex: 1, paddingRight: 8 },
   historyTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
@@ -305,7 +304,7 @@ const styles = StyleSheet.create({
   historyRight: { alignItems: "flex-end", gap: 8 },
   historyPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 15,
   },
   statusBadge: {
     backgroundColor: COLORS.border,
@@ -318,7 +317,7 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     fontFamily: FONTS.bold,
-    fontSize: 11,
+    fontSize: 9,
     color: COLORS.textSecondary,
     textAlign: "right",
   },
@@ -328,7 +327,7 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
     textAlign: "center",
     marginTop: 20,

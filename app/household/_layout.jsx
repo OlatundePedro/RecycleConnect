@@ -69,9 +69,6 @@ export default function HouseholdLayout() {
       ))}
 
       {/* Hidden routes - accessible via router.push but not shown in tab bar */}
-
-      <Tabs.Screen name="partners" options={{ href: null }} />
-      <Tabs.Screen name="dropoff" options={{ href: null }} />
     </Tabs>
   );
 }

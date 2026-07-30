@@ -93,41 +93,65 @@ export default function HouseholdHome() {
             <Text style={styles.codeHint}>
               Share this for your pickup or drop-off collection
             </Text>
+
+            <TouchableOpacity
+              style={styles.confirmPickupBtn}
+              onPress={() => router.push("/(pickup)/confirm-rewards")}
+            >
+              <Text style={styles.confirmPickupText}>Confirm Pickup</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={handleCopyCode} hitSlop={10}>
-            <Ionicons
-              name={copied ? "checkmark" : "copy-outline"}
-              size={20}
-              color={COLORS.textSecondary}
-            />
-          </TouchableOpacity>
+          <Ionicons
+            name="qr-code-outline"
+            size={80}
+            color="rgba(255,255,255,0.15)"
+          />
         </View>
 
         {/* ─── Next Collection ─── */}
-        <View style={styles.nextCollectionCard}>
-          <Text style={styles.mutedLabel}>Next Collection</Text>
-          <Text style={styles.nextCollectionDate}>{NEXT_COLLECTION.date}</Text>
-          <Text style={styles.nextCollectionTime}>{NEXT_COLLECTION.time}</Text>
+        <View style={styles.collectionRow}>
+          <View style={styles.calendarCircle}>
+            <Ionicons
+              name="calendar-outline"
+              size={18}
+              color={COLORS.primary}
+            />
+          </View>
+
+          <View>
+            <Text style={styles.mutedLabel}>Next Collection</Text>
+
+            <Text style={styles.nextCollectionDate}>
+              {NEXT_COLLECTION.date}
+            </Text>
+
+            <Text style={styles.nextCollectionTime}>
+              {NEXT_COLLECTION.time}
+            </Text>
+          </View>
         </View>
 
         {/* ─── Partner Card ─── */}
-        <TouchableOpacity
-          style={styles.partnerCard}
-          onPress={() => router.push("/household/partners")}
-          activeOpacity={0.85}
-        >
-          <View style={styles.partnerCardTop}>
-            <Text style={styles.partnerName}>{PARTNER.name}</Text>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.white} />
+        <View style={styles.partnerCard}>
+          <View style={styles.partnerTopRow}>
+            <View style={styles.partnerIcon}>
+              <Ionicons name="star" size={15} color="#FFD54A" />
+            </View>
+
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.partnerName}>{PARTNER.name}</Text>
+
+              <View style={styles.verifiedTag}>
+                <Ionicons name="checkmark-circle" size={12} color="#FFFFFF" />
+                <Text style={styles.verifiedText}>Verified Partner</Text>
+              </View>
+
+              <Text style={styles.partnerLocation}>
+                Your Collection Partner - {PARTNER.location}
+              </Text>
+            </View>
           </View>
-          <View style={styles.verifiedRow}>
-            <Ionicons name="star" size={13} color={COLORS.white} />
-            <Text style={styles.verifiedText}>Verified Partner</Text>
-          </View>
-          <Text style={styles.partnerLocation}>
-            Your Collection Partner - {PARTNER.location}
-          </Text>
-        </TouchableOpacity>
+        </View>
 
         {/* ─── Mark as Ready ─── */}
         <View style={styles.readyCard}>
@@ -151,7 +175,9 @@ export default function HouseholdHome() {
           <Text style={styles.dropoffSubtext}>
             Drop-off your materials at a nearby collection hub
           </Text>
-          <TouchableOpacity onPress={() => router.push("/household/dropoff")}>
+          <TouchableOpacity
+            onPress={() => router.push("/(dropoff)/collection-hub")}
+          >
             <Text style={styles.dropoffLink}>Find Collection hub</Text>
           </TouchableOpacity>
         </View>
@@ -204,7 +230,7 @@ export default function HouseholdHome() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 20, paddingTop: 25, paddingBottom: 24 },
 
   header: {
     flexDirection: "row",
@@ -233,36 +259,35 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 20,
+    marginBottom: 15,
   },
 
   // Household code
   codeCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#0F4A35",
     borderRadius: 14,
-    padding: 14,
-    marginBottom: 13,
+    padding: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 25,
   },
   codeCardTextWrap: { flex: 1, paddingRight: 12 },
   codeLabel: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 5,
-  },
-  codeValue: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 18,
-    color: COLORS.textPrimary,
-    marginBottom: 5,
-  },
-  codeHint: {
-    fontFamily: FONTS.regular,
+    color: "#FFFFFF",
+    fontFamily: FONTS.bold,
     fontSize: 13,
-    color: COLORS.textSecondary,
+  },
+
+  codeValue: {
+    color: "#FFFFFF",
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+  },
+
+  codeHint: {
+    color: "#DCE9E2",
+    fontSize: 12,
+    fontFamily: FONTS.regular,
   },
   avatar: {
     width: 56,
@@ -273,6 +298,22 @@ const styles = StyleSheet.create({
   },
 
   // Next collection
+  collectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 22,
+    paddingLeft: 15,
+  },
+
+  calendarCircle: {
+    width: 35,
+    height: 35,
+    borderRadius: 30,
+    backgroundColor: "#CFF7DE",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
   nextCollectionCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
@@ -283,13 +324,13 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 10,
+    marginBottom: 6,
   },
   nextCollectionDate: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.textPrimary,
-    marginBottom: 4,
+    marginBottom: 1,
   },
   nextCollectionTime: {
     fontFamily: FONTS.semiBold,
@@ -301,8 +342,34 @@ const styles = StyleSheet.create({
   partnerCard: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    padding: 15,
-    marginBottom: 16,
+    padding: 10,
+    marginBottom: 10,
+  },
+  partnerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  partnerIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 28,
+    backgroundColor: "#166845",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  partnerCard: {
+    backgroundColor: "#0F4A35",
+    borderRadius: 18,
+    padding: 12,
+    marginBottom: 24,
+  },
+
+  partnerLocation: {
+    color: "rgba(255,255,255,0.85)",
+    fontFamily: FONTS.regular,
+    fontSize: 14,
   },
   partnerCardTop: {
     flexDirection: "row",
@@ -312,8 +379,9 @@ const styles = StyleSheet.create({
   },
   partnerName: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.black,
+    fontSize: 15,
+    color: "#FFFFFF",
+    marginBottom: 5,
   },
   verifiedRow: {
     flexDirection: "row",
@@ -321,10 +389,22 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 8,
   },
+  verifiedTag: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2FA866",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 15,
+    marginBottom: 4,
+  },
+
   verifiedText: {
+    color: "#FFFFFF",
     fontFamily: FONTS.medium,
-    fontSize: 10,
-    color: COLORS.white,
+    fontSize: 8,
+    marginLeft: 4,
   },
   partnerLocation: {
     fontFamily: FONTS.regular,
@@ -336,20 +416,20 @@ const styles = StyleSheet.create({
   readyCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 15,
+    padding: 12,
     marginBottom: 16,
   },
   readyHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
     marginBottom: 2,
   },
   readySubtext: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginBottom: 16,
+    marginBottom: 10,
   },
   markReadyBtn: {
     backgroundColor: COLORS.primary,
@@ -365,14 +445,13 @@ const styles = StyleSheet.create({
 
   // Drop-off
   dropoffCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 18,
-    marginBottom: 16,
+    padding: 14,
+    marginBottom: 10,
   },
   dropoffHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.textPrimary,
     marginBottom: 6,
   },
@@ -380,7 +459,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: 12,
+    marginBottom: 7,
   },
   dropoffLink: {
     fontFamily: FONTS.semiBold,
@@ -391,10 +470,9 @@ const styles = StyleSheet.create({
 
   // Buying prices
   pricesCard: {
-    backgroundColor: COLORS.primaryLight,
     borderRadius: 14,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 5,
   },
   pricesHeader: {
     flexDirection: "row",
@@ -434,11 +512,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    padding: 15,
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 16,
     color: COLORS.textPrimary,
   },
   viewAllText: {
@@ -450,11 +528,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
+    padding: 15,
   },
   activityIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 14,
     backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
@@ -475,5 +554,19 @@ const styles = StyleSheet.create({
   activityPoints: {
     fontFamily: FONTS.bold,
     fontSize: 14,
+  },
+  confirmPickupBtn: {
+    marginTop: 12,
+    backgroundColor: "#2FA866",
+    alignSelf: "flex-start",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+
+  confirmPickupText: {
+    color: "#fff",
+    fontFamily: FONTS.medium,
+    fontSize: 11,
   },
 });

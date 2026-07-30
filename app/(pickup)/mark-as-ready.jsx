@@ -31,12 +31,6 @@ const MATERIALS = [
     pricePerKg: 80,
   },
   { id: "glass", label: "Glass", icon: "wine-outline", pricePerKg: 80 },
-  {
-    id: "others",
-    label: "Others",
-    icon: "ellipsis-horizontal-circle-outline",
-    pricePerKg: 60,
-  },
 ];
 
 // Used when the person doesn't type in an estimated weight —
@@ -78,6 +72,7 @@ export default function MarkAsReady() {
       params: {
         materials: selected.join(","),
         estimatedWeightKg: estimatedWeightKg.toFixed(1),
+        estimatedReward: String(estimatedReward),
       },
     });
   };
@@ -89,7 +84,7 @@ export default function MarkAsReady() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={26} color={COLORS.textPrimary} />
+          <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Collection Materials</Text>
         <View style={{ width: 26 }} />
@@ -207,7 +202,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.surface,
   },
   headerTitle: {
     fontFamily: FONTS.bold,
@@ -218,16 +212,16 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 19,
+    fontSize: 18,
     color: COLORS.textPrimary,
     marginBottom: 6,
   },
   sectionSub: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
     lineHeight: 20,
-    marginBottom: 24,
+    marginBottom: 15,
   },
 
   grid: {
@@ -237,11 +231,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   materialCard: {
-    width: `${(100 - 2 * (CARD_GAP / 3.6)) / 3}%`,
+    width: `${(100 - 5 * (CARD_GAP / 4.2)) / 3}%`,
     aspectRatio: 1,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.border,
-    borderRadius: 16,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: COLORS.white,
@@ -253,18 +247,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 8,
     right: 8,
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     borderRadius: 11,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
   },
   materialIconWrap: {
-    width: 64,
-    height: 64,
+    width: 54,
+    height: 54,
     borderRadius: 32,
     backgroundColor: "#8FE3A4",
     alignItems: "center",
@@ -273,7 +267,7 @@ const styles = StyleSheet.create({
   },
   materialLabel: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textPrimary,
   },
 
@@ -286,21 +280,21 @@ const styles = StyleSheet.create({
   weightInputTextWrap: { flex: 1, paddingRight: 12 },
   weightInputLabel: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
   weightInputHint: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
   weightInputBox: {
     width: 84,
-    height: 56,
-    borderWidth: 1.5,
+    height: 50,
+    borderWidth: 1.0,
     borderColor: COLORS.primary,
-    borderRadius: 12,
+    borderRadius: 14,
     textAlign: "center",
     fontFamily: FONTS.semiBold,
     fontSize: 16,
@@ -310,19 +304,19 @@ const styles = StyleSheet.create({
   summaryBlock: { marginBottom: 26 },
   summaryLabel: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 16,
     color: COLORS.textPrimary,
     marginBottom: 6,
   },
   summaryValue: {
     fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontSize: 22,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
   rewardValue: {
     fontFamily: FONTS.bold,
-    fontSize: 26,
+    fontSize: 25,
     color: COLORS.primary,
     marginBottom: 4,
   },
@@ -338,21 +332,22 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    padding: 20,
+    padding: 18,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     backgroundColor: COLORS.white,
   },
+  confirmBtnDisabled: { opacity: 0.45 },
   confirmBtn: {
-    backgroundColor: COLORS.primaryDark,
+    backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 18,
     alignItems: "center",
   },
-  confirmBtnDisabled: { opacity: 0.45 },
+
   confirmBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 16,
     color: COLORS.white,
   },
 });

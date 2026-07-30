@@ -45,7 +45,7 @@ export default function CreateAccountCollector() {
 
         <View style={styles.illustrationWrap}>
           <Image
-            source={require("../assets/images/welcome-collector.png")}
+            source={require("../assets/images/collector-home.png")}
             style={styles.illustration}
             resizeMode="contain"
           />

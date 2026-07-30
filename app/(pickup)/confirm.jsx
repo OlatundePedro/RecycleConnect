@@ -65,7 +65,7 @@ export default function CollectionCompleted() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
+          <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Collection Complete</Text>
         <View style={{ width: 24 }} />
@@ -133,7 +133,7 @@ export default function CollectionCompleted() {
               >
                 <Ionicons
                   name={s <= rating ? "star" : "star-outline"}
-                  size={32}
+                  size={28}
                   color={s <= rating ? "#F9C74F" : COLORS.border}
                 />
               </TouchableOpacity>
@@ -157,19 +157,17 @@ export default function CollectionCompleted() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: { flex: 1, backgroundColor: COLORS.background, paddingTop: 12 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   headerTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 19,
     color: COLORS.textPrimary,
   },
   scroll: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 32 },
@@ -184,20 +182,20 @@ const styles = StyleSheet.create({
   },
   thanksTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 22,
     color: COLORS.textPrimary,
     textAlign: "center",
   },
   thanksSub: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 22,
   },
   homeBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
+    borderRadius: 14,
     paddingVertical: 15,
     paddingHorizontal: 48,
     alignItems: "center",
@@ -205,7 +203,7 @@ const styles = StyleSheet.create({
   },
   homeBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.white,
   },
 
@@ -221,7 +219,7 @@ const styles = StyleSheet.create({
   },
   successTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 20,
     color: COLORS.textPrimary,
     marginBottom: 8,
     textAlign: "center",
@@ -238,7 +236,7 @@ const styles = StyleSheet.create({
   breakdownCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     marginBottom: 16,
@@ -312,7 +310,7 @@ const styles = StyleSheet.create({
   ratingCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 16,
+    padding: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: "center",

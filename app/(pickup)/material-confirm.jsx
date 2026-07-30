@@ -55,12 +55,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   badgeImage: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
     marginBottom: 32,
   },
   title: {
-    fontFamily: FONTS.black,
+    fontFamily: FONTS.bold,
     fontSize: 40,
     lineHeight: 46,
     color: COLORS.primaryDark,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONTS.medium,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
     color: COLORS.primaryDark,
     textAlign: "center",
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   homeBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 16,
     color: COLORS.white,
   },
 });

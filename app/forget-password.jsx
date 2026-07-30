@@ -43,7 +43,7 @@ export default function ForgetPassword() {
 
         <View style={styles.illustrationWrap}>
           <Image
-            source={require("../assets/images/forgot-pin-illustration.png")}
+            source={require("../assets/images/forget.png")}
             style={styles.illustration}
             resizeMode="contain"
           />
