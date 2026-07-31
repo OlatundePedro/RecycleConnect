@@ -30,8 +30,6 @@ const TABS = [
   },
 ];
 
-// Maps a TABS route ("/household/home") to its expo-router screen
-// name ("home") — Tabs.Screen wants just the segment, not the full path.
 const routeToScreenName = (route) => route.split("/").pop();
 
 export default function HouseholdLayout() {
@@ -67,8 +65,6 @@ export default function HouseholdLayout() {
           }}
         />
       ))}
-
-      {/* Hidden routes - accessible via router.push but not shown in tab bar */}
     </Tabs>
   );
 }

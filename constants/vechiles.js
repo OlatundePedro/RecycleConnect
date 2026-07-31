@@ -1,0 +1,16 @@
+export const VEHICLE_TYPES = [
+  "Motorcycle",
+  "Tricycle (Keke)",
+  "Mini Van",
+  "Cargo Van",
+  "Pickup Truck",
+  "Small Truck",
+  "Medium Truck",
+  "Large Truck",
+  "Tipper",
+  "Electric Van",
+  "Bicycle",
+  "Electric Bicycle",
+  "Hand Cart",
+  "Other",
+];

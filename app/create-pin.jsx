@@ -13,8 +13,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// Household create-PIN screen. Collector has its own dedicated screen at
-// /create-pin-collector.
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#111111",
@@ -27,8 +25,6 @@ const COLORS = {
 
 const PIN_LENGTH = 4;
 
-// A single row of PIN_LENGTH digit boxes with auto-advance/backspace focus,
-// shared by both the "Create PIN" and "Confirm PIN" rows below.
 function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
   return (
     <View style={styles.pinRow}>
@@ -107,7 +103,6 @@ export default function CreatePin() {
       confirmRefs.current[0]?.focus();
       return;
     }
-    // TODO: save the PIN via the actual API call before navigating
     router.replace({
       pathname: "/pin-success",
       params: { type },

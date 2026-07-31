@@ -16,7 +16,6 @@ import {
 } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// Same palette used across the rest of the app, for visual consistency
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#111111",
@@ -28,7 +27,6 @@ const COLORS = {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-// Where the flow lands once someone finishes or skips onboarding.
 const NEXT_ROUTE = "/role-selection";
 
 const SLIDES = [
@@ -87,7 +85,6 @@ export default function SharedOnboarding() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
-      {/* Skip — pinned top-right, always available */}
       <TouchableOpacity
         style={[styles.skipButton, { top: insets.top + 16 }]}
         onPress={goToFlow}
@@ -118,7 +115,6 @@ export default function SharedOnboarding() {
         )}
       />
 
-      {/* Dots */}
       <View style={styles.dotsRow}>
         {SLIDES.map((slide, index) => (
           <View
@@ -131,7 +127,6 @@ export default function SharedOnboarding() {
         ))}
       </View>
 
-      {/* Primary button — Next on slides 1-2, Get Started on the last slide */}
       <TouchableOpacity
         style={styles.primaryButton}
         activeOpacity={0.85}

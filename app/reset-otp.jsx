@@ -13,8 +13,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// OTP verification for the "Forgot PIN" reset flow — not part of the
-// signup chain (that lives in verify-otp.jsx / verify-otp-collector.jsx).
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#111111",
@@ -26,8 +24,7 @@ const COLORS = {
 
 const OTP_LENGTH = 4;
 const RESEND_SECONDS = 35;
-// Masks a raw phone number as "+234 801 *** 4231" — keeps the country code
-// and leading digits plus the last 4 digits, hides the middle.
+
 function maskPhone(phone) {
   if (!phone) return "";
   const clean = String(phone).replace(/\s+/g, "");
@@ -81,7 +78,6 @@ export default function ResetOtp() {
 
   const handleResend = () => {
     if (secondsLeft > 0) return;
-    // TODO: hook this up to the actual resend-OTP API call
     setDigits(Array(OTP_LENGTH).fill(""));
     setSecondsLeft(RESEND_SECONDS);
     inputRefs.current[0]?.focus();
@@ -92,7 +88,6 @@ export default function ResetOtp() {
 
   const handleVerify = () => {
     if (!canContinue) return;
-    // TODO: verify `code` against the backend before proceeding
     router.replace({
       pathname: "/reset-pin",
       params: { phone, type },
@@ -113,7 +108,6 @@ export default function ResetOtp() {
         <Text style={styles.subtitle}>We&apos;ve sent a 4-digit code to</Text>
         <Text style={styles.phoneText}>{maskPhone(phone)}</Text>
 
-        {/* Illustration */}
         <View style={styles.illustrationWrap}>
           <Image
             source={require("../assets/images/otp-illustration.png")}
@@ -122,7 +116,6 @@ export default function ResetOtp() {
           />
         </View>
 
-        {/* OTP boxes */}
         <View style={styles.otpRow}>
           {digits.map((digit, index) => (
             <TextInput
@@ -139,7 +132,6 @@ export default function ResetOtp() {
           ))}
         </View>
 
-        {/* Resend */}
         <View style={styles.resendWrap}>
           <Text style={styles.resendPrompt}>Didn&apos;t receive it?</Text>
           <TouchableOpacity onPress={handleResend} disabled={secondsLeft > 0}>
@@ -154,7 +146,6 @@ export default function ResetOtp() {
           </TouchableOpacity>
         </View>
 
-        {/* Verify button */}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           activeOpacity={0.85}

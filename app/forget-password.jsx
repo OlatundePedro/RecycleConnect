@@ -23,7 +23,6 @@ export default function ForgetPassword() {
 
   const handleSendOtp = () => {
     if (!canContinue) return;
-    // TODO: trigger the actual send-OTP API call before navigating
     router.push({
       pathname: "/reset-otp",
       params: { phone, type },

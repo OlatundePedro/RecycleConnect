@@ -2,14 +2,10 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Image, StatusBar, StyleSheet, View } from "react-native";
 
-// Sampled from the image — a near-black forest green. Used as the
-// container background so "contain" never shows a mismatched-color edge.
 const BACKGROUND_COLOR = "#01150B";
 
-// How long the splash stays up before handing off to onboarding.
 const SPLASH_DURATION_MS = 5000;
 
-// Where the app goes once the splash finishes.
 const NEXT_ROUTE = "/shared-onboarding";
 
 export default function Splash() {

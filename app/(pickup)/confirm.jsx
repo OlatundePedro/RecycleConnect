@@ -1,163 +1,142 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Image,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CheckImage from "../../assets/images/check.png";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-const MATERIALS_BREAKDOWN = [
-  { label: "Plastic", weight: "1.5 kg", amount: "₦225.00" },
-  { label: "Paper", weight: "0.5 kg", amount: "₦80.00" },
-  { label: "Metal", weight: "0.4 kg", amount: "₦60.00" },
-  { label: "Glass", weight: "0.3 kg", amount: "₦40.00" },
-];
-
 export default function CollectionCompleted() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+
+  const receipt = params.receipt ? JSON.parse(String(params.receipt)) : {};
+
+  const MATERIALS_BREAKDOWN = params.breakdown
+    ? JSON.parse(String(params.breakdown))
+    : [];
+
+  const totalWeight = `${params.weight} kg`;
+  const totalAmount = `₦${Number(params.amount).toLocaleString()}.00`;
+
   const [rating, setRating] = useState(0);
   const [cashReceived, setCashReceived] = useState(false);
 
-  const totalWeight = "2.7 kg";
-  const totalAmount = "₦405.00";
-
-  if (cashReceived) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar
-          barStyle="dark-content"
-          backgroundColor={COLORS.background}
-        />
-        <View style={styles.thanksContainer}>
-          <View style={styles.successIconWrap}>
-            <Ionicons
-              name="checkmark-circle"
-              size={72}
-              color={COLORS.primary}
-            />
-          </View>
-          <Text style={styles.thanksTitle}>Awesome!</Text>
-          <Text style={styles.thanksSub}>
-            Thank you for recycling. Together we make a difference!
-          </Text>
-          <TouchableOpacity
-            style={styles.homeBtn}
-            onPress={() => router.replace("/household/home")}
-          >
-            <Text style={styles.homeBtnText}>Go to Home</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Collection Complete</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
         {/* Success */}
-        <View style={styles.successSection}>
-          <View style={styles.successIconWrap}>
-            <Ionicons
-              name="checkmark-circle"
-              size={64}
-              color={COLORS.primary}
+        <View style={styles.receiptCard}>
+          <View style={styles.successIcon}>
+            <Image
+              source={CheckImage}
+              style={styles.checkImage}
+              resizeMode="contain"
             />
           </View>
+
           <Text style={styles.successTitle}>Collection Complete!</Text>
-          <Text style={styles.successSub}>
-            Thank you for recycling. You've made a difference!
-          </Text>
-        </View>
 
-        {/* Materials breakdown */}
-        <View style={styles.breakdownCard}>
-          <Text style={styles.breakdownTitle}>Details</Text>
+          <Text style={styles.successSubtitle}>Thank you for recycling.</Text>
 
-          {MATERIALS_BREAKDOWN.map((item, i) => (
-            <View key={i} style={styles.breakdownRow}>
-              <Text style={styles.breakdownLabel}>{item.label}</Text>
-              <Text style={styles.breakdownWeight}>{item.weight}</Text>
-              <Text style={styles.breakdownAmount}>{item.amount}</Text>
-            </View>
-          ))}
+          <Text style={styles.successSubtitle}>You've earned</Text>
 
-          <View style={styles.breakdownDivider} />
+          <Text style={styles.receiptHeading}>Collection Receipt:</Text>
 
-          <View style={styles.breakdownRow}>
-            <Text style={styles.breakdownTotalLabel}>
-              Total ({totalWeight})
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Receipt no.</Text>
+            <Text style={styles.right}>{receipt.receiptNo}</Text>
+          </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Date</Text>
+            <Text style={styles.right}>
+              {receipt.date} ; {receipt.time}
             </Text>
-            <Text style={styles.breakdownTotalWeight}></Text>
-            <Text style={styles.breakdownTotalAmount}>{totalAmount}</Text>
           </View>
-        </View>
 
-        {/* Payment received label */}
-        <View style={styles.paymentBadge}>
-          <Ionicons name="cash-outline" size={18} color={COLORS.primary} />
-          <Text style={styles.paymentBadgeText}>
-            Cash in hand · {totalAmount}
-          </Text>
-        </View>
-
-        {/* Rate your experience */}
-        <View style={styles.ratingCard}>
-          <Text style={styles.ratingTitle}>Rate your experience</Text>
-          <View style={styles.starsRow}>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <TouchableOpacity
-                key={s}
-                onPress={() => setRating(s)}
-                hitSlop={8}
-              >
-                <Ionicons
-                  name={s <= rating ? "star" : "star-outline"}
-                  size={28}
-                  color={s <= rating ? "#F9C74F" : COLORS.border}
-                />
-              </TouchableOpacity>
-            ))}
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Collection Type</Text>
+            <Text style={styles.right}>{receipt.collectionType}</Text>
           </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Partner</Text>
+            <Text style={styles.right}>{receipt.partner}</Text>
+          </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Location</Text>
+            <Text style={styles.right}>{receipt.location}</Text>
+          </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Household</Text>
+            <Text style={styles.right}>{receipt.household}</Text>
+          </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Materials</Text>
+            <Text style={styles.right}>{receipt.materials}</Text>
+          </View>
+
+          <View style={styles.receiptRow}>
+            <Text style={styles.left}>Wt</Text>
+            <Text style={styles.right}>{receipt.weight}</Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.paymentRow}>
+            <Text style={styles.paymentLabel}>Payment received</Text>
+
+            <Text style={styles.paymentAmount}>
+              ₦{Number(receipt.payment).toLocaleString()}.00
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.doneButton}
+            onPress={() => router.replace("/household/home")}
+          >
+            <Text style={styles.doneText}>Done</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.generated}>
+          Receipt generated on {receipt.generated} {"\n"}RecycleConnect
+        </Text>
+
+        <Text style={styles.ratingTitle}>Rate your experience</Text>
+
+        <View style={styles.starsRow}>
+          {[1, 2, 3, 4, 5].map((s) => (
+            <TouchableOpacity key={s} onPress={() => setRating(s)}>
+              <Ionicons
+                name={s <= rating ? "star" : "star-outline"}
+                size={20}
+                color={s <= rating ? "#F9C74F" : "#999"}
+              />
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.receivedBtn}
-          onPress={() => setCashReceived(true)}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.receivedBtnText}>Received Cash</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background, paddingTop: 12 },
+  safeArea: { flex: 1, backgroundColor: COLORS.background, paddingTop: 5 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -165,179 +144,121 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
   },
-  headerTitle: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 19,
-    color: COLORS.textPrimary,
-  },
-  scroll: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 32 },
-
-  // Success state
-  thanksContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    gap: 16,
-  },
-  thanksTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
-    textAlign: "center",
-  },
-  thanksSub: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  homeBtn: {
-    backgroundColor: COLORS.primary,
+  scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 32 },
+  receiptCard: {
+    backgroundColor: "#F4F5F6",
     borderRadius: 14,
-    paddingVertical: 15,
-    paddingHorizontal: 48,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  homeBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.white,
+    padding: 20,
+    marginTop: 20,
   },
 
-  successSection: { alignItems: "center", marginBottom: 24 },
-  successIconWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: COLORS.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
   successTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 19,
     color: COLORS.textPrimary,
     marginBottom: 8,
     textAlign: "center",
   },
-  successSub: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
+  successSubtitle: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 13,
     color: COLORS.textSecondary,
     textAlign: "center",
-    lineHeight: 21,
+    lineHeight: 18,
     paddingHorizontal: 16,
   },
-
-  breakdownCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: 16,
+  successIcon: {
+    alignSelf: "center",
+    marginBottom: 10,
   },
-  breakdownTitle: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    marginBottom: 12,
+  checkImage: {
+    width: 90,
+    height: 90,
   },
-  breakdownRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  breakdownLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    flex: 1,
-  },
-  breakdownWeight: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.muted,
-    width: 54,
-    textAlign: "right",
-  },
-  breakdownAmount: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
-    color: COLORS.textPrimary,
-    width: 70,
-    textAlign: "right",
-  },
-  breakdownDivider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginVertical: 10,
-  },
-  breakdownTotalLabel: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    flex: 1,
-  },
-  breakdownTotalWeight: { width: 54 },
-  breakdownTotalAmount: {
+  receiptHeading: {
+    marginTop: 25,
+    marginBottom: 15,
     fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: COLORS.primary,
-    width: 70,
-    textAlign: "right",
+    fontSize: 18,
+    color: COLORS.textPrimary,
   },
 
-  paymentBadge: {
+  receiptRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 20,
-  },
-  paymentBadgeText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.primary,
+    justifyContent: "space-between",
+    marginBottom: 7,
   },
 
-  ratingCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  left: {
+    fontFamily: FONTS.medium,
+    color: "#8E8E93",
+    fontSize: 16,
+  },
+
+  right: {
+    fontFamily: FONTS.semiBold,
+    color: "#000",
+    fontSize: 16,
+    textAlign: "right",
+    flex: 1,
+    marginLeft: 20,
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E5E5",
+    marginVertical: 22,
+  },
+
+  paymentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 12,
+  },
+
+  paymentLabel: {
+    fontFamily: FONTS.bold,
+    fontSize: 19,
+  },
+
+  paymentAmount: {
+    fontFamily: FONTS.bold,
+    fontSize: 19,
+    color: "#2E9E58",
+  },
+
+  doneButton: {
+    marginTop: 28,
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  doneText: {
+    color: "#FFF",
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+  },
+  generated: {
+    textAlign: "center",
+    marginTop: 18,
+    color: "#8E8E93",
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    lineHeight: 25,
   },
   ratingTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textPrimary,
+    textAlign: "center",
+    marginTop: 25,
   },
-  starsRow: { flexDirection: "row", gap: 10 },
-
-  footer: {
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
-  },
-  receivedBtn: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  receivedBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 16,
-    color: COLORS.white,
+  starsRow: {
+    flexDirection: "row",
+    gap: 10,
+    alignSelf: "center",
+    marginTop: 5,
   },
 });

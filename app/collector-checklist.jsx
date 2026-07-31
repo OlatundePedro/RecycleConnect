@@ -10,10 +10,9 @@ import {
   View,
 } from "react-native";
 import { COLORS } from "../constants/colors";
-import { FONTS, TEXT_STYLES } from "../constants/typography";
+import { FONTS } from "../constants/typography";
 
-// Where "Continue" sends the person once every box is checked.
-const NEXT_ROUTE = "/collector-about";
+const NEXT_ROUTE = "/collector-about-you";
 
 const CHECKLIST_ITEMS = [
   {
@@ -68,8 +67,8 @@ export default function CollectorChecklist() {
           Are you ready to become{"\n"}a Collection Partner?
         </Text>
         <Text style={styles.subtitle}>
-          Before you begin, confirm that you have the basic resources needed to
-          operate successfully.
+          Before you begin, confirm that you have the basic {"\n"}resources
+          needed to operate successfully.
         </Text>
 
         <Text style={styles.sectionLabel}>Checklist</Text>
@@ -124,28 +123,31 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 70,
     paddingBottom: 16,
   },
   title: {
-    ...TEXT_STYLES.heading1,
+    fontSize: 30,
+    fontFamily: FONTS.bold,
     color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 38,
     marginBottom: 16,
   },
   subtitle: {
-    ...TEXT_STYLES.body,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
+    fontSize: 14,
     textAlign: "center",
     lineHeight: 22,
     marginBottom: 20,
   },
   sectionLabel: {
-    ...TEXT_STYLES.heading3,
-    color: COLORS.primary,
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
     textAlign: "center",
     marginBottom: 16,
+    color: "#2E9E58",
   },
   card: {
     flexDirection: "row",
@@ -158,8 +160,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   checkbox: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     borderRadius: 6,
     borderWidth: 2,
     borderColor: COLORS.muted,
@@ -173,7 +175,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   cardText: {
-    ...TEXT_STYLES.body,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    fontSize: 16,
     flex: 1,
     color: COLORS.textPrimary,
     lineHeight: 23,
@@ -195,19 +199,20 @@ const styles = StyleSheet.create({
   },
   continueText: {
     color: COLORS.white,
-    fontSize: 17,
+    fontSize: 14,
     fontFamily: FONTS.bold,
   },
   backButton: {
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
+    marginBottom: 20,
   },
   backText: {
     color: COLORS.primary,
-    fontSize: 17,
+    fontSize: 14,
     fontFamily: FONTS.semiBold,
   },
 });

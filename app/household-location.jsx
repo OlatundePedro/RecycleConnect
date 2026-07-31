@@ -116,14 +116,9 @@ export default function HouseholdProfile() {
   const [landmark, setLandmark] = useState("");
   const [stateModalVisible, setStateModalVisible] = useState(false);
 
-  const handleUseCurrentLocation = () => {
-    // TODO: hook this up to expo-location to reverse-geocode the user's
-    // current position into state/area
-  };
+  const handleUseCurrentLocation = () => {};
 
   const handleSaveLocation = () => {
-    // TODO: persist the full profile (fullName, email, state, area,
-    // landmark) via the actual API call before navigating
     router.replace({
       pathname: "/household-education",
       params: { fullName, email, state, area, landmark },
@@ -134,7 +129,6 @@ export default function HouseholdProfile() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -157,7 +151,6 @@ export default function HouseholdProfile() {
           This helps us find the best collection partner in your area.
         </Text>
 
-        {/* Use current location */}
         <TouchableOpacity
           style={styles.currentLocationCard}
           activeOpacity={0.85}
@@ -169,7 +162,6 @@ export default function HouseholdProfile() {
           <Text style={styles.currentLocationText}>Use current location</Text>
         </TouchableOpacity>
 
-        {/* State */}
         <Text style={styles.fieldLabel}>State</Text>
         <TouchableOpacity
           style={styles.stateField}
@@ -186,7 +178,6 @@ export default function HouseholdProfile() {
           />
         </TouchableOpacity>
 
-        {/* Area / Neighborhood */}
         <Text style={styles.fieldLabel}>Area / Neighborhood</Text>
         <View style={styles.fieldWrap}>
           <TextInput
@@ -198,7 +189,6 @@ export default function HouseholdProfile() {
           />
         </View>
 
-        {/* Nearest Landmark */}
         <View style={styles.landmarkLabelRow}>
           <Text style={styles.fieldLabel}>Nearest Landmark</Text>
           <View style={styles.reliabilityBadge}>
@@ -225,7 +215,6 @@ export default function HouseholdProfile() {
           you faster.
         </Text>
 
-        {/* Map preview */}
         <View style={styles.mapWrap}>
           <Image
             source={require("../assets/images/location-map-preview.png")}

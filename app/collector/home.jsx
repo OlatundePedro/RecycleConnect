@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import {
   Image,
+  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -10,435 +10,489 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-const REQUESTS = [
-  {
-    id: "r1",
-    name: "Samuel A.",
-    address: "15 Adeniran Ogunsanya St, Surulere",
-    materials: ["Plastic", "Paper"],
-    time: "10:00 AM – 12:00 PM",
-    distance: "1.4 km",
-    reward: "₦350 – ₦500",
-    urgent: true,
-  },
-  {
-    id: "r2",
-    name: "Chioma N.",
-    address: "22 Bode Thomas St, Surulere",
-    materials: ["Glass", "Metal"],
-    time: "12:00 PM – 2:00 PM",
-    distance: "2.8 km",
-    reward: "₦400 – ₦600",
-    urgent: false,
-  },
-  {
-    id: "r3",
-    name: "Babatunde F.",
-    address: "8 Oduduwa Crescent, Ikeja",
-    materials: ["Electronics"],
-    time: "2:00 PM – 4:00 PM",
-    distance: "5.1 km",
-    reward: "₦600 – ₦900",
-    urgent: false,
-  },
-];
-
-export default function CollectorHome() {
+export default function CollectorDashboard() {
   const router = useRouter();
-  const [onlineStatus, setOnlineStatus] = useState(true);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
+      >
+        {/* HEADER */}
+
         <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>Dashboard</Text>
-            <Text style={styles.greeting}>Welcome back, John 👋</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.bellBtn}>
-              <Ionicons
-                name="notifications-outline"
-                size={22}
-                color={COLORS.textPrimary}
-              />
-            </TouchableOpacity>
-            <View style={styles.avatarSmall}>
-              <Image
-                source={require("../../assets/images/image 7.png")}
-                style={styles.avatarSmallImg}
-                resizeMode="cover"
-              />
+          <View style={styles.profileRow}>
+            <Image
+              source={require("../../assets/images/profile.png")}
+              style={styles.avatar}
+            />
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.partner}>Collection Partner</Text>
+
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>Greencycle Lagos</Text>
+
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={COLORS.white}
+                />
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Online toggle */}
-        <View style={styles.statusCard}>
-          <View>
-            <Text style={styles.statusLabel}>Status</Text>
-            <Text
-              style={[
-                styles.statusValue,
-                { color: onlineStatus ? COLORS.primary : COLORS.muted },
-              ]}
-            >
-              {onlineStatus ? "● Online" : "○ Offline"}
-            </Text>
-          </View>
+          <Text style={styles.walletLabel}>Wallet Balance</Text>
+
+          <Text style={styles.wallet}>₦5,240.00</Text>
+
           <TouchableOpacity
-            style={[
-              styles.toggleBtn,
-              { backgroundColor: onlineStatus ? COLORS.primary : COLORS.muted },
-            ]}
-            onPress={() => setOnlineStatus(!onlineStatus)}
+            style={styles.addButton}
+            onPress={() => router.push("/wallet-topup")}
           >
-            <Text style={styles.toggleBtnText}>
-              {onlineStatus ? "Go Offline" : "Go Online"}
-            </Text>
+            <Ionicons name="add" size={40} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
-        {/* Earnings today */}
-        <View style={styles.earningsRow}>
-          <View style={styles.earningCard}>
-            <Text style={styles.earningLabel}>Today</Text>
-            <Text style={styles.earningValue}>₦1,450</Text>
-          </View>
-          <View style={styles.earningCard}>
-            <Text style={styles.earningLabel}>This Week</Text>
-            <Text style={styles.earningValue}>₦8,200</Text>
-          </View>
-          <View style={styles.earningCard}>
-            <Text style={styles.earningLabel}>Jobs Done</Text>
-            <Text style={styles.earningValue}>6</Text>
-          </View>
-        </View>
+        {/* TRIP CARD */}
 
-        {/* Pickup requests */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Nearby Requests</Text>
-          <TouchableOpacity onPress={() => router.navigate("/collector/jobs")}>
-            <Text style={styles.viewAll}>View all</Text>
+        <View style={styles.tripCard}>
+          <View style={styles.tripHeader}>
+            <View style={styles.tripLeft}>
+              <View style={styles.dot} />
+
+              <Text style={styles.tripHeading}>NEXT SCHEDULED TRIP</Text>
+            </View>
+
+            <View style={styles.dayBadge}>
+              <Text style={styles.dayText}>TUESDAY</Text>
+            </View>
+          </View>
+
+          <Text style={styles.zone}>Surulere Zone A</Text>
+
+          <Text style={styles.address}>
+            May 14 · 8:00 - 12:00 · Adeniran Ogunsanya
+          </Text>
+
+          <Text style={styles.address}>Bode Thomas · Shitta</Text>
+
+          <View style={styles.stats}>
+            <View>
+              <Text style={styles.statNumber}>42</Text>
+
+              <Text style={styles.statLabel}>HOUSEHOLDS READY</Text>
+
+              <Text style={styles.statSmall}>↑4 Since yesterday</Text>
+            </View>
+
+            <View>
+              <Text style={styles.statNumber}>185 kg</Text>
+
+              <Text style={styles.statLabel}>EST. VOLUME</Text>
+
+              <Text style={styles.statSmall}>worth a trip</Text>
+            </View>
+          </View>
+          {/* Log Collection */}
+
+          <TouchableOpacity
+            style={styles.logButton}
+            onPress={() => router.push("/log-collection")}
+          >
+            <Ionicons
+              name="document-text-outline"
+              size={22}
+              color={COLORS.white}
+            />
+
+            <Text style={styles.logButtonText}>Log Collection</Text>
           </TouchableOpacity>
-        </View>
 
-        {REQUESTS.map((req) => (
-          <View key={req.id} style={styles.requestCard}>
-            {req.urgent && (
-              <View style={styles.urgentBadge}>
-                <Text style={styles.urgentText}>Urgent</Text>
-              </View>
-            )}
-            <View style={styles.requestTop}>
-              <View style={styles.requestAvatar}>
-                <Ionicons name="person" size={20} color={COLORS.primary} />
-              </View>
-              <View style={styles.requestInfo}>
-                <Text style={styles.requestName}>{req.name}</Text>
-                <Text style={styles.requestAddr}>{req.address}</Text>
-              </View>
-              <View style={styles.distanceBadge}>
-                <Ionicons
-                  name="location-outline"
-                  size={12}
-                  color={COLORS.muted}
-                />
-                <Text style={styles.distanceText}>{req.distance}</Text>
-              </View>
+          {/* Today's Summary */}
+
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>Confirmed Today</Text>
+
+              <Text style={styles.summaryValue}>18</Text>
+
+              <Text style={styles.summarySub}>17 completed pickups</Text>
             </View>
 
-            {/* Materials */}
-            <View style={styles.materialsRow}>
-              {req.materials.map((m) => (
-                <View key={m} style={styles.materialChip}>
-                  <Text style={styles.materialChipText}>{m}</Text>
-                </View>
-              ))}
-            </View>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>Payment Made Today</Text>
 
-            {/* Time & reward */}
-            <View style={styles.requestMeta}>
-              <View style={styles.metaItem}>
-                <Ionicons name="time-outline" size={14} color={COLORS.muted} />
-                <Text style={styles.metaText}>{req.time}</Text>
-              </View>
-              <View style={styles.metaItem}>
-                <Ionicons
-                  name="cash-outline"
-                  size={14}
-                  color={COLORS.primary}
-                />
-                <Text style={[styles.metaText, { color: COLORS.primary }]}>
-                  {req.reward}
+              <Text style={styles.summaryValue}>₦42,800</Text>
+
+              <Text style={styles.summarySub}>Cash paid to households</Text>
+            </View>
+          </View>
+
+          {/* Buyer Interest */}
+
+          <View style={styles.interestCard}>
+            <View style={styles.interestHeader}>
+              <View>
+                <Text style={styles.interestTitle}>Buyer Interest</Text>
+
+                <Text style={styles.interestSubtitle}>
+                  Lagos Recycling Ltd.
                 </Text>
               </View>
+
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>NEW</Text>
+              </View>
             </View>
 
-            {/* Actions */}
-            <View style={styles.requestActions}>
-              <TouchableOpacity style={styles.declineBtn}>
-                <Text style={styles.declineBtnText}>Decline</Text>
-              </TouchableOpacity>
+            <Text style={styles.interestText}>
+              Wants 120kg of Plastic bottles.
+            </Text>
+
+            <Text style={styles.interestPrice}>₦350/kg</Text>
+
+            <View style={styles.actionRow}>
               <TouchableOpacity
-                style={styles.acceptBtn}
-                onPress={() => router.navigate("/collector/jobs")}
+                style={styles.acceptButton}
+                onPress={() => router.push("/buyer-request")}
               >
-                <Text style={styles.acceptBtnText}>Accept</Text>
+                <Text style={styles.acceptText}>Review & Accept</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.declineButton}>
+                <Text style={styles.declineText}>Decline</Text>
               </TouchableOpacity>
             </View>
           </View>
-        ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 14,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
   },
-  headerTitle: {
+
+  scroll: {
+    paddingBottom: 30,
+  },
+
+  header: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 95,
+  },
+
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    marginRight: 12,
+  },
+
+  partner: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    color: COLORS.white,
+    opacity: 0.9,
+  },
+
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+
+  name: {
     fontFamily: FONTS.bold,
     fontSize: 22,
-    color: COLORS.textPrimary,
+    color: COLORS.white,
+    marginRight: 6,
   },
-  greeting: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  headerRight: { flexDirection: "row", alignItems: "center", gap: 10 },
-  bellBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: COLORS.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarSmall: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    overflow: "hidden",
-    backgroundColor: COLORS.border,
-  },
-  avatarSmallImg: { width: "100%", height: "100%" },
 
-  statusCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginHorizontal: 20,
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  statusLabel: {
+  walletLabel: {
+    marginTop: 28,
     fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: COLORS.muted,
-    marginBottom: 4,
-  },
-  statusValue: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 16,
-  },
-  toggleBtn: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  toggleBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 15,
     color: COLORS.white,
   },
 
-  earningsRow: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    gap: 10,
-    marginBottom: 24,
-  },
-  earningCard: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 12,
-    padding: 14,
-    alignItems: "center",
-  },
-  earningLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 11,
-    color: COLORS.primaryMid,
-    marginBottom: 4,
-  },
-  earningValue: {
+  wallet: {
+    marginTop: 8,
     fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: COLORS.primary,
+    fontSize: 44,
+    color: COLORS.white,
   },
 
-  sectionHeader: {
+  addButton: {
+    position: "absolute",
+    right: 24,
+    bottom: 40,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+
+    elevation: 6,
+  },
+
+  tripCard: {
+    marginHorizontal: 22,
+    marginTop: -55,
+    backgroundColor: COLORS.white,
+    borderRadius: 22,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: "#D8EEE3",
+  },
+
+  tripHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 16,
-    color: COLORS.textPrimary,
-  },
-  viewAll: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
-    color: COLORS.primary,
   },
 
-  requestCard: {
-    marginHorizontal: 20,
-    backgroundColor: COLORS.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    position: "relative",
-  },
-  urgentBadge: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    backgroundColor: "#FEF3C7",
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  urgentText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 11,
-    color: "#D97706",
-  },
-  requestTop: {
+  tripLeft: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
-  requestAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primaryLight,
     alignItems: "center",
-    justifyContent: "center",
+  },
+
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#5B6663",
     marginRight: 10,
   },
-  requestInfo: { flex: 1 },
-  requestName: {
-    fontFamily: FONTS.semiBold,
+
+  tripHeading: {
+    fontFamily: FONTS.bold,
     fontSize: 14,
+    color: "#5B6663",
+  },
+
+  dayBadge: {
+    backgroundColor: "#F9C74F",
+    paddingHorizontal: 15,
+    paddingVertical: 7,
+    borderRadius: 18,
+  },
+
+  dayText: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: "#7A4B00",
+  },
+
+  zone: {
+    marginTop: 18,
+    fontFamily: FONTS.bold,
+    fontSize: 24,
     color: COLORS.textPrimary,
   },
-  requestAddr: {
+
+  address: {
+    marginTop: 6,
     fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.muted,
-    marginTop: 2,
+    fontSize: 15,
+    color: COLORS.textSecondary,
   },
-  distanceBadge: {
+
+  stats: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 28,
+  },
+
+  statNumber: {
+    fontFamily: FONTS.bold,
+    fontSize: 36,
+    color: COLORS.textPrimary,
+  },
+
+  statLabel: {
+    marginTop: 4,
+    fontFamily: FONTS.medium,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+  },
+
+  statSmall: {
+    marginTop: 4,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  logButton: {
+    marginHorizontal: 22,
+    marginTop: 22,
+    backgroundColor: COLORS.primary,
+    borderRadius: 18,
+    height: 62,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    gap: 3,
-    backgroundColor: COLORS.border,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 2,
   },
-  distanceText: {
-    fontFamily: FONTS.medium,
-    fontSize: 11,
-    color: COLORS.muted,
+
+  logButtonText: {
+    fontFamily: FONTS.bold,
+    fontSize: 17,
+    color: COLORS.white,
+    marginLeft: 10,
   },
-  materialsRow: {
+
+  summaryRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginBottom: 12,
+    justifyContent: "space-between",
+    marginHorizontal: 22,
+    marginTop: 20,
   },
-  materialChip: {
-    backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+
+  summaryCard: {
+    width: "48%",
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  materialChipText: {
+
+  summaryTitle: {
     fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+
+  summaryValue: {
+    marginTop: 10,
+    fontFamily: FONTS.bold,
+    fontSize: 28,
+    color: COLORS.textPrimary,
+  },
+
+  summarySub: {
+    marginTop: 8,
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+
+  interestCard: {
+    marginHorizontal: 22,
+    marginTop: 24,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+
+  interestHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  interestTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.textPrimary,
+  },
+
+  interestSubtitle: {
+    marginTop: 4,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+
+  badge: {
+    backgroundColor: "#FFF4D6",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  badgeText: {
+    fontFamily: FONTS.bold,
+    color: "#A56B00",
     fontSize: 12,
+  },
+
+  interestText: {
+    marginTop: 18,
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+  },
+
+  interestPrice: {
+    marginTop: 8,
+    fontFamily: FONTS.bold,
+    fontSize: 26,
     color: COLORS.primary,
   },
-  requestMeta: {
+
+  actionRow: {
     flexDirection: "row",
-    gap: 16,
-    marginBottom: 14,
+    justifyContent: "space-between",
+    marginTop: 24,
   },
-  metaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  metaText: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  requestActions: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  declineBtn: {
+
+  acceptButton: {
     flex: 1,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    paddingVertical: 11,
-    alignItems: "center",
-  },
-  declineBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  acceptBtn: {
-    flex: 2,
     backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    paddingVertical: 11,
+    borderRadius: 14,
+    height: 52,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+
+  acceptText: {
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+    fontSize: 15,
+  },
+
+  declineButton: {
+    width: 110,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 14,
+    justifyContent: "center",
     alignItems: "center",
   },
-  acceptBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.white,
+
+  declineText: {
+    fontFamily: FONTS.bold,
+    color: COLORS.primary,
+    fontSize: 15,
   },
 });

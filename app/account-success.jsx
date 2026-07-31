@@ -10,7 +10,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// Same palette used across the create-account flow, for visual consistency
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#3F4B47",

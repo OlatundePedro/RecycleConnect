@@ -30,7 +30,6 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-// Placeholder data — swap for the real wallet/rewards state once wired up.
 const WALLET = {
   balance: "5,240.00",
 };
@@ -103,7 +102,6 @@ export default function HouseholdRewards() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -119,7 +117,6 @@ export default function HouseholdRewards() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Wallet balance card */}
         <View style={styles.walletCard}>
           <View style={styles.walletTopRow}>
             <View>
@@ -159,7 +156,6 @@ export default function HouseholdRewards() {
           </View>
         </View>
 
-        {/* Redeem */}
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>Redeem</Text>
           <TouchableOpacity>
@@ -201,7 +197,6 @@ export default function HouseholdRewards() {
           ))}
         </View>
 
-        {/* Featured Rewards */}
         <Text style={[styles.sectionTitle, styles.featuredTitle]}>
           Featured Rewards
         </Text>
@@ -227,7 +222,6 @@ export default function HouseholdRewards() {
           ))}
         </View>
 
-        {/* Grocery voucher */}
         <TouchableOpacity style={styles.voucherCard} activeOpacity={0.85}>
           <Image
             source={require("../../assets/images/grocery.png")}
@@ -244,7 +238,6 @@ export default function HouseholdRewards() {
           </View>
         </TouchableOpacity>
 
-        {/* Eco-Warrior status */}
         <View style={styles.ecoCard}>
           <View style={styles.ecoTopRow}>
             <View style={styles.ecoStarWrap}>

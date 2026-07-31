@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the real totals/level from the household's account.
 const IMPACT = {
   totalPoints: 1240,
   level: "Level 4: Eco Hero",
@@ -97,7 +96,6 @@ export default function History() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
@@ -112,7 +110,6 @@ export default function History() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Total impact card */}
         <LinearGradient
           colors={[COLORS.primaryDark, COLORS.primary]}
           start={{ x: 0, y: 0 }}
@@ -128,7 +125,6 @@ export default function History() {
           </View>
         </LinearGradient>
 
-        {/* Filter tabs */}
         <View style={styles.filterTrack}>
           {FILTERS.map((filter) => {
             const active = filter.id === activeFilter;
@@ -148,7 +144,6 @@ export default function History() {
           })}
         </View>
 
-        {/* History list */}
         {filteredHistory.map((item) => (
           <View key={item.id} style={styles.historyCard}>
             <View style={[styles.iconWrap, { backgroundColor: item.iconBg }]}>

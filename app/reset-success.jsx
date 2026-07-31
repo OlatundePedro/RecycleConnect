@@ -10,9 +10,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// Success screen for the Forgot-PIN reset flow. Unlike the signup version
-// (pin-success.jsx), there's no "Register" option here — the user already
-// has an account, so the only next step is to log back in.
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#3F4B47",

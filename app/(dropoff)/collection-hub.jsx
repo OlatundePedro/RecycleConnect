@@ -15,7 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the real hub list for this household's area.
 const HUBS = [
   {
     id: "greencycle-ikorodu",
@@ -91,8 +90,6 @@ export default function CollectionHubs() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={22} color={COLORS.textPrimary} />
@@ -105,7 +102,6 @@ export default function CollectionHubs() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Search + filter */}
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
             <Ionicons name="search" size={16} color={COLORS.textSecondary} />
@@ -126,7 +122,6 @@ export default function CollectionHubs() {
           </TouchableOpacity>
         </View>
 
-        {/* Hub list */}
         {filteredHubs.map((hub) => (
           <View key={hub.id}>
             <TouchableOpacity

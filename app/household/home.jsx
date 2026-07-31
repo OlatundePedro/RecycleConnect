@@ -15,7 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the logged-in household's real data.
 const HOUSEHOLD = {
   firstName: "Juliet",
   avatar: require("../../assets/images/Ellipse 51.png"),
@@ -33,16 +32,33 @@ const PARTNER = {
 };
 
 const BUYING_PRICES = [
-  { id: "plastic", label: "Plastic", price: "₦300.00/kg" },
-  { id: "paper", label: "Paper", price: "₦200.00/kg" },
-  { id: "metal", label: "Metal", price: "₦1,000.00/kg" },
-  { id: "glass", label: "Glass", price: "₦500.00/kg" },
+  {
+    id: "plastic",
+    label: "Plastic",
+    price: "₦300.00/kg",
+    icon: "water-outline",
+  },
+  {
+    id: "paper",
+    label: "Paper",
+    price: "₦200.00/kg",
+    icon: "document-text-outline",
+  },
+  {
+    id: "metal",
+    label: "Metal",
+    price: "₦1,000.00/kg",
+    icon: "hardware-chip-outline",
+  },
+  { id: "glass", label: "Glass", price: "₦500.00/kg", icon: "wine-outline" },
 ];
 
 const RECENT = [
   {
     id: "1",
-    icon: "cube-outline",
+    icon: "trash-outline",
+    iconBg: COLORS.primaryLight,
+    iconColor: COLORS.primary,
     title: "Plastic Collection",
     subtitle: "1.2kg collected on Oct 12",
     points: "+25 pts",
@@ -51,12 +67,16 @@ const RECENT = [
   {
     id: "2",
     icon: "gift-outline",
+    iconBg: "#FBE4C4",
+    iconColor: "#B9741E",
     title: "Reward Redeemed",
     subtitle: "Data Top-up (500MB)",
     points: "-150 pts",
     positive: false,
   },
 ];
+
+const CONFIRM_PICKUP_ROUTE = "/(pickup)/confirm-rewards";
 
 export default function HouseholdHome() {
   const router = useRouter();
@@ -75,85 +95,93 @@ export default function HouseholdHome() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* ─── Header ─── */}
         <View style={styles.header}>
-          <Image source={HOUSEHOLD.avatar} style={styles.avatar} />
-          <View style={styles.headerText}>
-            <Text style={styles.helloText}>Hello,</Text>
-            <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
+          <View style={styles.headerLeft}>
+            <Image source={HOUSEHOLD.avatar} style={styles.avatar} />
+            <View>
+              <Text style={styles.helloText}>Hello,</Text>
+              <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
+            </View>
           </View>
+          <TouchableOpacity hitSlop={12}>
+            <Ionicons
+              name="notifications-outline"
+              size={22}
+              color={COLORS.textPrimary}
+            />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.subText}>What would you like to do?</Text>
+        <Text style={styles.subGreeting}>What would you like to do?</Text>
 
-        {/* ─── Household Code ─── */}
         <View style={styles.codeCard}>
           <View style={styles.codeCardTextWrap}>
             <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
             <Text style={styles.codeValue}>{HOUSEHOLD.code}</Text>
-            <Text style={styles.codeHint}>
-              Share this for your pickup or drop-off collection
-            </Text>
-
+            <TouchableOpacity onPress={handleCopyCode} hitSlop={6}>
+              <Text style={styles.codeHint}>
+                {copied
+                  ? "Copied!"
+                  : "Share this for your pickup or drop-off collection"}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
-              style={styles.confirmPickupBtn}
-              onPress={() => router.push("/(pickup)/confirm-rewards")}
+              style={styles.confirmPickupPill}
+              onPress={() => router.push(CONFIRM_PICKUP_ROUTE)}
+              activeOpacity={0.85}
             >
-              <Text style={styles.confirmPickupText}>Confirm Pickup</Text>
+              <Text style={styles.confirmPickupPillText}>Confirm Pickup</Text>
             </TouchableOpacity>
           </View>
           <Ionicons
             name="qr-code-outline"
-            size={80}
-            color="rgba(255,255,255,0.15)"
+            size={74}
+            color="rgba(255,255,255,0.35)"
           />
         </View>
 
-        {/* ─── Next Collection ─── */}
-        <View style={styles.collectionRow}>
-          <View style={styles.calendarCircle}>
+        <View style={styles.nextCollectionRow}>
+          <View style={styles.nextCollectionIconWrap}>
             <Ionicons
               name="calendar-outline"
               size={18}
               color={COLORS.primary}
             />
           </View>
-
           <View>
             <Text style={styles.mutedLabel}>Next Collection</Text>
-
             <Text style={styles.nextCollectionDate}>
               {NEXT_COLLECTION.date}
             </Text>
-
             <Text style={styles.nextCollectionTime}>
               {NEXT_COLLECTION.time}
             </Text>
           </View>
         </View>
 
-        {/* ─── Partner Card ─── */}
-        <View style={styles.partnerCard}>
-          <View style={styles.partnerTopRow}>
-            <View style={styles.partnerIcon}>
-              <Ionicons name="star" size={15} color="#FFD54A" />
-            </View>
-
-            <View style={{ flex: 1, marginLeft: 14 }}>
-              <Text style={styles.partnerName}>{PARTNER.name}</Text>
-
-              <View style={styles.verifiedTag}>
-                <Ionicons name="checkmark-circle" size={12} color="#FFFFFF" />
-                <Text style={styles.verifiedText}>Verified Partner</Text>
-              </View>
-
-              <Text style={styles.partnerLocation}>
-                Your Collection Partner - {PARTNER.location}
-              </Text>
-            </View>
+        <TouchableOpacity
+          style={styles.partnerCard}
+          onPress={() => router.push("/(pickup)/collection-partners")}
+          activeOpacity={0.85}
+        >
+          <View style={styles.partnerStarWrap}>
+            <Ionicons name="star" size={15} color={COLORS.accent} />
           </View>
-        </View>
+          <View style={styles.partnerTextWrap}>
+            <Text style={styles.partnerName}>{PARTNER.name}</Text>
+            <View style={styles.verifiedPill}>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={12}
+                color={COLORS.primaryLight}
+              />
+              <Text style={styles.verifiedPillText}>Verified Partner</Text>
+            </View>
+            <Text style={styles.partnerLocation}>
+              Your Collection Partner - {PARTNER.location}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
-        {/* ─── Mark as Ready ─── */}
         <View style={styles.readyCard}>
           <Text style={styles.mutedLabel}>Mark your materials as</Text>
           <Text style={styles.readyHeading}>Ready for Collection</Text>
@@ -169,8 +197,7 @@ export default function HouseholdHome() {
           </TouchableOpacity>
         </View>
 
-        {/* ─── Find Drop-off Location ─── */}
-        <View style={styles.dropoffCard}>
+        <View style={styles.dropoffSection}>
           <Text style={styles.dropoffHeading}>Find a Drop-off Location</Text>
           <Text style={styles.dropoffSubtext}>
             Drop-off your materials at a nearby collection hub
@@ -182,21 +209,22 @@ export default function HouseholdHome() {
           </TouchableOpacity>
         </View>
 
-        {/* ─── Today's Buying Prices ─── */}
-        <View style={styles.pricesCard}>
+        <View style={styles.pricesSection}>
           <View style={styles.pricesHeader}>
             <Text style={styles.pricesHeading}>Today's buying prices</Text>
             <Text style={styles.pricesUpdated}>UPDATED 1H AGO</Text>
           </View>
           {BUYING_PRICES.map((item) => (
             <View key={item.id} style={styles.priceRow}>
+              <View style={styles.priceIconWrap}>
+                <Ionicons name={item.icon} size={16} color={COLORS.primary} />
+              </View>
               <Text style={styles.priceLabel}>{item.label}</Text>
               <Text style={styles.priceValue}>{item.price}</Text>
             </View>
           ))}
         </View>
 
-        {/* ─── Recent Activity ─── */}
         <View style={styles.recentHeader}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
           <TouchableOpacity onPress={() => router.navigate("/household/track")}>
@@ -206,8 +234,13 @@ export default function HouseholdHome() {
 
         {RECENT.map((item) => (
           <View key={item.id} style={styles.activityCard}>
-            <View style={styles.activityIconWrap}>
-              <Ionicons name={item.icon} size={20} color={COLORS.textPrimary} />
+            <View
+              style={[
+                styles.activityIconWrap,
+                { backgroundColor: item.iconBg },
+              ]}
+            >
+              <Ionicons name={item.icon} size={20} color={item.iconColor} />
             </View>
             <View style={styles.activityInfo}>
               <Text style={styles.activityTitle}>{item.title}</Text>
@@ -230,13 +263,15 @@ export default function HouseholdHome() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 20, paddingTop: 25, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 20, paddingTop: 32, paddingBottom: 24 },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
+  headerLeft: { flexDirection: "row", alignItems: "center" },
   avatar: {
     width: 56,
     height: 56,
@@ -244,197 +279,165 @@ const styles = StyleSheet.create({
     marginRight: 14,
     backgroundColor: COLORS.surface,
   },
-  headerText: { justifyContent: "center" },
   helloText: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 16,
     color: COLORS.textSecondary,
   },
   nameText: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 24,
     color: COLORS.textPrimary,
   },
-  subText: {
+  subGreeting: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
-    marginBottom: 15,
+    marginBottom: 10,
   },
 
-  // Household code
   codeCard: {
-    backgroundColor: "#0F4A35",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 14,
     padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: 25,
   },
   codeCardTextWrap: { flex: 1, paddingRight: 12 },
   codeLabel: {
-    color: "#FFFFFF",
-    fontFamily: FONTS.bold,
-    fontSize: 13,
+    fontFamily: FONTS.semiBold,
+    fontSize: 11,
+    color: "rgba(255,255,255,0.7)",
+    letterSpacing: 0.6,
+    marginBottom: 6,
   },
-
   codeValue: {
-    color: "#FFFFFF",
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 19,
+    color: COLORS.white,
+    marginBottom: 6,
   },
-
   codeHint: {
-    color: "#DCE9E2",
-    fontSize: 12,
     fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: "rgba(255,255,255,0.75)",
+    marginBottom: 14,
   },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    marginRight: 14,
-    backgroundColor: COLORS.surface,
+  confirmPickupPill: {
+    alignSelf: "flex-start",
+    backgroundColor: "#188A5A",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  confirmPickupPillText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 10,
+    color: COLORS.primaryLight,
   },
 
-  // Next collection
-  collectionRow: {
+  nextCollectionRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 22,
-    paddingLeft: 15,
+    marginBottom: 24,
   },
-
-  calendarCircle: {
-    width: 35,
-    height: 35,
-    borderRadius: 30,
-    backgroundColor: "#CFF7DE",
-    justifyContent: "center",
+  nextCollectionIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 22,
+    backgroundColor: COLORS.primaryLight,
     alignItems: "center",
-    marginRight: 16,
-  },
-  nextCollectionCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 16,
+    justifyContent: "center",
+    marginRight: 14,
   },
   mutedLabel: {
     fontFamily: FONTS.medium,
     fontSize: 14,
     color: COLORS.textSecondary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   nextCollectionDate: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 17,
     color: COLORS.textPrimary,
-    marginBottom: 1,
   },
   nextCollectionTime: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
 
-  // Partner card
   partnerCard: {
-    backgroundColor: COLORS.primary,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: COLORS.primaryDark,
     borderRadius: 14,
-    padding: 10,
-    marginBottom: 10,
+    padding: 13,
+    marginBottom: 15,
   },
-  partnerTopRow: {
-    flexDirection: "row",
+  partnerStarWrap: {
+    width: 35,
+    height: 35,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
-  },
-
-  partnerIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 28,
-    backgroundColor: "#166845",
     justifyContent: "center",
-    alignItems: "center",
+    marginRight: 14,
+    marginTop: 15,
   },
-
-  partnerCard: {
-    backgroundColor: "#0F4A35",
-    borderRadius: 18,
-    padding: 12,
-    marginBottom: 24,
-  },
-
-  partnerLocation: {
-    color: "rgba(255,255,255,0.85)",
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-  },
-  partnerCardTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 6,
-  },
+  partnerTextWrap: { flex: 1 },
   partnerName: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: "#FFFFFF",
+    fontSize: 16,
+    color: COLORS.white,
     marginBottom: 5,
   },
-  verifiedRow: {
+  verifiedPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    alignSelf: "flex-start",
+    gap: 4,
+    backgroundColor: "#188A5A",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     marginBottom: 8,
   },
-  verifiedTag: {
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2FA866",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 15,
-    marginBottom: 4,
-  },
-
-  verifiedText: {
-    color: "#FFFFFF",
-    fontFamily: FONTS.medium,
-    fontSize: 8,
-    marginLeft: 4,
+  verifiedPillText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 9,
+    color: COLORS.primaryLight,
   },
   partnerLocation: {
     fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.85)",
+    fontSize: 10,
+    color: "rgba(255,255,255,0.75)",
   },
 
-  // Mark as ready
   readyCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 12,
-    marginBottom: 16,
+    padding: 13,
+    marginBottom: 20,
   },
   readyHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 20,
     color: COLORS.textPrimary,
-    marginBottom: 2,
+    marginBottom: 6,
   },
   readySubtext: {
     fontFamily: FONTS.regular,
     fontSize: 12,
     color: COLORS.textSecondary,
-    marginBottom: 10,
+    marginBottom: 16,
   },
   markReadyBtn: {
     backgroundColor: COLORS.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+    borderRadius: 10,
+    paddingVertical: 14,
     alignItems: "center",
   },
   markReadyBtnText: {
@@ -443,15 +446,10 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
 
-  // Drop-off
-  dropoffCard: {
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-  },
+  dropoffSection: { marginBottom: 28, padding: 2 },
   dropoffHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.textPrimary,
     marginBottom: 6,
   },
@@ -459,21 +457,16 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: 7,
+    marginBottom: 13,
   },
   dropoffLink: {
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.primary,
     textDecorationLine: "underline",
   },
 
-  // Buying prices
-  pricesCard: {
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 5,
-  },
+  pricesSection: { marginBottom: 24 },
   pricesHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -482,7 +475,7 @@ const styles = StyleSheet.create({
   },
   pricesHeading: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 18,
     color: COLORS.textPrimary,
   },
   pricesUpdated: {
@@ -493,30 +486,38 @@ const styles = StyleSheet.create({
   },
   priceRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  priceIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: COLORS.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
   priceLabel: {
+    flex: 1,
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
   priceValue: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
-
-  // Recent activity
   recentHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 15,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.textPrimary,
   },
   viewAllText: {
@@ -528,13 +529,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    padding: 15,
   },
   activityIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 14,
-    backgroundColor: COLORS.surface,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -542,31 +541,17 @@ const styles = StyleSheet.create({
   activityInfo: { flex: 1 },
   activityTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
   activitySub: {
     fontFamily: FONTS.regular,
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
   activityPoints: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-  },
-  confirmPickupBtn: {
-    marginTop: 12,
-    backgroundColor: "#2FA866",
-    alignSelf: "flex-start",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-
-  confirmPickupText: {
-    color: "#fff",
-    fontFamily: FONTS.medium,
-    fontSize: 11,
+    fontSize: 15,
   },
 });

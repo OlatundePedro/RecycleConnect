@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 
-// Collector sign-in. Household has its own dedicated screen at /login.
 const PIN_LENGTH = 4;
 
 export default function LoginCollector() {
@@ -51,7 +50,6 @@ export default function LoginCollector() {
 
   const handleLogin = () => {
     if (!canLogin) return;
-    // TODO: verify phone + PIN against the backend before navigating
     router.replace("/collector/home");
   };
 
@@ -67,7 +65,6 @@ export default function LoginCollector() {
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
 
-        {/* Illustration — collector-specific, in place of household's lock icon */}
         <View style={styles.illustrationWrap}>
           <Image
             source={require("../assets/images/collector-home.png")}
@@ -76,7 +73,6 @@ export default function LoginCollector() {
           />
         </View>
 
-        {/* Phone number */}
         <Text style={styles.fieldLabel}>Phone Number</Text>
         <View style={styles.fieldWrap}>
           <TextInput
@@ -89,7 +85,6 @@ export default function LoginCollector() {
           />
         </View>
 
-        {/* PIN */}
         <Text style={styles.fieldLabel}>PIN</Text>
         <View style={styles.pinRow}>
           {pin.map((digit, index) => (
@@ -108,7 +103,6 @@ export default function LoginCollector() {
           ))}
         </View>
 
-        {/* Login button */}
         <TouchableOpacity
           style={[styles.loginBtn, !canLogin && styles.loginBtnDisabled]}
           onPress={handleLogin}

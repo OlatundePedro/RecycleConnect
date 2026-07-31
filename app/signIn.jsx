@@ -50,8 +50,6 @@ export default function Login() {
 
   const handleLogin = () => {
     if (!canLogin) return;
-    // TODO: verify phone + PIN against the backend, then route to the
-    // account's actual role (household vs collector) rather than assuming.
     router.replace("/household/home");
   };
 
@@ -67,7 +65,6 @@ export default function Login() {
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
 
-        {/* Illustration — collector-specific, in place of household's lock icon */}
         <View style={styles.illustrationWrap}>
           <Image
             source={require("../assets/images/welcome-household.png")}
@@ -76,7 +73,6 @@ export default function Login() {
           />
         </View>
 
-        {/* Phone number */}
         <Text style={styles.fieldLabel}>Phone Number</Text>
         <View style={styles.fieldWrap}>
           <TextInput
@@ -89,7 +85,6 @@ export default function Login() {
           />
         </View>
 
-        {/* PIN */}
         <Text style={styles.fieldLabel}>PIN</Text>
         <View style={styles.pinRow}>
           {pin.map((digit, index) => (
@@ -108,7 +103,6 @@ export default function Login() {
           ))}
         </View>
 
-        {/* Login button */}
         <TouchableOpacity
           style={[styles.loginBtn, !canLogin && styles.loginBtnDisabled]}
           onPress={handleLogin}

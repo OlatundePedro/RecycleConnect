@@ -1,4 +1,3 @@
-// RecycleConnect design-system colour tokens
 export const COLORS = {
   primary: "#2D7A46",
   primaryLight: "#EAF6F0",

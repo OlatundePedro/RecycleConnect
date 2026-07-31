@@ -28,7 +28,6 @@ export default function GetStarted() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>
           What brings you to{"\n"}RecycleConnect?
@@ -39,7 +38,6 @@ export default function GetStarted() {
         </Text>
       </View>
 
-      {/* Household Card */}
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.9}
@@ -60,7 +58,6 @@ export default function GetStarted() {
         <AntDesign name="right" size={15} color="#111" />
       </TouchableOpacity>
 
-      {/* Collector Card — routes to its own dedicated sign-up screen */}
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.9}

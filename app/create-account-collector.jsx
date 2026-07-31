@@ -14,8 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 
-// Collector sign-up. Household has its own dedicated screen at
-// /create-account.
 export default function CreateAccountCollector() {
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -24,7 +22,7 @@ export default function CreateAccountCollector() {
 
   const handleVerifyPhone = () => {
     if (!canContinue) return;
-    // TODO: trigger the actual send-OTP API call before navigating
+
     router.push({
       pathname: "/create-otp-collector",
       params: { phone },
@@ -51,7 +49,6 @@ export default function CreateAccountCollector() {
           />
         </View>
 
-        {/* Phone number */}
         <Text style={styles.fieldLabel}>Phone Number</Text>
         <View style={styles.fieldWrap}>
           <TextInput
@@ -64,7 +61,6 @@ export default function CreateAccountCollector() {
           />
         </View>
 
-        {/* Verify button */}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           onPress={handleVerifyPhone}
@@ -74,7 +70,6 @@ export default function CreateAccountCollector() {
           <Text style={styles.verifyBtnText}>Verify Phone Number</Text>
         </TouchableOpacity>
 
-        {/* Sign in link */}
         <View style={styles.signinRow}>
           <Text style={styles.signinText}>Already have an account? </Text>
           <TouchableOpacity onPress={() => router.push("/signIn-collector")}>

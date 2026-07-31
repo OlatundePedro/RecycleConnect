@@ -13,8 +13,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 
-// Household OTP verification. Collector has its own dedicated screen at
-// /verify-otp-collector.
 const COLORS = {
   primary: "#2D7A46",
   textPrimary: "#111111",
@@ -28,8 +26,6 @@ const OTP_LENGTH = 4;
 const RESEND_SECONDS = 35;
 const ACCOUNT_TYPE = "household";
 
-// Masks a raw phone number as "+234 801 *** 4231" — keeps the country code
-// and leading digits plus the last 4 digits, hides the middle.
 function maskPhone(phone) {
   if (!phone) return "";
   const clean = String(phone).replace(/\s+/g, "");
@@ -83,7 +79,6 @@ export default function VerifyOtp() {
 
   const handleResend = () => {
     if (secondsLeft > 0) return;
-    // TODO: hook this up to the actual resend-OTP API call
     setDigits(Array(OTP_LENGTH).fill(""));
     setSecondsLeft(RESEND_SECONDS);
     inputRefs.current[0]?.focus();
@@ -94,7 +89,6 @@ export default function VerifyOtp() {
 
   const handleVerify = () => {
     if (!canContinue) return;
-    // TODO: verify `code` against the backend before proceeding
     router.replace({
       pathname: "/account-success",
       params: { type: ACCOUNT_TYPE },
@@ -115,7 +109,6 @@ export default function VerifyOtp() {
         <Text style={styles.subtitle}>We've sent a 4-digit code to</Text>
         <Text style={styles.phoneText}>{maskPhone(phone)}</Text>
 
-        {/* Illustration */}
         <View style={styles.illustrationWrap}>
           <Image
             source={require("../assets/images/otp-illustration.png")}
@@ -124,7 +117,6 @@ export default function VerifyOtp() {
           />
         </View>
 
-        {/* OTP boxes */}
         <View style={styles.otpRow}>
           {digits.map((digit, index) => (
             <TextInput
@@ -141,7 +133,6 @@ export default function VerifyOtp() {
           ))}
         </View>
 
-        {/* Resend */}
         <View style={styles.resendWrap}>
           <Text style={styles.resendPrompt}>Didn't receive it?</Text>
           <TouchableOpacity onPress={handleResend} disabled={secondsLeft > 0}>
@@ -156,7 +147,6 @@ export default function VerifyOtp() {
           </TouchableOpacity>
         </View>
 
-        {/* Verify button */}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           activeOpacity={0.85}

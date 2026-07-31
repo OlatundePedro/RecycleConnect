@@ -27,8 +27,6 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-// Placeholder profile data — swap for the real signed-in user once wired
-// up to the backend/auth state.
 const USER = {
   name: "Chidi Adebayo",
   phone: "+234 803 123 4567",
@@ -51,13 +49,9 @@ const MENU_ITEMS = [
 
 export default function HouseholdProfile() {
   const router = useRouter();
-
-  const handleEditAvatar = () => {
-    // TODO: hook this up to expo-image-picker
-  };
+  const handleEditAvatar = () => {};
 
   const handleLogout = () => {
-    // TODO: clear auth/session state before navigating
     router.replace("/signIn");
   };
 
@@ -65,7 +59,6 @@ export default function HouseholdProfile() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -81,7 +74,6 @@ export default function HouseholdProfile() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Avatar + name */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
@@ -100,7 +92,6 @@ export default function HouseholdProfile() {
           <Text style={styles.phone}>{USER.phone}</Text>
         </View>
 
-        {/* Environmental impact card */}
         <View style={styles.impactCard}>
           <View style={styles.impactTopRow}>
             <View style={{ flex: 1 }}>
@@ -131,7 +122,6 @@ export default function HouseholdProfile() {
           </Text>
         </View>
 
-        {/* Menu */}
         <View style={styles.menuCard}>
           {MENU_ITEMS.map((item, index) => (
             <TouchableOpacity
@@ -155,7 +145,6 @@ export default function HouseholdProfile() {
           ))}
         </View>
 
-        {/* Logout */}
         <TouchableOpacity
           style={styles.logoutBtn}
           activeOpacity={0.8}

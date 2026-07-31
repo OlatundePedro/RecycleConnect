@@ -1,4 +1,3 @@
-// Font family names — must match the keys used in useFonts() in app/_layout.jsx
 export const FONTS = {
   regular: "Inter-Regular",
   medium: "Inter-Medium",
@@ -7,7 +6,6 @@ export const FONTS = {
   black: "Inter-Black",
 };
 
-// Type scale from the RecycleConnect design system
 export const TEXT_STYLES = {
   heading1: {
     fontFamily: FONTS.bold,

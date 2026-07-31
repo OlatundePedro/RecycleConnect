@@ -23,7 +23,7 @@ export default function PinSuccess() {
   const isCollector = type === "collector";
 
   const handleRegister = () => {
-    router.replace(isCollector ? "/collector-checklist" : "/about-you");
+    router.replace(isCollector ? "/collector-about-business" : "/about-you");
   };
 
   return (

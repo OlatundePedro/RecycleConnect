@@ -1,5 +1,3 @@
-// constants/partners.ts
-
 export const PARTNERS = [
   {
     id: "greencycle-ikorodu",

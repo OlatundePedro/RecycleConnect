@@ -58,7 +58,6 @@ export default function RecyclablesInfo() {
   const params = useLocalSearchParams();
 
   const handleGotIt = () => {
-    // TODO: persist the collected profile (params) via the actual API call
     router.replace("/household/home");
   };
 
@@ -94,8 +93,6 @@ export default function RecyclablesInfo() {
             </View>
           </View>
         ))}
-
-        {/* Illustration banner */}
         <View style={styles.bannerWrap}>
           <Image
             source={require("../assets/images/education-banner.png")}
@@ -112,7 +109,6 @@ export default function RecyclablesInfo() {
           </View>
         </View>
 
-        {/* What we don't take */}
         <View style={styles.warnBox}>
           <Ionicons name="warning" size={22} color={COLORS.warnText} />
           <View style={styles.warnTextWrap}>

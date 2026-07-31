@@ -49,7 +49,6 @@ export default function ResetPassword() {
 
   const handleSave = () => {
     if (!canSave) return;
-    // TODO: call your reset-password endpoint with newPassword, then route on
     router.replace("/login");
   };
 
@@ -77,7 +76,6 @@ export default function ResetPassword() {
           />
         </View>
 
-        {/* New password — icon + label-over-value style, matching create-account's Field */}
         <View style={styles.fieldWrap}>
           <Ionicons
             name="lock-closed-outline"
@@ -108,7 +106,6 @@ export default function ResetPassword() {
           </TouchableOpacity>
         </View>
 
-        {/* Confirm password — same field style */}
         <View style={styles.fieldWrap}>
           <Ionicons
             name="lock-closed-outline"
@@ -142,7 +139,6 @@ export default function ResetPassword() {
           <Text style={styles.mismatchText}>Passwords don't match</Text>
         )}
 
-        {/* Requirements checklist */}
         <Text style={styles.requirementsHeading}>Password must have:</Text>
         <View style={styles.requirementsList}>
           {checks.map((c) => (
@@ -165,7 +161,6 @@ export default function ResetPassword() {
           ))}
         </View>
 
-        {/* Save button */}
         <TouchableOpacity
           style={[styles.loginBtn, !canSave && styles.loginBtnDisabled]}
           onPress={handleSave}

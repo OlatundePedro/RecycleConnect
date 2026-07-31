@@ -33,12 +33,30 @@ export default function ConfirmCollectionReward() {
   const [amountMatches, setAmountMatches] = useState(false);
 
   const canConfirm = receivedCash && amountMatches;
-
   const handleConfirm = () => {
     if (!canConfirm) return;
-    router.push(NEXT_ROUTE);
-  };
 
+    const receipt = {
+      receiptNo: REWARD.code,
+      date: "May 15, 2025",
+      time: "11:30 AM",
+      collectionType: "Pickup",
+      partner: REWARD.partnerName,
+      location: "Ikorodu, Lagos",
+      household: "John A. - Maryland",
+      materials: "Plastic, Metal",
+      weight: `${REWARD.weightKg} kg`,
+      payment: REWARD.amount,
+      generated: "May 15, 2025; 11:32 AM",
+    };
+
+    router.push({
+      pathname: "/(pickup)/confirm",
+      params: {
+        receipt: JSON.stringify(receipt),
+      },
+    });
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
