@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -109,7 +110,7 @@ function StateListModal({ visible, selected, onSelect, onClose }) {
 
 export default function HouseholdProfile() {
   const router = useRouter();
-  const { fullName, email } = useLocalSearchParams();
+  const { updateData } = useHouseholdOnboarding();
 
   const [state, setState] = useState("");
   const [area, setArea] = useState("");
@@ -119,10 +120,8 @@ export default function HouseholdProfile() {
   const handleUseCurrentLocation = () => {};
 
   const handleSaveLocation = () => {
-    router.replace({
-      pathname: "/household-education",
-      params: { fullName, email, state, area, landmark },
-    });
+    updateData({ state, area, landmark });
+    router.replace("/household-education");
   };
 
   return (

@@ -13,19 +13,32 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { sendOtp } from "../services/authApi";
 
 export default function CreateAccount() {
   const router = useRouter();
+  const { updateData } = useHouseholdOnboarding();
   const [phone, setPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const canContinue = phone.trim().length > 0;
+  const canContinue = phone.trim().length > 0 && !submitting;
 
-  const handleVerifyPhone = () => {
+  const handleVerifyPhone = async () => {
     if (!canContinue) return;
-    router.push({
-      pathname: "/create-otp-house",
-      params: { phone },
-    });
+    setSubmitting(true);
+    setError("");
+    try {
+      await sendOtp(phone.trim());
+      updateData({ phone: phone.trim() });
+      router.push("/create-otp-house");
+    } catch (err) {
+      setError(err.message || "Couldn't send the code. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
+    const API_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
   };
 
   return (
@@ -60,13 +73,17 @@ export default function CreateAccount() {
           />
         </View>
 
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           onPress={handleVerifyPhone}
           activeOpacity={0.85}
           disabled={!canContinue}
         >
-          <Text style={styles.verifyBtnText}>Verify Phone Number</Text>
+          <Text style={styles.verifyBtnText}>
+            {submitting ? "Sending..." : "Verify Phone Number"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.signinRow}>
@@ -117,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    marginBottom: 48,
+    marginBottom: 16,
   },
   fieldInput: {
     fontFamily: FONTS.regular,
@@ -125,12 +142,21 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "#D64545",
+    marginBottom: 16,
+  },
   verifyBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
     marginBottom: 20,
+  },
+  verifyBtnDisabled: {
+    opacity: 0.6,
   },
   verifyBtnText: {
     fontFamily: FONTS.semiBold,

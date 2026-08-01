@@ -2,6 +2,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { HouseholdOnboardingProvider } from "../context/HouseholdOnboardingContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,5 +30,9 @@ export default function RootLayout() {
 
   if (!appReady) return null;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <HouseholdOnboardingProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </HouseholdOnboardingProvider>
+  );
 }

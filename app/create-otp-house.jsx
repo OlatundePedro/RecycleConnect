@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Image,
@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { sendOtp } from "../services/authApi";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -20,6 +22,7 @@ const COLORS = {
   background: "#FFFFFF",
   surface: "#F4F7F6",
   white: "#FFFFFF",
+  error: "#D64545",
 };
 
 const OTP_LENGTH = 4;
@@ -38,10 +41,13 @@ function maskPhone(phone) {
 
 export default function VerifyOtp() {
   const router = useRouter();
-  const { phone } = useLocalSearchParams();
+  const { data, updateData } = useHouseholdOnboarding();
+  const phone = data.phone;
 
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState("");
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -61,6 +67,7 @@ export default function VerifyOtp() {
       next[index] = char;
       return next;
     });
+    if (error) setError("");
     if (char && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -77,20 +84,34 @@ export default function VerifyOtp() {
     }
   };
 
-  const handleResend = () => {
-    if (secondsLeft > 0) return;
-    setDigits(Array(OTP_LENGTH).fill(""));
-    setSecondsLeft(RESEND_SECONDS);
-    inputRefs.current[0]?.focus();
+  const handleResend = async () => {
+    if (secondsLeft > 0 || resending) return;
+    setResending(true);
+    setError("");
+    try {
+      await sendOtp(phone);
+      setDigits(Array(OTP_LENGTH).fill(""));
+      setSecondsLeft(RESEND_SECONDS);
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      setError(err.message || "Couldn't resend the code. Try again.");
+    } finally {
+      setResending(false);
+    }
   };
 
   const code = digits.join("");
   const canContinue = code.length === OTP_LENGTH;
 
+  // Note: this screen doesn't hit a separate /auth/verify-otp endpoint —
+  // the OTP is validated server-side as part of the final
+  // /auth/register/household call. If your API does expose a dedicated
+  // verify step, call it here before saving otp to context.
   const handleVerify = () => {
     if (!canContinue) return;
-    router.replace({
-      pathname: "/account-success",
+    updateData({ otp: code });
+    router.push({
+      pathname: "/create-pin",
       params: { type: ACCOUNT_TYPE },
     });
   };
@@ -133,16 +154,25 @@ export default function VerifyOtp() {
           ))}
         </View>
 
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
         <View style={styles.resendWrap}>
           <Text style={styles.resendPrompt}>Didn't receive it?</Text>
-          <TouchableOpacity onPress={handleResend} disabled={secondsLeft > 0}>
+          <TouchableOpacity
+            onPress={handleResend}
+            disabled={secondsLeft > 0 || resending}
+          >
             <Text
               style={[
                 styles.resendAction,
-                secondsLeft > 0 && styles.resendActionDisabled,
+                (secondsLeft > 0 || resending) && styles.resendActionDisabled,
               ]}
             >
-              {secondsLeft > 0 ? `Resend in ${formattedTimer}` : "Resend Code"}
+              {resending
+                ? "Resending..."
+                : secondsLeft > 0
+                  ? `Resend in ${formattedTimer}`
+                  : "Resend Code"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -209,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "85%",
-    marginBottom: 28,
+    marginBottom: 12,
   },
   otpBox: {
     width: 60,
@@ -223,6 +253,13 @@ const styles = StyleSheet.create({
   },
   otpBoxFilled: {
     backgroundColor: COLORS.white,
+  },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: COLORS.error,
+    textAlign: "center",
+    marginBottom: 16,
   },
   resendWrap: {
     alignItems: "center",
@@ -250,7 +287,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 24,
   },
-
+  verifyBtnDisabled: {
+    opacity: 0.6,
+  },
   verifyBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,

@@ -32,7 +32,7 @@ export default function PendingApproval() {
           <Text style={styles.title}>Pending Approval</Text>
 
           <Text style={styles.subtitle}>
-            We will notify you once your application has been reviewed and
+            We will notify you {"\n"}once your application has been reviewed and
             approved.
           </Text>
         </View>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 42,
+    fontSize: 35,
     color: COLORS.textPrimary,
     textAlign: "center",
     marginBottom: 16,
@@ -85,24 +85,24 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 18,
+    fontSize: 13,
     color: COLORS.textSecondary,
     textAlign: "center",
-    lineHeight: 28,
+    lineHeight: 18,
     paddingHorizontal: 16,
   },
 
   button: {
-    height: 62,
+    height: 50,
     backgroundColor: COLORS.primary,
-    borderRadius: 18,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
   },
 
   buttonText: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 14,
     color: COLORS.white,
   },
 });

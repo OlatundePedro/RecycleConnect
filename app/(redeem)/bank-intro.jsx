@@ -34,7 +34,6 @@ const FEATURES = [
   },
 ];
 
-// Where "Get Started" hands off to — the actual bank-details form.
 const NEXT_ROUTE = "/(redeem)/withdraw";
 
 export default function LinkBankAccountIntro() {

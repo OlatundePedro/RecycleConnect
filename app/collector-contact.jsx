@@ -66,12 +66,15 @@ export default function CollectionApplication() {
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons
               name="chevron-back"
-              size={28}
+              size={18}
               color={COLORS.textPrimary}
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.skipButton}>
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={() => router.replace("/collector/home")}
+          >
             <Text style={styles.skipText}>Skip for now</Text>
 
             <Ionicons name="arrow-forward" size={16} color={COLORS.primary} />
@@ -167,8 +170,6 @@ export default function CollectionApplication() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Vehicle Type</Text>
-
           <DropdownInput
             label="Vehicle Type"
             placeholder="Select vehicle type"
@@ -179,8 +180,6 @@ export default function CollectionApplication() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Bank Name</Text>
-
           <DropdownInput
             label="Bank Name"
             placeholder="Select bank"
@@ -233,7 +232,7 @@ export default function CollectionApplication() {
               <View style={styles.uploadContent}>
                 <Text style={styles.uploadText}>Upload</Text>
 
-                <Ionicons name="add" size={32} color="#65748B" />
+                <Ionicons name="add" size={22} color="#65748B" />
               </View>
             )}
           </TouchableOpacity>
@@ -258,7 +257,7 @@ export default function CollectionApplication() {
               <View style={styles.uploadContent}>
                 <Text style={styles.uploadText}>Upload</Text>
 
-                <Ionicons name="add" size={32} color="#65748B" />
+                <Ionicons name="add" size={22} color="#65748B" />
               </View>
             )}
           </TouchableOpacity>
@@ -283,7 +282,7 @@ export default function CollectionApplication() {
               <View style={styles.uploadContent}>
                 <Text style={styles.uploadText}>Upload</Text>
 
-                <Ionicons name="add" size={32} color="#65748B" />
+                <Ionicons name="add" size={22} color="#65748B" />
               </View>
             )}
           </TouchableOpacity>
@@ -305,15 +304,15 @@ const styles = StyleSheet.create({
 
   scroll: {
     paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 40,
+    paddingTop: 50,
+    paddingBottom: 20,
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 25,
   },
 
   skipButton: {
@@ -324,85 +323,85 @@ const styles = StyleSheet.create({
 
   skipText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.primary,
   },
 
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 30,
+    fontSize: 28,
     color: COLORS.textPrimary,
     textAlign: "center",
-    lineHeight: 38,
+    lineHeight: 30,
     marginBottom: 12,
   },
 
   subtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 23,
-    marginBottom: 40,
+    marginBottom: 18,
   },
 
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 19,
     color: COLORS.textPrimary,
-    marginBottom: 20,
-    marginTop: 12,
+    marginBottom: 18,
+    marginTop: 10,
   },
 
   inputGroup: {
-    marginBottom: 22,
+    marginBottom: 20,
   },
 
   label: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.primary,
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   input: {
-    height: 58,
-    borderRadius: 16,
-    borderWidth: 1.5,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.0,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.white,
     paddingHorizontal: 18,
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textPrimary,
   },
   searchInput: {
-    height: 45,
-    borderRadius: 10,
+    height: 40,
+    borderRadius: 14,
     fontFamily: FONTS.regular,
     fontSize: 15,
     color: COLORS.textPrimary,
   },
   uploadGroup: {
-    marginBottom: 24,
+    marginBottom: 15,
   },
 
   uploadHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   uploadLimit: {
     fontFamily: FONTS.regular,
-    fontSize: 12,
+    fontSize: 10,
     color: COLORS.textSecondary,
   },
 
   uploadCard: {
     height: 130,
-    borderRadius: 18,
-    borderWidth: 1.5,
+    borderRadius: 14,
+    borderWidth: 1.0,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.white,
     justifyContent: "center",
@@ -417,7 +416,7 @@ const styles = StyleSheet.create({
 
   uploadText: {
     fontFamily: FONTS.medium,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textSecondary,
     marginBottom: 8,
   },
@@ -429,8 +428,8 @@ const styles = StyleSheet.create({
 
   submitButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 18,
-    height: 60,
+    borderRadius: 14,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
@@ -439,7 +438,7 @@ const styles = StyleSheet.create({
 
   submitText: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 14,
     color: COLORS.white,
   },
 });

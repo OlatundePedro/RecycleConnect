@@ -34,8 +34,6 @@ export default function CollectionAboutYou() {
           <Text style={styles.label}>First Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter first name"
-            placeholderTextColor={COLORS.textSecondary}
             value={firstName}
             onChangeText={setFirstName}
           />
@@ -46,8 +44,6 @@ export default function CollectionAboutYou() {
 
           <TextInput
             style={styles.input}
-            placeholder="Enter last name"
-            placeholderTextColor={COLORS.textSecondary}
             value={lastName}
             onChangeText={setLastName}
           />
@@ -85,55 +81,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 70,
+    paddingTop: 50,
   },
 
   header: {
     alignItems: "center",
-    marginBottom: 50,
+    marginBottom: 40,
   },
 
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 32,
+    fontSize: 28,
     color: COLORS.textPrimary,
     textAlign: "center",
     lineHeight: 40,
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   subtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: "center",
   },
 
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 19,
     color: COLORS.textPrimary,
-    marginBottom: 28,
+    marginBottom: 18,
   },
 
   fieldContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
   label: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 13,
     color: COLORS.primary,
     marginBottom: 10,
   },
 
   input: {
-    height: 88,
-    borderWidth: 2,
+    height: 55,
+    borderWidth: 1,
     borderColor: COLORS.primary,
-    borderRadius: 20,
+    borderRadius: 14,
     backgroundColor: COLORS.white,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     fontFamily: FONTS.regular,
     fontSize: 17,
     color: COLORS.textPrimary,
@@ -145,38 +141,42 @@ const styles = StyleSheet.create({
 
   footer: {
     paddingHorizontal: 24,
-    paddingBottom: 28,
-    paddingTop: 12,
+    paddingTop: 8,
+    paddingBottom: 24,
   },
 
   continueButton: {
-    height: 64,
-    borderRadius: 20,
     backgroundColor: COLORS.primary,
-    justifyContent: "center",
+    borderRadius: 14,
+    paddingVertical: 16,
     alignItems: "center",
-    marginBottom: 18,
+    alignSelf: "center",
+    marginBottom: 12,
+    width: "110%",
   },
 
   continueText: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 14,
     color: COLORS.white,
   },
 
   backButton: {
-    height: 64,
-    borderRadius: 20,
-    borderWidth: 2,
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
+
+    width: "110%",
   },
 
   backText: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 14,
     color: COLORS.primary,
   },
 });

@@ -14,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the real partner list for this household's area.
 const PARTNERS = [
   {
     id: "greencycle-ikorodu",
@@ -62,8 +61,6 @@ export default function CollectionPartners() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
@@ -76,7 +73,6 @@ export default function CollectionPartners() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Search + filter */}
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
             <Ionicons name="search" size={20} color={COLORS.textSecondary} />
@@ -97,7 +93,6 @@ export default function CollectionPartners() {
           </TouchableOpacity>
         </View>
 
-        {/* Partner list */}
         {filteredPartners.map((partner) => {
           const active = partner.id === selectedId;
           return (
@@ -134,7 +129,6 @@ export default function CollectionPartners() {
           </Text>
         )}
 
-        {/* Next collection + accepts, for the selected partner */}
         {selectedPartner && (
           <>
             <View style={styles.nextCollectionCard}>
@@ -166,7 +160,6 @@ export default function CollectionPartners() {
         )}
       </ScrollView>
 
-      {/* Confirm */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[

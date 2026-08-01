@@ -4,7 +4,7 @@ import { Image, StatusBar, StyleSheet, View } from "react-native";
 
 const BACKGROUND_COLOR = "#01150B";
 
-const SPLASH_DURATION_MS = 5000;
+const SPLASH_DURATION_MS = 4000;
 
 const NEXT_ROUTE = "/shared-onboarding";
 

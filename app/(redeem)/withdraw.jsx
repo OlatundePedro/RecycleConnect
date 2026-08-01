@@ -35,7 +35,6 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-// Placeholder wallet balance — swap for the real signed-in user's balance.
 const WALLET_BALANCE = 5240.0;
 
 const QUICK_AMOUNTS = [500, 1000, 5000, 10000];
@@ -45,8 +44,6 @@ export default function Withdraw() {
   const [amount, setAmount] = useState("");
   const [linkedBank, setLinkedBankState] = useState(getLinkedBank());
 
-  // Re-read the linked bank every time this screen regains focus, so
-  // picking a different bank via "change" is reflected immediately.
   useFocusEffect(
     useCallback(() => {
       setLinkedBankState(getLinkedBank());
@@ -74,7 +71,7 @@ export default function Withdraw() {
 
   const handleWithdraw = () => {
     if (!canWithdraw) return;
-    // TODO: submit the withdrawal via the actual API call before navigating
+
     router.replace({
       pathname: "/withdrawal-success",
       params: {
@@ -92,8 +89,6 @@ export default function Withdraw() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -110,7 +105,6 @@ export default function Withdraw() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Wallet balance card */}
         <View style={styles.walletCard}>
           <View style={styles.walletTopRow}>
             <View>
@@ -149,8 +143,6 @@ export default function Withdraw() {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Withdrawal amount */}
         <Text style={styles.sectionTitle}>Withdrawal Amount</Text>
         <View style={styles.amountField}>
           <Text style={styles.nairaPrefix}>₦</Text>
@@ -179,7 +171,6 @@ export default function Withdraw() {
           ))}
         </View>
 
-        {/* Withdraw to */}
         <Text style={styles.sectionTitle}>Withdraw To</Text>
         {linkedBank ? (
           <View style={styles.linkedBankCard}>
@@ -216,7 +207,6 @@ export default function Withdraw() {
           </TouchableOpacity>
         )}
 
-        {/* Note */}
         <View style={styles.noteBox}>
           <Ionicons
             name="shield-checkmark-outline"

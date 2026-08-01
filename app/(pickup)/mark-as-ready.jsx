@@ -14,8 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// pricePerKg is the numeric part of the old display price, used to
-// estimate the reward below. Adjust to your real per-kg rates.
 const MATERIALS = [
   { id: "plastic", label: "Plastic", icon: "water-outline", pricePerKg: 150 },
   {
@@ -33,8 +31,6 @@ const MATERIALS = [
   { id: "glass", label: "Glass", icon: "wine-outline", pricePerKg: 80 },
 ];
 
-// Used when the person doesn't type in an estimated weight —
-// a rough per-material guess so the screen still shows a number.
 const DEFAULT_KG_PER_MATERIAL = 0.8;
 
 export default function MarkAsReady() {
@@ -81,7 +77,6 @@ export default function MarkAsReady() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
@@ -102,7 +97,6 @@ export default function MarkAsReady() {
           date.
         </Text>
 
-        {/* Material grid */}
         <View style={styles.grid}>
           {MATERIALS.map((m) => {
             const active = selected.includes(m.id);
@@ -138,7 +132,6 @@ export default function MarkAsReady() {
           })}
         </View>
 
-        {/* Estimated weight input */}
         <View style={styles.weightInputRow}>
           <View style={styles.weightInputTextWrap}>
             <Text style={styles.weightInputLabel}>Enter estimated weight</Text>
@@ -154,7 +147,6 @@ export default function MarkAsReady() {
           />
         </View>
 
-        {/* Estimated total weight */}
         <View style={styles.summaryBlock}>
           <Text style={styles.summaryLabel}>Estimated Total weight</Text>
           <Text style={styles.summaryValue}>
@@ -163,7 +155,6 @@ export default function MarkAsReady() {
           <Text style={styles.summaryCaption}>This is an estimate</Text>
         </View>
 
-        {/* Estimated reward */}
         <View style={styles.summaryBlock}>
           <Text style={styles.summaryLabel}>Estimated Reward</Text>
           <Text style={styles.rewardValue}>
@@ -174,7 +165,6 @@ export default function MarkAsReady() {
         </View>
       </ScrollView>
 
-      {/* Confirm button */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[

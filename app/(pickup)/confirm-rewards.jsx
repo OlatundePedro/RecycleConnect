@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Linking,
@@ -14,21 +14,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the reward the partner actually logged for this pickup.
-const REWARD = {
-  weightKg: 1.5,
-  amount: 1250,
-  breakdown: "Metal - N1000/kg; Plastic - N300/kg",
-  partnerName: "GreenCycle Lagos",
-  timestamp: "Today - 11:32 AM",
-  code: "GC087",
-};
-
 const NEXT_ROUTE = "/(pickup)/confirm";
 const HELP_URL = "https://recycleconnect.example.com/help";
 
 export default function ConfirmCollectionReward() {
   const router = useRouter();
+  const { pickup } = useLocalSearchParams();
+
+  const parsedPickup = pickup ? JSON.parse(String(pickup)) : null;
+
+  const REWARD = {
+    id: parsedPickup?.id ?? "",
+    material: parsedPickup?.material ?? "",
+    weightKg: parsedPickup?.weight ?? "",
+    amount: Number(String(parsedPickup?.amount ?? "0").replace(/[₦,]/g, "")),
+    breakdown: `${parsedPickup?.material ?? ""} - ${parsedPickup?.pricePerKg ?? ""}`,
+    partnerName: "GreenCycle Lagos",
+    timestamp: parsedPickup?.date ?? "",
+    code: "GC087",
+  };
   const [receivedCash, setReceivedCash] = useState(false);
   const [amountMatches, setAmountMatches] = useState(false);
 
@@ -44,7 +48,7 @@ export default function ConfirmCollectionReward() {
       partner: REWARD.partnerName,
       location: "Ikorodu, Lagos",
       household: "John A. - Maryland",
-      materials: "Plastic, Metal",
+      materials: REWARD.material,
       weight: `${REWARD.weightKg} kg`,
       payment: REWARD.amount,
       generated: "May 15, 2025; 11:32 AM",
@@ -61,7 +65,6 @@ export default function ConfirmCollectionReward() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
@@ -80,11 +83,12 @@ export default function ConfirmCollectionReward() {
           cash amount.
         </Text>
 
-        {/* Logged reward card */}
         <View style={styles.rewardCard}>
           <Text style={styles.rewardCardLabel}>Logged by Partner</Text>
           <View style={styles.rewardTopRow}>
-            <Text style={styles.rewardWeight}>{REWARD.weightKg} kg</Text>
+            <Text style={styles.rewardWeight}>
+              {REWARD.weightKg} {REWARD.material}
+            </Text>
             <Text style={styles.rewardAmount}>
               ₦{REWARD.amount.toLocaleString()}.00
             </Text>
@@ -95,7 +99,6 @@ export default function ConfirmCollectionReward() {
           </Text>
         </View>
 
-        {/* Confirmation checkboxes */}
         <TouchableOpacity
           style={styles.checkRow}
           onPress={() => setReceivedCash((v) => !v)}
@@ -131,7 +134,6 @@ export default function ConfirmCollectionReward() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.confirmBtn, !canConfirm && styles.confirmBtnDisabled]}

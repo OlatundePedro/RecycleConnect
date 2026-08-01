@@ -49,8 +49,6 @@ export default function LinkBankAccount() {
   const [verifiedName, setVerifiedName] = useState("");
   const [verifying, setVerifying] = useState(false);
 
-  // Simulates a resolve-account-number lookup once 10 digits are entered.
-  // TODO: replace with the actual Paystack/bank resolve-account API call.
   useEffect(() => {
     if (accountNumber.length === ACCOUNT_NUMBER_LENGTH) {
       setVerifying(true);
@@ -80,7 +78,6 @@ export default function LinkBankAccount() {
 
   const handleLinkBankAccount = () => {
     if (!canLink) return;
-    // TODO: submit bankKey/accountNumber/verifiedName via the actual API call
     setLinkedBank({
       key: bankKey,
       name: bankName,
@@ -104,7 +101,6 @@ export default function LinkBankAccount() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -216,7 +212,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.selectedBg,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: "#CFE6D9",
     borderRadius: 16,
     padding: 16,

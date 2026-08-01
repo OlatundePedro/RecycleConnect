@@ -76,8 +76,6 @@ const RECENT = [
   },
 ];
 
-const CONFIRM_PICKUP_ROUTE = "/(pickup)/confirm-rewards";
-
 export default function HouseholdHome() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -103,7 +101,10 @@ export default function HouseholdHome() {
               <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
             </View>
           </View>
-          <TouchableOpacity hitSlop={12}>
+          <TouchableOpacity
+            hitSlop={12}
+            onPress={() => router.push("/(redeem)/notification")} // change to your route
+          >
             <Ionicons
               name="notifications-outline"
               size={22}
@@ -117,26 +118,17 @@ export default function HouseholdHome() {
           <View style={styles.codeCardTextWrap}>
             <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
             <Text style={styles.codeValue}>{HOUSEHOLD.code}</Text>
-            <TouchableOpacity onPress={handleCopyCode} hitSlop={6}>
-              <Text style={styles.codeHint}>
-                {copied
-                  ? "Copied!"
-                  : "Share this for your pickup or drop-off collection"}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.confirmPickupPill}
-              onPress={() => router.push(CONFIRM_PICKUP_ROUTE)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.confirmPickupPillText}>Confirm Pickup</Text>
-            </TouchableOpacity>
+            <Text style={styles.codeHint}>
+              Share this for your pickup or drop-off collection
+            </Text>
           </View>
-          <Ionicons
-            name="qr-code-outline"
-            size={74}
-            color="rgba(255,255,255,0.35)"
-          />
+          <TouchableOpacity onPress={handleCopyCode} hitSlop={10}>
+            <Ionicons
+              name={copied ? "checkmark" : "copy-outline"}
+              size={18}
+              color={COLORS.textSecondary}
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.nextCollectionRow}>
@@ -144,7 +136,7 @@ export default function HouseholdHome() {
             <Ionicons
               name="calendar-outline"
               size={18}
-              color={COLORS.primary}
+              color={COLORS.primaryBlack}
             />
           </View>
           <View>
@@ -324,18 +316,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "rgba(255,255,255,0.75)",
     marginBottom: 14,
-  },
-  confirmPickupPill: {
-    alignSelf: "flex-start",
-    backgroundColor: "#188A5A",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  confirmPickupPillText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 10,
-    color: COLORS.primaryLight,
   },
 
   nextCollectionRow: {

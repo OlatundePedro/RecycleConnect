@@ -33,6 +33,4 @@ export const NIGERIAN_BANKS = [
   "PalmPay",
   "Kuda Bank",
   "Rubies Bank",
-  "Sparkle",
-  "VFD Microfinance Bank",
 ];

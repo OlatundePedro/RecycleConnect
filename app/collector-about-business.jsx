@@ -18,7 +18,6 @@ export default function CollectionBusinessScreen() {
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>
             Tell us about your{"\n"}
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
   optionCard: {
     backgroundColor: "#F5F5F5",
     borderRadius: 14,
-    height: 110,
+    height: 100,
     paddingHorizontal: 36,
     flexDirection: "row",
     alignItems: "center",
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
 
   optionText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 });

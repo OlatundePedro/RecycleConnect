@@ -156,8 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 18,
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   checkbox: {
     width: 20,
@@ -177,7 +175,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
-    fontSize: 16,
+    fontSize: 14,
     flex: 1,
     color: COLORS.textPrimary,
     lineHeight: 23,
