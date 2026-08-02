@@ -130,7 +130,11 @@ export default function CollectorHome() {
                 </Text>
               </Text>
             </View>
-            <TouchableOpacity style={styles.addFundsBtn} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={styles.addFundsBtn}
+              activeOpacity={0.85}
+              onPress={() => router.push("/(collect)/top-up-wallet")}
+            >
               <Ionicons name="add" size={22} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
@@ -178,7 +182,7 @@ export default function CollectorHome() {
 
           <TouchableOpacity
             style={styles.logBtn}
-            onPress={() => router.push("/collector/log-collection")}
+            onPress={() => router.push("/(collect)/log-transaction")}
             activeOpacity={0.85}
           >
             <Ionicons name="add" size={16} color={COLORS.white} />
@@ -275,7 +279,7 @@ export default function CollectorHome() {
 
           <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionTitle}>Latest Activity</Text>
-            <TouchableOpacity onPress={() => router.push("/collector/history")}>
+            <TouchableOpacity onPress={() => router.push("/(collect)/history")}>
               <Text style={styles.linkText}>View history</Text>
             </TouchableOpacity>
           </View>
@@ -335,7 +339,7 @@ const styles = StyleSheet.create({
   headerBlock: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 30,
     paddingBottom: 50,
   },
   headerTopRow: {

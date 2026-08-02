@@ -1,7 +1,8 @@
 // Adjust this to wherever your baseUrl actually lives (e.g. an env var or
 // app config), it's just inlined here to match the Postman {{baseUrl}}.
 const BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://your-api.example.com";
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
+  "https://recycleconnect-api.onrender.com ";
 
 async function postJson(path, body) {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -9,7 +10,7 @@ async function postJson(path, body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-
+  console.log(`${BASE_URL}/auth/send-otp`);
   let payload = null;
   try {
     payload = await res.json();

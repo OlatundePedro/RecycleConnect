@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-export default function DropLayout() {
+export default function CollectLayout() {
   return (
     <Stack
       screenOptions={{

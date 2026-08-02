@@ -1,6 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Image,
   ScrollView,
@@ -12,8 +11,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
-import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { registerHousehold } from "../services/authApi";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -58,27 +55,10 @@ const MATERIALS = [
 
 export default function RecyclablesInfo() {
   const router = useRouter();
-  const { data, resetData } = useHouseholdOnboarding();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const params = useLocalSearchParams();
 
-  const handleGotIt = async () => {
-    if (submitting) return;
-    setSubmitting(true);
-    setError("");
-    try {
-      const { phone, otp, pin, state, area } = data;
-      await registerHousehold({ phone, otp, pin, state, area });
-      resetData();
-      router.replace({
-        pathname: "/account-success",
-        params: { type: "household" },
-      });
-    } catch (err) {
-      setError(err.message || "Couldn't complete registration. Try again.");
-    } finally {
-      setSubmitting(false);
-    }
+  const handleGotIt = () => {
+    router.replace("/household/home");
   };
 
   return (
@@ -139,22 +119,15 @@ export default function RecyclablesInfo() {
             </Text>
           </View>
         </View>
-
-        {!!error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
 
       <TouchableOpacity
-        style={[styles.gotItBtn, submitting && styles.gotItBtnDisabled]}
+        style={styles.gotItBtn}
         activeOpacity={0.85}
         onPress={handleGotIt}
-        disabled={submitting}
       >
-        <Text style={styles.gotItText}>
-          {submitting ? "Setting up your account..." : "Got it, let's go!"}
-        </Text>
-        {!submitting && (
-          <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
-        )}
+        <Text style={styles.gotItText}>Got it, let&apos;s go!</Text>
+        <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -172,7 +145,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 18,
-    color: COLORS.textPrimary,
+    color: COLORS.textPrimaryprimary,
   },
   scroll: {
     paddingHorizontal: 24,
@@ -283,13 +256,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.textSecondary,
   },
-  errorText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: "#D64545",
-    textAlign: "center",
-    marginTop: 8,
-  },
   gotItBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -300,9 +266,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginHorizontal: 24,
     marginBottom: 28,
-  },
-  gotItBtnDisabled: {
-    opacity: 0.7,
   },
   gotItText: {
     fontFamily: FONTS.semiBold,
