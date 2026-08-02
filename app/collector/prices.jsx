@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 25,
     color: COLORS.textPrimary,
   },
   avatar: {

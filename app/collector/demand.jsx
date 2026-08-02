@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 25,
     color: COLORS.textPrimary,
   },
   avatar: {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   summaryStatsRow: { flexDirection: "row", gap: 40 },
   summaryValue: {
     fontFamily: FONTS.black,
-    fontSize: 34,
+    fontSize: 32,
     color: COLORS.white,
     marginBottom: 4,
   },
@@ -221,32 +221,32 @@ const styles = StyleSheet.create({
   },
   streetName: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
   streetSubRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   streetSub: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   streetRight: { flexDirection: "row", alignItems: "center", gap: 6 },
   streetWeight: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 
   explainerBanner: {
     backgroundColor: COLORS.primaryLight,
     borderRadius: 14,
-    padding: 20,
+    padding: 15,
     marginTop: 20,
   },
   explainerText: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 22,
     color: COLORS.primary,
   },

@@ -59,7 +59,7 @@ export default function TopUpWallet() {
   const handleContinue = () => {
     if (!canContinue) return;
     router.push({
-      pathname: "/collector/payment-confirm",
+      pathname: "/(collect)/payment-confirm",
       params: { amount, method: selectedMethod },
     });
   };

@@ -26,36 +26,41 @@ const BUYER_INTEREST = {
   weightKg: 1200,
 };
 
-const INVENTORY = [
+const INITIAL_INVENTORY = [
   {
     id: "pet",
     label: "PET Plastic (Clear)",
     availableKg: 18.5,
     onHoldKg: 4,
+    sold: false,
   },
   {
     id: "aluminium",
     label: "Aluminium Cans",
     availableKg: 88.2,
     onHoldKg: 0,
+    sold: true,
   },
   {
     id: "cardboard",
     label: "Cardboard",
     availableKg: 1200,
     onHoldKg: 26,
+    sold: true,
   },
   {
     id: "mixed-paper",
     label: "Mixed Paper",
     availableKg: 320,
     onHoldKg: 0,
+    sold: true,
   },
 ];
 
 export default function Stock() {
   const router = useRouter();
   const [interestDismissed, setInterestDismissed] = useState(false);
+  const [inventory, setInventory] = useState(INITIAL_INVENTORY);
 
   const handleAccept = () => {
     router.push({
@@ -69,6 +74,7 @@ export default function Stock() {
   };
 
   const handleMarkSold = (item) => {
+    if (item.sold) return;
     router.push({
       pathname: "/collector/mark-sold",
       params: { materialId: item.id, availableKg: String(item.availableKg) },
@@ -148,27 +154,39 @@ export default function Stock() {
           <Text style={styles.inventoryUnit}>Per material</Text>
         </View>
 
-        {INVENTORY.map((item) => (
+        {inventory.map((item) => (
           <View key={item.id} style={styles.inventoryRow}>
             <View style={styles.inventoryLeft}>
               <Text style={styles.inventoryLabel}>{item.label}</Text>
               <View style={styles.inventoryValueRow}>
                 <Text style={styles.inventoryValue}>{item.availableKg} kg</Text>
-                <Text style={styles.inventoryValueUnit}>available</Text>
+                {!item.sold && (
+                  <Text style={styles.inventoryValueUnit}>available</Text>
+                )}
               </View>
-              {item.onHoldKg > 0 && (
+              {!item.sold && item.onHoldKg > 0 && (
                 <Text style={styles.onHoldText}>
                   +{item.onHoldKg} kg on hold (awaiting confirmation)
                 </Text>
               )}
             </View>
             <TouchableOpacity
-              style={styles.markSoldBtn}
+              style={[styles.markSoldBtn, item.sold && styles.soldBtn]}
               onPress={() => handleMarkSold(item)}
-              activeOpacity={0.85}
+              activeOpacity={item.sold ? 1 : 0.85}
+              disabled={item.sold}
             >
-              <Ionicons name="checkmark" size={16} color={COLORS.white} />
-              <Text style={styles.markSoldBtnText}>Mark sold</Text>
+              {!item.sold && (
+                <Ionicons name="checkmark" size={16} color={COLORS.white} />
+              )}
+              <Text
+                style={[
+                  styles.markSoldBtnText,
+                  item.sold && styles.soldBtnText,
+                ]}
+              >
+                {item.sold ? "Sold" : "Mark sold"}
+              </Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -197,14 +215,13 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.primary,
-
     maxWidth: 240,
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 25,
     color: COLORS.textPrimary,
   },
   avatar: {
@@ -216,7 +233,7 @@ const styles = StyleSheet.create({
   interestCard: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    padding: 18,
+    padding: 15,
     marginBottom: 28,
   },
   interestTopRow: {
@@ -236,33 +253,33 @@ const styles = StyleSheet.create({
   },
   interestMeta: {
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 12,
     color: "rgba(255,255,255,0.9)",
   },
   interestCompany: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 19,
     color: COLORS.white,
     marginBottom: 8,
   },
   interestDetail: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
-    lineHeight: 21,
+    fontSize: 12,
+    lineHeight: 19,
     color: "rgba(255,255,255,0.9)",
-    marginBottom: 18,
+    marginBottom: 15,
   },
   interestActionsRow: { flexDirection: "row", gap: 12 },
   acceptBtn: {
     flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 21,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: "center",
   },
   acceptBtnText: {
     fontFamily: FONTS.bold,
-    fontSize: 13,
+    fontSize: 11,
     color: COLORS.primaryDark,
   },
   declineBtn: {
@@ -270,12 +287,12 @@ const styles = StyleSheet.create({
     borderWidth: 1.0,
     borderColor: "rgba(255,255,255,0.6)",
     borderRadius: 21,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: "center",
   },
   declineBtnText: {
     fontFamily: FONTS.bold,
-    fontSize: 13,
+    fontSize: 11,
     color: COLORS.white,
   },
   inventoryHeaderRow: {
@@ -286,12 +303,12 @@ const styles = StyleSheet.create({
   },
   inventoryHeading: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   inventoryUnit: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
   inventoryRow: {
@@ -303,7 +320,7 @@ const styles = StyleSheet.create({
   inventoryLeft: { flex: 1, paddingRight: 12 },
   inventoryLabel: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textPrimary,
     marginBottom: 6,
   },
@@ -315,17 +332,17 @@ const styles = StyleSheet.create({
   },
   inventoryValue: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
   },
   inventoryValueUnit: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 10,
     color: COLORS.textSecondary,
   },
   onHoldText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 11,
     color: "#B9741E",
   },
   markSoldBtn: {
@@ -333,25 +350,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: 14,
+    paddingHorizontal: 13,
+    paddingVertical: 9.5,
   },
   markSoldBtnText: {
     fontFamily: FONTS.bold,
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.white,
   },
-
+  soldBtn: {
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: 14,
+    paddingHorizontal: 25,
+    paddingVertical: 9.5,
+    width: 105,
+    alignSelf: "center",
+  },
+  soldBtnText: {
+    color: COLORS.textSecondary,
+    marginLeft: 15,
+  },
   explainerBanner: {
     backgroundColor: COLORS.primaryLight,
     borderRadius: 14,
-    padding: 17,
+    padding: 14,
     marginTop: 12,
   },
   explainerText: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 22,
     color: COLORS.primary,
   },

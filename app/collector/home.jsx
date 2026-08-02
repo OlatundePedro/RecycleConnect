@@ -90,6 +90,9 @@ const LATEST_ACTIVITY = [
   },
 ];
 
+// Where tapping the avatar sends the collector.
+const PROFILE_ROUTE = "/(collect)/profile";
+
 export default function CollectorHome() {
   const router = useRouter();
 
@@ -101,7 +104,12 @@ export default function CollectorHome() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.headerBlock}>
           <View style={styles.headerTopRow}>
-            <Image source={COLLECTOR.avatar} style={styles.avatar} />
+            <TouchableOpacity
+              onPress={() => router.push(PROFILE_ROUTE)}
+              activeOpacity={0.8}
+            >
+              <Image source={COLLECTOR.avatar} style={styles.avatar} />
+            </TouchableOpacity>
             <View style={styles.headerTextWrap}>
               <Text style={styles.headerLabel}>Collection Partner</Text>
               <View style={styles.businessNameRow}>
