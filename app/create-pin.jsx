@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -48,7 +49,8 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
 
 export default function CreatePin() {
   const router = useRouter();
-  const { type } = useLocalSearchParams();
+  const { type } = useLocalSearchParams(); // still fine as a param, it's just a route flag
+  const { updateData } = useHouseholdOnboarding();
 
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
   const [confirmPin, setConfirmPin] = useState(Array(PIN_LENGTH).fill(""));
@@ -103,6 +105,8 @@ export default function CreatePin() {
       confirmRefs.current[0]?.focus();
       return;
     }
+    updateData({ pin: pinCode });
+    console.log("PIN saved to context:", pinCode);
     router.replace({
       pathname: "/pin-success",
       params: { type },
@@ -229,6 +233,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 98,
+  },
+  createBtnDisabled: {
+    opacity: 0.5,
   },
   createBtnText: {
     fontFamily: FONTS.semiBold,

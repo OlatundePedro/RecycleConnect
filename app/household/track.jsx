@@ -1,12 +1,14 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
+  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -15,7 +17,6 @@ import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
 const IMPACT = {
-  totalPoints: 1240,
   level: "Level 4: Eco Hero",
 };
 
@@ -29,59 +30,135 @@ const HISTORY = [
   {
     id: "1",
     category: "collections",
-    icon: "reload-outline",
+    icon: { set: "Ionicons", name: "reload-outline" },
     iconBg: COLORS.primaryLight,
     iconColor: COLORS.primaryDark,
     title: "Plastic Collection",
     subtitle: "4.2 kg • Oct 24, 2023",
-    points: 120,
-    status: { label: "VERIFIED", tone: "neutral" },
+    amount: 3350,
+    amountTone: "credit",
+    status: { label: "VERIFIED", tone: "success" },
   },
   {
     id: "2",
-    category: "rewards",
-    icon: "gift-outline",
+    category: "collections",
+    icon: { set: "MaterialCommunityIcons", name: "bank" },
     iconBg: COLORS.accent,
     iconColor: COLORS.primaryDark,
-    title: "Data Bundle (MTN)",
-    subtitle: "2GB Pack • Oct 21, 2023",
-    points: -500,
+    title: "Withdraw to Bank",
+    subtitle: "*****9473 • Oct 21, 2023",
+    amount: 2700,
+    amountTone: "debit",
     status: { label: "SUCCESS", tone: "success" },
   },
   {
     id: "3",
     category: "collections",
-    icon: "hardware-chip-outline",
+    icon: { set: "Ionicons", name: "hardware-chip-outline" },
     iconBg: COLORS.primaryLight,
     iconColor: COLORS.primaryDark,
     title: "Metal Collection",
     subtitle: "12.5 kg • Oct 18, 2023",
-    points: 340,
     status: { label: "VERIFIED", tone: "neutral" },
   },
   {
     id: "4",
     category: "collections",
-    icon: "document-text-outline",
+    icon: { set: "Ionicons", name: "document-text-outline" },
     iconBg: COLORS.primaryLight,
     iconColor: COLORS.primaryDark,
     title: "Paper & Cardboard",
     subtitle: "3.1 kg • Oct 15, 2023",
-    points: 85,
     status: { label: "VERIFIED", tone: "neutral" },
   },
   {
     id: "5",
-    category: "rewards",
-    icon: "bag-handle-outline",
+    category: "collection",
+    icon: { set: "Ionicons", name: "bag-handle-outline" },
     iconBg: COLORS.accent,
     iconColor: COLORS.primaryDark,
     title: "Eco-Bag Set",
     subtitle: "Physical Item • Oct 10, 2023",
-    points: -300,
     status: { label: "PICKED UP", tone: "success" },
   },
+  {
+    id: "6",
+    category: "collections",
+    icon: { set: "MaterialCommunityIcons", name: "bank" },
+    iconBg: COLORS.accent,
+    iconColor: COLORS.primaryDark,
+    title: "Withdraw to Bank",
+    subtitle: "*****9473 • Oct 21, 2023",
+    amount: 1650,
+    amountTone: "debit",
+    status: { label: "SUCCESS", tone: "success" },
+  },
+  {
+    id: "7",
+    category: "collections",
+    icon: { set: "Ionicons", name: "document-text-outline" },
+    iconBg: COLORS.primaryLight,
+    iconColor: COLORS.primaryDark,
+    title: "MTN 5GB Data Bundle ",
+    subtitle: "Oct 24, 2023 • 10:15 AM",
+    status: { label: "SUCCESS", tone: "neutral" },
+  },
 ];
+
+function HistoryIcon({ icon, color, size = 22 }) {
+  if (icon.set === "MaterialCommunityIcons") {
+    return (
+      <MaterialCommunityIcons name={icon.name} size={size} color={color} />
+    );
+  }
+  return <Ionicons name={icon.name} size={size} color={color} />;
+}
+
+// Rewards isn't live yet — this is the waitlist promo shown instead of
+// a normal (empty) list whenever the Rewards filter is selected.
+function RewardsComingSoon() {
+  const [email, setEmail] = useState("");
+
+  const handleGetEarlyAccess = () => {
+    if (!email.trim()) return;
+    // Wire this up to your actual waitlist/signup endpoint.
+  };
+
+  return (
+    <View>
+      <Image
+        source={require("../../assets/images/reward.png")}
+        style={styles.comingSoonImage}
+        resizeMode="cover"
+      />
+      <Text style={styles.comingSoonTitle}>
+        Sustainable Intelligence in{"\n"}Your Pocket.
+      </Text>
+      <Text style={styles.comingSoonSubtitle}>
+        Our mobile experience is launching soon. Get early access to start
+        earning rewards for your recycling.
+      </Text>
+      <View style={styles.emailBox}>
+        <TextInput
+          style={styles.emailInput}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email Address"
+          placeholderTextColor={COLORS.muted}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+      </View>
+      <TouchableOpacity
+        style={styles.earlyAccessBtn}
+        onPress={handleGetEarlyAccess}
+        activeOpacity={0.85}
+      >
+        <Text style={styles.earlyAccessBtnText}>Get Early Access</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function History() {
   const router = useRouter();
@@ -116,10 +193,6 @@ export default function History() {
           end={{ x: 1, y: 1 }}
           style={styles.impactCard}
         >
-          <Text style={styles.impactLabel}>Total Impact</Text>
-          <Text style={styles.impactPoints}>
-            {IMPACT.totalPoints.toLocaleString()} Points
-          </Text>
           <View style={styles.levelPill}>
             <Text style={styles.levelPillText}>{IMPACT.level}</Text>
           </View>
@@ -144,47 +217,62 @@ export default function History() {
           })}
         </View>
 
-        {filteredHistory.map((item) => (
-          <View key={item.id} style={styles.historyCard}>
-            <View style={[styles.iconWrap, { backgroundColor: item.iconBg }]}>
-              <Ionicons name={item.icon} size={22} color={item.iconColor} />
-            </View>
-            <View style={styles.historyText}>
-              <Text style={styles.historyTitle}>{item.title}</Text>
-              <Text style={styles.historySubtitle}>{item.subtitle}</Text>
-            </View>
-            <View style={styles.historyRight}>
-              <Text
-                style={[
-                  styles.historyPoints,
-                  { color: item.points >= 0 ? COLORS.primary : COLORS.danger },
-                ]}
-              >
-                {item.points >= 0 ? "+" : ""}
-                {item.points} pts
-              </Text>
-              <View
-                style={[
-                  styles.statusBadge,
-                  item.status.tone === "success" && styles.statusBadgeSuccess,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.statusBadgeText,
-                    item.status.tone === "success" &&
-                      styles.statusBadgeTextSuccess,
-                  ]}
+        {activeFilter === "rewards" ? (
+          <RewardsComingSoon />
+        ) : (
+          <>
+            {filteredHistory.map((item) => (
+              <View key={item.id} style={styles.historyCard}>
+                <View
+                  style={[styles.iconWrap, { backgroundColor: item.iconBg }]}
                 >
-                  {item.status.label}
-                </Text>
+                  <HistoryIcon icon={item.icon} color={item.iconColor} />
+                </View>
+                <View style={styles.historyText}>
+                  <Text style={styles.historyTitle}>{item.title}</Text>
+                  <Text style={styles.historySubtitle}>{item.subtitle}</Text>
+                </View>
+                <View style={styles.historyRight}>
+                  {item.amount != null && (
+                    <Text
+                      style={[
+                        styles.historyAmount,
+                        {
+                          color:
+                            item.amountTone === "debit"
+                              ? COLORS.danger
+                              : COLORS.primary,
+                        },
+                      ]}
+                    >
+                      ₦{item.amount.toLocaleString()}.00
+                    </Text>
+                  )}
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      item.status.tone === "success" &&
+                        styles.statusBadgeSuccess,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusBadgeText,
+                        item.status.tone === "success" &&
+                          styles.statusBadgeTextSuccess,
+                      ]}
+                    >
+                      {item.status.label}
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </View>
-          </View>
-        ))}
+            ))}
 
-        {filteredHistory.length === 0 && (
-          <Text style={styles.emptyText}>Nothing here yet.</Text>
+            {filteredHistory.length === 0 && (
+              <Text style={styles.emptyText}>Nothing here yet.</Text>
+            )}
+          </>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -212,28 +300,16 @@ const styles = StyleSheet.create({
     padding: 18,
     marginBottom: 15,
   },
-  impactLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 15,
-    color: "rgba(255,255,255,0.7)",
-    marginBottom: 3,
-  },
-  impactPoints: {
-    fontFamily: FONTS.black,
-    fontSize: 25,
-    color: COLORS.white,
-    marginBottom: 13,
-  },
   levelPill: {
     alignSelf: "flex-start",
     backgroundColor: COLORS.accent,
     borderRadius: 20,
     paddingHorizontal: 18,
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
   levelPillText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 15,
     color: COLORS.primaryDark,
   },
 
@@ -242,7 +318,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
     borderRadius: 24,
     padding: 4,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   filterPill: {
     flex: 1,
@@ -252,6 +328,11 @@ const styles = StyleSheet.create({
   },
   filterPillActive: {
     backgroundColor: "#8FE3A4",
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   filterText: {
     fontFamily: FONTS.medium,
@@ -297,7 +378,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   historyRight: { alignItems: "flex-end", gap: 8 },
-  historyPoints: {
+  historyAmount: {
     fontFamily: FONTS.bold,
     fontSize: 15,
   },
@@ -326,5 +407,55 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: "center",
     marginTop: 20,
+  },
+
+  // Rewards coming-soon promo
+  comingSoonImage: {
+    width: "100%",
+    height: 320,
+    borderRadius: 18,
+    marginBottom: 24,
+    backgroundColor: COLORS.surface,
+  },
+  comingSoonTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 26,
+    lineHeight: 32,
+    color: COLORS.primaryDark,
+    textAlign: "center",
+    marginBottom: 14,
+  },
+  comingSoonSubtitle: {
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    lineHeight: 22,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  emailBox: {
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 15,
+    marginBottom: 16,
+  },
+  emailInput: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    padding: 0,
+  },
+  earlyAccessBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingVertical: 18,
+    alignItems: "center",
+  },
+  earlyAccessBtnText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
+    color: COLORS.white,
   },
 });

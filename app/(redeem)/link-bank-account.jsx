@@ -156,7 +156,8 @@ export default function LinkBankAccount() {
         </View>
 
         <Text style={styles.disclaimerText}>
-          Your account is securely verified before any withdrawal is processed
+          Your account is securely verified before {"\n"}any withdrawal is
+          processed
         </Text>
       </ScrollView>
 
@@ -182,10 +183,9 @@ export default function LinkBankAccount() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   header: {
-    backgroundColor: COLORS.headerBg,
     paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
+    paddingTop: 25,
+    paddingBottom: 10,
   },
   backRow: {
     flexDirection: "row",
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     fontSize: 18,
     color: COLORS.primary,
-    marginLeft: 4,
+    marginLeft: 90,
   },
   scroll: {
     paddingHorizontal: 24,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 30,
+    fontSize: 23,
     color: COLORS.textPrimary,
     marginBottom: 20,
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.selectedBg,
     borderWidth: 1.0,
     borderColor: "#CFE6D9",
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 40,
   },
@@ -232,31 +232,31 @@ const styles = StyleSheet.create({
   selectedBankName: {
     flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 19,
+    fontSize: 17,
     color: COLORS.textPrimary,
   },
   changeText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.primary,
   },
   fieldLabel: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 17,
     color: COLORS.textPrimary,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   fieldWrap: {
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingHorizontal: 13,
+    paddingVertical: 13,
     marginBottom: 20,
   },
   fieldInput: {
     fontFamily: FONTS.regular,
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.textPrimary,
     padding: 0,
   },
@@ -270,11 +270,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.textSecondary,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   nameCardValue: {
     fontFamily: FONTS.bold,
-    fontSize: 26,
+    fontSize: 23,
     color: COLORS.primary,
     marginBottom: 16,
   },
@@ -285,12 +285,12 @@ const styles = StyleSheet.create({
   },
   verifyNoteText: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
   disclaimerText: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     lineHeight: 22,
     color: COLORS.textSecondary,
     textAlign: "center",
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   linkBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   linkBtnDisabled: { opacity: 0.5 },
   linkBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.white,
   },
   securedRow: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   },
   securedText: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
 });

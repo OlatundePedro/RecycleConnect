@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -95,6 +96,7 @@ const PROFILE_ROUTE = "/(collect)/profile";
 
 export default function CollectorHome() {
   const router = useRouter();
+  const [showBalance, setShowBalance] = useState(true);
 
   return (
     <View style={styles.screen}>
@@ -103,47 +105,77 @@ export default function CollectorHome() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.headerBlock}>
+          {/* Top Row */}
           <View style={styles.headerTopRow}>
-            <TouchableOpacity
-              onPress={() => router.push(PROFILE_ROUTE)}
-              activeOpacity={0.8}
-            >
-              <Image source={COLLECTOR.avatar} style={styles.avatar} />
-            </TouchableOpacity>
-            <View style={styles.headerTextWrap}>
-              <Text style={styles.headerLabel}>Collection Partner</Text>
-              <View style={styles.businessNameRow}>
-                <Text style={styles.businessName}>
-                  {COLLECTOR.businessName}
-                </Text>
-                {COLLECTOR.verified && (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={18}
-                    color={COLORS.white}
-                    style={styles.verifiedIcon}
-                  />
-                )}
+            <View style={styles.headerLeft}>
+              <TouchableOpacity
+                onPress={() => router.push(PROFILE_ROUTE)}
+                activeOpacity={0.8}
+              >
+                <Image source={COLLECTOR.avatar} style={styles.avatar} />
+              </TouchableOpacity>
+
+              <View style={styles.headerTextWrap}>
+                <Text style={styles.headerLabel}>Collection Partner</Text>
+
+                <View style={styles.businessNameRow}>
+                  <Text style={styles.businessName}>
+                    {COLLECTOR.businessName}
+                  </Text>
+
+                  {COLLECTOR.verified && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={18}
+                      color={COLORS.white}
+                      style={styles.verifiedIcon}
+                    />
+                  )}
+                </View>
               </View>
             </View>
+
+            <TouchableOpacity>
+              <Ionicons
+                name="notifications-outline"
+                size={28}
+                color={COLORS.white}
+              />
+            </TouchableOpacity>
           </View>
 
+          {/* Wallet */}
           <View style={styles.walletRow}>
             <View>
-              <Text style={styles.walletLabel}>Wallet Balance</Text>
-              <Text style={styles.walletBalance}>
-                ₦{WALLET.balance.split(".")[0]}
-                <Text style={styles.walletBalanceDecimals}>
-                  .{WALLET.balance.split(".")[1]}
+              <View style={styles.walletLabelRow}>
+                <Text style={styles.walletLabel}>Wallet Balance</Text>
+
+                <TouchableOpacity onPress={() => setShowBalance(!showBalance)}>
+                  <Ionicons
+                    name={showBalance ? "eye-outline" : "eye-off-outline"}
+                    size={22}
+                    color={COLORS.white}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {showBalance ? (
+                <Text style={styles.walletBalance}>
+                  ₦{WALLET.balance.split(".")[0]}
+                  <Text style={styles.walletBalanceDecimals}>
+                    .{WALLET.balance.split(".")[1]}
+                  </Text>
                 </Text>
-              </Text>
+              ) : (
+                <Text style={styles.walletBalance}>₦••••••</Text>
+              )}
             </View>
+
             <TouchableOpacity
               style={styles.addFundsBtn}
-              activeOpacity={0.85}
               onPress={() => router.push("/(collect)/top-up-wallet")}
             >
-              <Ionicons name="add" size={22} color={COLORS.primary} />
+              <Ionicons name="add" size={34} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -226,10 +258,7 @@ export default function CollectorHome() {
             </Text>
             <View style={styles.buyerActionsRow}>
               <TouchableOpacity style={styles.acceptBtn} activeOpacity={0.85}>
-                <Text style={styles.acceptBtnText}>Review & accept</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.declineBtn} activeOpacity={0.85}>
-                <Text style={styles.declineBtnText}>Decline</Text>
+                <Text style={styles.acceptBtnText}>Review Offer</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -344,24 +373,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.background },
   topInset: { backgroundColor: COLORS.primary },
 
-  headerBlock: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 50,
-  },
-  headerTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-    backgroundColor: COLORS.primaryLight,
-  },
   headerTextWrap: { flex: 1 },
   headerLabel: {
     fontFamily: FONTS.regular,
@@ -369,38 +380,90 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.8)",
     marginBottom: 1,
   },
-  businessNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  headerBlock: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 22,
+    paddingTop: 18,
+    paddingBottom: 72,
+  },
+
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 26,
+  },
+
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    marginRight: 12,
+  },
+
+  headerLabel: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "rgba(255,255,255,0.9)",
+  },
+
+  businessNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+  },
+
   businessName: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 20,
     color: COLORS.white,
   },
-  verifiedIcon: { marginTop: 1 },
+
+  verifiedIcon: {
+    marginLeft: 6,
+  },
 
   walletRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "flex-end",
   },
+
+  walletLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+
   walletLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)",
-    marginBottom: 3,
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.white,
+    marginRight: 10,
   },
+
   walletBalance: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 30,
     color: COLORS.white,
   },
-  walletBalanceDecimals: { fontSize: 18 },
+
+  walletBalanceDecimals: {
+    fontSize: 18,
+  },
+
   addFundsBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 26,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: COLORS.white,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
 
   content: {

@@ -1,40 +1,34 @@
-import { createContext, useCallback, useContext, useState } from "react";
+// app/context/HouseholdOnboardingContext.jsx
+import { createContext, useContext, useMemo, useState } from "react";
 
 const HouseholdOnboardingContext = createContext(null);
 
-const initialState = {
+const initialData = {
   phone: "",
   otp: "",
   pin: "",
-  fullName: "",
-  email: "",
-  state: "",
-  area: "",
-  landmark: "",
+  // add more fields here as later steps need them
+  // (aboutYou, location, education, etc.)
 };
 
 export function HouseholdOnboardingProvider({ children }) {
-  const [data, setData] = useState(initialState);
+  const [data, setData] = useState(initialData);
 
-  // Merge partial updates in, e.g. updateData({ phone: "+234..." })
-  const updateData = useCallback((updates) => {
-    setData((prev) => ({ ...prev, ...updates }));
-  }, []);
+  const updateData = (patch) => {
+    setData((prev) => ({ ...prev, ...patch }));
+  };
 
-  const resetData = useCallback(() => {
-    setData(initialState);
-  }, []);
+  const resetData = () => setData(initialData);
+
+  const value = useMemo(() => ({ data, updateData, resetData }), [data]);
 
   return (
-    <HouseholdOnboardingContext.Provider
-      value={{ data, updateData, resetData }}
-    >
+    <HouseholdOnboardingContext.Provider value={value}>
       {children}
     </HouseholdOnboardingContext.Provider>
   );
 }
 
-// Usage in any screen: const { data, updateData } = useHouseholdOnboarding();
 export function useHouseholdOnboarding() {
   const ctx = useContext(HouseholdOnboardingContext);
   if (!ctx) {

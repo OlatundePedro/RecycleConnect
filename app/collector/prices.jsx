@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   Image,
@@ -25,7 +26,8 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // Price step used by the +/- buttons, in Naira.
 const PRICE_STEP = 1;
 
-const INITIAL_MATERIALS = [
+// Buying: what the collector pays households for materials.
+const INITIAL_BUYING_MATERIALS = [
   { id: "pet", label: "PET Plastic (Clear)", price: 128 },
   { id: "hdpe", label: "HDPE Plastic", price: 95 },
   { id: "aluminium", label: "Aluminium Cans", price: 450 },
@@ -34,7 +36,44 @@ const INITIAL_MATERIALS = [
   { id: "glass", label: "Glass Bottles", price: 25 },
 ];
 
+// Selling: what the collector charges buyers/recyclers for materials.
+const INITIAL_SELLING_MATERIALS = [
+  { id: "pet", label: "PET Plastic (Clear)", price: 185 },
+  { id: "hdpe", label: "HDPE Plastic", price: 140 },
+  { id: "aluminium", label: "Aluminium Cans", price: 620 },
+  { id: "cardboard", label: "Cardboard", price: 125 },
+  { id: "mixed-paper", label: "Mixed Paper", price: 98 },
+  { id: "glass", label: "Glass Bottles", price: 45 },
+];
+
+function PriceRow({ material, onAdjust, isLast }) {
+  return (
+    <View style={[styles.materialRow, !isLast && styles.materialRowDivider]}>
+      <View>
+        <Text style={styles.materialLabel}>{material.label}</Text>
+        <Text style={styles.materialSub}>per kg</Text>
+      </View>
+      <View style={styles.materialControls}>
+        <TouchableOpacity
+          style={styles.stepBtn}
+          onPress={() => onAdjust(material.id, -PRICE_STEP)}
+        >
+          <Ionicons name="remove" size={16} color={COLORS.primary} />
+        </TouchableOpacity>
+        <Text style={styles.materialPrice}>₦{material.price}</Text>
+        <TouchableOpacity
+          style={[styles.stepBtn, styles.stepBtnFilled]}
+          onPress={() => onAdjust(material.id, PRICE_STEP)}
+        >
+          <Ionicons name="add" size={16} color={COLORS.white} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 export default function PricesAndSchedule() {
+  const router = useRouter();
   const [scheduledCollectionOn, setScheduledCollectionOn] = useState(true);
   const [dropoffOn, setDropoffOn] = useState(true);
   const [selectedDays, setSelectedDays] = useState(["Tue", "Thu", "Fri"]);
@@ -44,7 +83,12 @@ export default function PricesAndSchedule() {
     "GreenNode yard, 22 Bode Thomas — blue gate beside Ebeano",
   );
   const [openingHours, setOpeningHours] = useState("Mon–Sat, 9:00 – 17:00");
-  const [materials, setMaterials] = useState(INITIAL_MATERIALS);
+  const [buyingMaterials, setBuyingMaterials] = useState(
+    INITIAL_BUYING_MATERIALS,
+  );
+  const [sellingMaterials, setSellingMaterials] = useState(
+    INITIAL_SELLING_MATERIALS,
+  );
 
   const toggleDay = (day) => {
     setSelectedDays((prev) =>
@@ -52,8 +96,16 @@ export default function PricesAndSchedule() {
     );
   };
 
-  const adjustPrice = (id, delta) => {
-    setMaterials((prev) =>
+  const adjustBuyingPrice = (id, delta) => {
+    setBuyingMaterials((prev) =>
+      prev.map((m) =>
+        m.id === id ? { ...m, price: Math.max(0, m.price + delta) } : m,
+      ),
+    );
+  };
+
+  const adjustSellingPrice = (id, delta) => {
+    setSellingMaterials((prev) =>
       prev.map((m) =>
         m.id === id ? { ...m, price: Math.max(0, m.price + delta) } : m,
       ),
@@ -68,10 +120,8 @@ export default function PricesAndSchedule() {
   }, [selectedDays, fromTime, toTime]);
 
   const handlePublish = () => {
-    // Send scheduledCollectionOn, selectedDays, fromTime, toTime,
-    // dropoffOn, landmark, openingHours, and materials to your API here.
+    router.push("/(collect)/publish-success");
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
@@ -229,40 +279,34 @@ export default function PricesAndSchedule() {
           </>
         )}
 
-        {/* Buying prices */}
+        {/* Buying prices — what you pay households */}
         <View style={styles.pricesHeaderRow}>
           <Text style={styles.pricesHeading}>Buying Prices</Text>
           <Text style={styles.pricesUnit}>₦ per kg</Text>
         </View>
 
-        {materials.map((m, index) => (
-          <View
+        {buyingMaterials.map((m, index) => (
+          <PriceRow
             key={m.id}
-            style={[
-              styles.materialRow,
-              index < materials.length - 1 && styles.materialRowDivider,
-            ]}
-          >
-            <View>
-              <Text style={styles.materialLabel}>{m.label}</Text>
-              <Text style={styles.materialSub}>per kg</Text>
-            </View>
-            <View style={styles.materialControls}>
-              <TouchableOpacity
-                style={styles.stepBtn}
-                onPress={() => adjustPrice(m.id, -PRICE_STEP)}
-              >
-                <Ionicons name="remove" size={16} color={COLORS.primary} />
-              </TouchableOpacity>
-              <Text style={styles.materialPrice}>₦{m.price}</Text>
-              <TouchableOpacity
-                style={[styles.stepBtn, styles.stepBtnFilled]}
-                onPress={() => adjustPrice(m.id, PRICE_STEP)}
-              >
-                <Ionicons name="add" size={16} color={COLORS.white} />
-              </TouchableOpacity>
-            </View>
-          </View>
+            material={m}
+            onAdjust={adjustBuyingPrice}
+            isLast={index === buyingMaterials.length - 1}
+          />
+        ))}
+
+        {/* Selling prices — what you charge buyers/recyclers */}
+        <View style={[styles.pricesHeaderRow, styles.sellingHeaderRow]}>
+          <Text style={styles.pricesHeading}>Selling Prices</Text>
+          <Text style={styles.pricesUnit}>₦ per kg</Text>
+        </View>
+
+        {sellingMaterials.map((m, index) => (
+          <PriceRow
+            key={m.id}
+            material={m}
+            onAdjust={adjustSellingPrice}
+            isLast={index === sellingMaterials.length - 1}
+          />
         ))}
 
         <TouchableOpacity
@@ -443,6 +487,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 6,
+  },
+  sellingHeaderRow: {
+    marginTop: 20,
   },
   pricesHeading: {
     fontFamily: FONTS.bold,

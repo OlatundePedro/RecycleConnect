@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
     color: COLORS.textSecondary,
     textAlign: "center",
@@ -116,17 +116,17 @@ const styles = StyleSheet.create({
   bankCard: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.cardBorder,
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     width: "100%",
   },
   bankLogo: {
     width: 56,
     height: 56,
     borderRadius: 10,
-    marginRight: 16,
+    marginRight: 13,
   },
   bankCardText: {
     flex: 1,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   viewRewardsText: {
     fontFamily: FONTS.semiBold,
     color: COLORS.primary,
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
   },
 });

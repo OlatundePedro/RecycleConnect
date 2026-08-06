@@ -124,23 +124,7 @@ export default function Withdraw() {
           </View>
 
           <View style={styles.walletBottomRow}>
-            <View style={styles.pointsDotsRow}>
-              <View
-                style={[styles.pointsDot, { backgroundColor: COLORS.white }]}
-              >
-                <Ionicons
-                  name="leaf-outline"
-                  size={16}
-                  color={COLORS.primary}
-                />
-              </View>
-              <View style={[styles.pointsDot, styles.pointsDotYellow]}>
-                <Ionicons name="flash" size={16} color={COLORS.primaryDark} />
-              </View>
-            </View>
-            <TouchableOpacity style={styles.historyPill} activeOpacity={0.85}>
-              <Text style={styles.historyPillText}>History</Text>
-            </TouchableOpacity>
+            <View style={styles.pointsDotsRow}></View>
           </View>
         </View>
         <Text style={styles.sectionTitle}>Withdrawal Amount</Text>
@@ -194,7 +178,7 @@ export default function Withdraw() {
           <TouchableOpacity
             style={styles.linkBankPrompt}
             activeOpacity={0.8}
-            onPress={() => router.push("/select-bank")}
+            onPress={() => router.push("/bank-intro")}
           >
             <Ionicons
               name="add-circle-outline"
@@ -251,10 +235,9 @@ export default function Withdraw() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   header: {
-    backgroundColor: COLORS.headerBg,
     paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
+    paddingTop: 25,
+    paddingBottom: 10,
   },
   backRow: {
     flexDirection: "row",
@@ -262,9 +245,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 18,
+    fontSize: 17,
     color: COLORS.primary,
-    marginLeft: 4,
+    marginLeft: 135,
   },
   scroll: {
     paddingHorizontal: 24,
@@ -273,9 +256,9 @@ const styles = StyleSheet.create({
   },
   walletCard: {
     backgroundColor: COLORS.primaryDark,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 28,
+    borderRadius: 14,
+    padding: 17,
+    marginBottom: 18,
   },
   walletTopRow: {
     flexDirection: "row",
@@ -291,15 +274,15 @@ const styles = StyleSheet.create({
   },
   walletBalance: {
     fontFamily: FONTS.bold,
-    fontSize: 34,
+    fontSize: 32,
     color: COLORS.white,
   },
   walletBalanceDecimals: {
-    fontSize: 20,
+    fontSize: 18,
   },
   walletIcon: {
-    width: 110,
-    height: 110,
+    width: 150,
+    height: 130,
   },
   walletBottomRow: {
     flexDirection: "row",
@@ -322,43 +305,32 @@ const styles = StyleSheet.create({
   pointsDotYellow: {
     backgroundColor: COLORS.pillBgYellow,
   },
-  historyPill: {
-    backgroundColor: COLORS.pillBg,
-    borderRadius: 20,
-    paddingHorizontal: 22,
-    paddingVertical: 12,
-  },
-  historyPillText: {
-    fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: COLORS.primaryDark,
-  },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 26,
+    fontSize: 20,
     color: COLORS.textPrimary,
     marginBottom: 16,
   },
   amountField: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.border,
     borderRadius: 14,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginBottom: 16,
   },
   nairaPrefix: {
-    fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontFamily: FONTS.SemiBold,
+    fontSize: 22,
     color: COLORS.textPrimary,
     marginRight: 12,
   },
   amountInput: {
     flex: 1,
-    fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontFamily: FONTS.regular,
+    fontSize: 22,
     color: COLORS.textPrimary,
     padding: 0,
   },
@@ -369,25 +341,25 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   quickAmountChip: {
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   quickAmountText: {
-    fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
   linkedBankCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.linkedCardBg,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.linkedCardBorder,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 13,
     marginBottom: 24,
   },
   bankLogo: {
@@ -401,13 +373,13 @@ const styles = StyleSheet.create({
   },
   linkedBankName: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.textPrimary,
     marginBottom: 2,
   },
   linkedAccountNumber: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
   linkedAccountName: {
@@ -417,14 +389,14 @@ const styles = StyleSheet.create({
   },
   changeText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.primary,
   },
   linkBankPrompt: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.border,
     borderStyle: "dashed",
     borderRadius: 16,
@@ -433,16 +405,16 @@ const styles = StyleSheet.create({
   },
   linkBankPromptText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.primary,
   },
   noteBox: {
     flexDirection: "row",
     alignItems: "flex-start",
     backgroundColor: COLORS.noteBg,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.noteBorder,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 18,
     gap: 14,
   },
@@ -451,13 +423,13 @@ const styles = StyleSheet.create({
   },
   noteTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.primary,
     marginBottom: 4,
   },
   noteDescription: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
     color: COLORS.textSecondary,
   },
@@ -469,7 +441,7 @@ const styles = StyleSheet.create({
   withdrawBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
@@ -477,7 +449,7 @@ const styles = StyleSheet.create({
   withdrawBtnDisabled: { opacity: 0.5 },
   withdrawBtnText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 13,
     color: COLORS.white,
   },
   securedRow: {
@@ -488,7 +460,7 @@ const styles = StyleSheet.create({
   },
   securedText: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 11,
     color: COLORS.textSecondary,
   },
 });

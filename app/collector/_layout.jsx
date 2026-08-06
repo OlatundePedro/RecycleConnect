@@ -6,7 +6,7 @@ import { FONTS } from "../../constants/typography";
 const TABS = [
   { id: "home", label: "Home", icon: "home-outline" },
   { id: "demand", label: "Demand", icon: "trending-up-outline" },
-  { id: "prices", label: "Prices", icon: "pricetag-outline" },
+  { id: "prices", label: "Manage", icon: "pricetag-outline" },
   { id: "stock", label: "Stock", icon: "cube-outline" },
 ];
 
@@ -33,7 +33,7 @@ export default function CollectorLayout() {
     >
       {TABS.map((tab) => (
         <Tabs.Screen
-          key={tab.name}
+          key={tab.id}
           name={tab.id}
           options={{
             title: tab.label,

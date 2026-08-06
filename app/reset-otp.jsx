@@ -90,7 +90,7 @@ export default function ResetOtp() {
     if (!canContinue) return;
     router.replace({
       pathname: "/reset-pin",
-      params: { phone, type },
+      params: { phone, type, otp: code },
     });
   };
 

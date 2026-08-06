@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -14,9 +14,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
+import { useProfile } from "../../context/profileContext";
+import { getUser } from "../../lib/session";
 
 const HOUSEHOLD = {
-  firstName: "Juliet",
+  firstName: "Chidi!",
   avatar: require("../../assets/images/Ellipse 51.png"),
   code: "JULIET-6674",
 };
@@ -60,7 +62,7 @@ const RECENT = [
     iconBg: COLORS.primaryLight,
     iconColor: COLORS.primary,
     title: "Plastic Collection",
-    subtitle: "1.2kg collected on Oct 12",
+    subtitle: "4.2kg collected on Oct 12",
     points: "+25 pts",
     positive: true,
   },
@@ -78,7 +80,18 @@ const RECENT = [
 
 export default function HouseholdHome() {
   const router = useRouter();
+  const { avatar } = useProfile();
   const [copied, setCopied] = useState(false);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    (async () => {
+      const stored = await getUser();
+      setUser(stored);
+    })();
+  }, []);
+
+  const firstName = user?.first_name || "there";
+  const referenceCode = user?.reference_code || "—";
 
   const handleCopyCode = async () => {
     await Clipboard.setStringAsync(HOUSEHOLD.code);
@@ -95,15 +108,22 @@ export default function HouseholdHome() {
       >
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Image source={HOUSEHOLD.avatar} style={styles.avatar} />
+            <Image
+              source={
+                avatar
+                  ? { uri: avatar }
+                  : require("../../assets/images/Ellipse 51.png")
+              }
+              style={styles.avatar}
+            />
             <View>
               <Text style={styles.helloText}>Hello,</Text>
-              <Text style={styles.nameText}>{HOUSEHOLD.firstName}!</Text>
+              <Text style={styles.nameText}>{firstName}!</Text>
             </View>
           </View>
           <TouchableOpacity
             hitSlop={12}
-            onPress={() => router.push("/(redeem)/notification")} // change to your route
+            onPress={() => router.push("/(redeem)/notification")}
           >
             <Ionicons
               name="notifications-outline"
@@ -117,7 +137,7 @@ export default function HouseholdHome() {
         <View style={styles.codeCard}>
           <View style={styles.codeCardTextWrap}>
             <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
-            <Text style={styles.codeValue}>{HOUSEHOLD.code}</Text>
+            <Text style={styles.codeValue}>{referenceCode}</Text>
             <Text style={styles.codeHint}>
               Share this for your pickup or drop-off collection
             </Text>
@@ -130,7 +150,6 @@ export default function HouseholdHome() {
             />
           </TouchableOpacity>
         </View>
-
         <View style={styles.nextCollectionRow}>
           <View style={styles.nextCollectionIconWrap}>
             <Ionicons
@@ -195,9 +214,11 @@ export default function HouseholdHome() {
             Drop-off your materials at a nearby collection hub
           </Text>
           <TouchableOpacity
+            style={styles.dropoffBtn}
             onPress={() => router.push("/(dropoff)/collection-hub")}
+            activeOpacity={0.85}
           >
-            <Text style={styles.dropoffLink}>Find Collection hub</Text>
+            <Text style={styles.dropoffBtnText}>Find Drop-off Hub</Text>
           </TouchableOpacity>
         </View>
 
@@ -425,7 +446,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.white,
   },
-
+  dropoffBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+    width: "95%",
+    alignSelf: "center",
+  },
+  dropoffBtnText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    color: COLORS.white,
+  },
   dropoffSection: { marginBottom: 28, padding: 2 },
   dropoffHeading: {
     fontFamily: FONTS.bold,
@@ -438,12 +471,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 13,
-  },
-  dropoffLink: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.primary,
-    textDecorationLine: "underline",
   },
 
   pricesSection: { marginBottom: 24 },

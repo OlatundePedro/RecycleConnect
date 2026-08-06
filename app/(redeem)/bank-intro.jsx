@@ -34,7 +34,7 @@ const FEATURES = [
   },
 ];
 
-const NEXT_ROUTE = "/(redeem)/withdraw";
+const NEXT_ROUTE = "/(redeem)/select-bank";
 
 export default function LinkBankAccountIntro() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function LinkBankAccountIntro() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={26} color={COLORS.primary} />
+          <Ionicons name="chevron-back" size={21} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Link Bank Account</Text>
       </View>
@@ -63,8 +63,8 @@ export default function LinkBankAccountIntro() {
 
         <Text style={styles.title}>Withdraw your{"\n"}Cash</Text>
         <Text style={styles.subtitle}>
-          Link your Bank account once and receive Cash rewards directly into
-          your account.
+          Link your Bank account once and receive Cash{"\n"}rewards directly
+          into your account.
         </Text>
 
         <View style={styles.featureCard}>
@@ -114,42 +114,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: COLORS.surface,
     gap: 12,
   },
   headerTitle: {
     fontFamily: FONTS.medium,
-    fontSize: 19,
+    fontSize: 17,
     color: COLORS.primary,
+    marginLeft: 90,
   },
   scroll: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 },
 
   illustration: {
     width: "100%",
     height: 260,
-    marginBottom: 24,
+    marginBottom: 22,
   },
   title: {
-    fontFamily: FONTS.black,
-    fontSize: 38,
-    lineHeight: 44,
+    fontFamily: FONTS.bold,
+    fontSize: 30,
+    lineHeight: 42,
     color: COLORS.textPrimary,
     textAlign: "center",
-    marginBottom: 18,
+    marginBottom: 15,
   },
   subtitle: {
-    fontFamily: FONTS.medium,
-    fontSize: 16,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
     lineHeight: 23,
     color: COLORS.textSecondary,
     textAlign: "center",
-    marginBottom: 28,
+    marginBottom: 25,
   },
 
   featureCard: {
     backgroundColor: COLORS.primaryLight,
-    borderRadius: 18,
-    padding: 22,
+    borderRadius: 14,
+    padding: 20,
   },
   featureRow: {
     flexDirection: "row",
@@ -166,13 +166,13 @@ const styles = StyleSheet.create({
   featureTextWrap: { flex: 1 },
   featureTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 2,
   },
   featureDescription: {
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
   },
 
@@ -184,12 +184,12 @@ const styles = StyleSheet.create({
   getStartedBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 18,
+    paddingVertical: 15,
     alignItems: "center",
   },
   getStartedText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 17,
+    fontSize: 14,
     color: COLORS.white,
   },
 });

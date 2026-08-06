@@ -13,19 +13,33 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { sendOtp } from "../lib/auth";
+import { normalizePhone } from "../lib/phone";
 
 export default function CreateAccount() {
   const router = useRouter();
+  const { updateData } = useHouseholdOnboarding();
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const canContinue = phone.trim().length > 0;
+  const canContinue = phone.trim().length > 0 && !loading;
 
-  const handleVerifyPhone = () => {
+  const handleVerifyPhone = async () => {
     if (!canContinue) return;
-    router.push({
-      pathname: "/create-otp-house",
-      params: { phone },
-    });
+    const normalizedPhone = normalizePhone(phone);
+    setLoading(true);
+    setError(null);
+    try {
+      await sendOtp(normalizedPhone);
+      updateData({ phone: normalizedPhone });
+      router.push("/create-otp-house");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,13 +74,17 @@ export default function CreateAccount() {
           />
         </View>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           onPress={handleVerifyPhone}
           activeOpacity={0.85}
           disabled={!canContinue}
         >
-          <Text style={styles.verifyBtnText}>Verify Phone Number</Text>
+          <Text style={styles.verifyBtnText}>
+            {loading ? "Sending..." : "Verify Phone Number"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.signinRow}>
@@ -125,12 +143,22 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "#D14343",
+    textAlign: "center",
+    marginBottom: 16,
+  },
   verifyBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
     marginBottom: 20,
+  },
+  verifyBtnDisabled: {
+    opacity: 0.5,
   },
   verifyBtnText: {
     fontFamily: FONTS.semiBold,

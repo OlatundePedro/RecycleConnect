@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Image,
@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { sendOtp } from "../lib/auth";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -23,7 +25,7 @@ const COLORS = {
 };
 
 const OTP_LENGTH = 4;
-const RESEND_SECONDS = 35;
+const RESEND_SECONDS = 60;
 const ACCOUNT_TYPE = "collector";
 
 function maskPhone(phone) {
@@ -38,10 +40,14 @@ function maskPhone(phone) {
 
 export default function VerifyOtpCollector() {
   const router = useRouter();
-  const { phone } = useLocalSearchParams();
+  const { data, updateData } = useHouseholdOnboarding();
+  const phone = data.phone;
 
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState(null);
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -61,6 +67,7 @@ export default function VerifyOtpCollector() {
       next[index] = char;
       return next;
     });
+    if (error) setError(null);
     if (char && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -77,25 +84,33 @@ export default function VerifyOtpCollector() {
     }
   };
 
-  const handleResend = () => {
-    if (secondsLeft > 0) return;
-    setDigits(Array(OTP_LENGTH).fill(""));
-    setSecondsLeft(RESEND_SECONDS);
-    inputRefs.current[0]?.focus();
+  const handleResend = async () => {
+    if (secondsLeft > 0 || resending) return;
+    setResending(true);
+    setError(null);
+    try {
+      await sendOtp(phone);
+      setDigits(Array(OTP_LENGTH).fill(""));
+      setSecondsLeft(RESEND_SECONDS);
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResending(false);
+    }
   };
 
   const code = digits.join("");
-  const canContinue = code.length === OTP_LENGTH;
+  const canContinue = code.length === OTP_LENGTH && !verifying;
 
   const handleVerify = () => {
     if (!canContinue) return;
-
+    updateData({ otp: code });
     router.replace({
       pathname: "/account-success",
       params: { type: ACCOUNT_TYPE },
     });
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />

@@ -1,18 +1,29 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  Alert,
+  Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
+
+// Kept in sync with mark-as-ready.jsx's MATERIALS list — same ids,
+// icons, and labels, so a material id passed through route params
+// resolves back to the right display here.
+const MATERIAL_DISPLAY = {
+  plastic: { label: "Plastic", icon: "water-outline" },
+  paper: { label: "Paper", icon: "document-text-outline" },
+  metal: { label: "Metal", icon: "hardware-chip-outline" },
+  glass: { label: "Glass", icon: "wine-outline" },
+};
 
 const PARTNERS = [
   {
@@ -25,30 +36,47 @@ const PARTNERS = [
       time: "9:00 AM - 12:30 PM",
       location: "Ikorodu, Lagos",
     },
-    accepts: [
-      { id: "plastic", icon: "water-outline" },
-      { id: "paper", icon: "document-text-outline" },
-      { id: "metal", icon: "hardware-chip-outline" },
-      { id: "glass", icon: "wine-outline" },
-    ],
   },
 ];
 
 export default function CollectionPartners() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState(PARTNERS[0]?.id ?? null);
+  const { materials } = useLocalSearchParams();
 
-  const filteredPartners = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return PARTNERS;
-    return PARTNERS.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) || p.area.toLowerCase().includes(q),
+  // Whatever the household checked off on mark-as-ready, in order.
+  const selectedMaterialIds = (materials ?? "")
+    .toString()
+    .split(",")
+    .filter(Boolean);
+
+  const handleCancelOrder = () => {
+    Alert.alert(
+      "Cancel Collection",
+      "Are you sure you want to cancel this scheduled collection?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes, Cancel",
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              "Collection Cancelled",
+              "Your scheduled collection has been cancelled.",
+            );
+
+            // Go back to the pickup screen
+            router.replace("/(pickup)/mark-as-ready");
+          },
+        },
+      ],
     );
-  }, [query]);
-
-  const selectedPartner = PARTNERS.find((p) => p.id === selectedId);
+  };
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(PARTNERS[0]?.id ?? null);
+  const selectedPartner = PARTNERS[0];
 
   const handleConfirm = () => {
     if (!selectedPartner) return;
@@ -73,91 +101,87 @@ export default function CollectionPartners() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.searchRow}>
-          <View style={styles.searchBox}>
-            <Ionicons name="search" size={20} color={COLORS.textSecondary} />
-            <TextInput
-              style={styles.searchInput}
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search partners or areas"
-              placeholderTextColor={COLORS.textSecondary}
-            />
+        <Text style={styles.confirmedTitle}>
+          Your Materials have been Confirmed!
+        </Text>
+
+        {/* Partner */}
+        <View style={styles.partnerCard}>
+          <Text style={styles.partnerName}>{selectedPartner.name}</Text>
+
+          <View style={styles.verifiedRow}>
+            <Ionicons name="star" size={12} color="#14834B" />
+            <Text style={styles.verifiedText}>Verified Partner</Text>
           </View>
-          <TouchableOpacity style={styles.filterBtn}>
-            <Ionicons
-              name="filter-outline"
-              size={20}
-              color={COLORS.textSecondary}
-            />
-          </TouchableOpacity>
+
+          <View style={styles.areaRow}>
+            <Ionicons name="location-outline" size={15} color="#8A9690" />
+            <Text style={styles.areaText}>{selectedPartner.area}</Text>
+          </View>
         </View>
 
-        {filteredPartners.map((partner) => {
-          const active = partner.id === selectedId;
-          return (
-            <View
-              key={partner.id}
-              style={styles.partnerCard}
-              onPress={() => setSelectedId(partner.id)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.partnerCardText}>
-                <Text style={styles.partnerName}>{partner.name}</Text>
-                {partner.verified && (
-                  <View style={styles.verifiedRow}>
-                    <Ionicons name="star" size={12} color={COLORS.primary} />
-                    <Text style={styles.verifiedText}>Verified Partner</Text>
-                  </View>
-                )}
-                <View style={styles.areaRow}>
-                  <Ionicons
-                    name="location-outline"
-                    size={15}
-                    color={COLORS.textSecondary}
-                  />
-                  <Text style={styles.areaText}>{partner.area}</Text>
-                </View>
-              </View>
-            </View>
-          );
-        })}
+        {/* Next Collection */}
 
-        {filteredPartners.length === 0 && (
-          <Text style={styles.emptyText}>
-            No partners match "{query}". Try a different name or area.
-          </Text>
-        )}
+        <View style={styles.nextCollectionCard}>
+          <View style={styles.nextHeaderRow}>
+            <View>
+              <Text style={styles.nextLabel}>Next Collection</Text>
 
-        {selectedPartner && (
-          <>
-            <View style={styles.nextCollectionCard}>
-              <Text style={styles.mutedLabel}>Next Collection</Text>
-              <Text style={styles.nextCollectionDate}>
+              <Text style={styles.nextDate}>
                 {selectedPartner.nextCollection.date}
               </Text>
-              <Text style={styles.nextCollectionTime}>
+
+              <Text style={styles.nextTime}>
                 {selectedPartner.nextCollection.time}
-              </Text>
-              <Text style={styles.nextCollectionLocation}>
-                {selectedPartner.nextCollection.location}
               </Text>
             </View>
 
-            <Text style={styles.acceptsLabel}>Accepts</Text>
-            <View style={styles.acceptsRow}>
-              {selectedPartner.accepts.map((item) => (
-                <View key={item.id} style={styles.acceptsIconWrap}>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={() => setShowCancelModal(true)}
+            >
+              <Text style={styles.cancelBtnText}>Cancel Order</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.areaRow}>
+            <Ionicons name="location-outline" size={18} color="#8A9690" />
+            <Text style={styles.areaText}>
+              {selectedPartner.nextCollection.location}
+            </Text>
+          </View>
+        </View>
+
+        {/* Materials — whatever the household selected on mark-as-ready,
+            not the partner's full accepted list. */}
+        <View style={styles.materialsRow}>
+          {selectedMaterialIds.map((id) => {
+            const material = MATERIAL_DISPLAY[id];
+            if (!material) return null;
+            return (
+              <View key={id} style={styles.materialCard}>
+                <View style={styles.materialIconCircle}>
                   <Ionicons
-                    name={item.icon}
-                    size={26}
-                    color={COLORS.primaryDark}
+                    name={material.icon}
+                    size={30}
+                    color={COLORS.primary}
                   />
                 </View>
-              ))}
-            </View>
-          </>
-        )}
+                <Text style={styles.materialText}>{material.label}</Text>
+              </View>
+            );
+          })}
+        </View>
+
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/(pickup)/mark-as-ready",
+            })
+          }
+        >
+          <Text style={styles.editText}>Edit</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -170,9 +194,51 @@ export default function CollectionPartners() {
           disabled={!selectedPartner}
           activeOpacity={0.85}
         >
-          <Text style={styles.confirmBtnText}>Confirm</Text>
+          <Text style={styles.confirmBtnText}>Done</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={showCancelModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowCancelModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Ionicons
+              name="warning-outline"
+              size={35}
+              color="#E53935"
+              style={{ marginBottom: 12 }}
+            />
+
+            <Text style={styles.modalTitle}>Cancel Collection?</Text>
+
+            <Text style={styles.modalMessage}>
+              Are you sure you want to cancel your scheduled collection?
+            </Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.keepBtn}
+                onPress={() => setShowCancelModal(false)}
+              >
+                <Text style={styles.keepBtnText}>Keep Collection</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.confirmCancelBtn}
+                onPress={() => {
+                  setShowCancelModal(false);
+                  router.replace("/(pickup)/mark-as-ready");
+                }}
+              >
+                <Text style={styles.confirmCancelText}>Yes, Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -193,139 +259,211 @@ const styles = StyleSheet.create({
   },
   scroll: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 },
 
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 20,
-  },
-  searchBox: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderWidth: 1.0,
-    borderColor: COLORS.border,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: FONTS.regular,
-    fontSize: 15,
+  confirmedTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 20,
     color: COLORS.textPrimary,
-  },
-  filterBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    borderWidth: 1.0,
-    borderColor: COLORS.border,
-    alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 26,
   },
 
   partnerCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#F8FAF9",
     borderRadius: 14,
     padding: 18,
     marginBottom: 16,
   },
-  partnerCardText: { flex: 1 },
+
   partnerName: {
     fontFamily: FONTS.bold,
     fontSize: 16,
     color: COLORS.textPrimary,
-    marginBottom: 6,
   },
+
   verifiedRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    marginTop: 6,
     marginBottom: 8,
   },
   verifiedText: {
-    fontFamily: FONTS.semiBold,
+    marginLeft: 6,
+    fontFamily: FONTS.medium,
+    color: "#14834B",
     fontSize: 13,
-    color: COLORS.primary,
-  },
-  areaRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  areaText: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.textSecondary,
   },
 
-  emptyText: {
+  areaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  areaText: {
+    marginLeft: 8,
     fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginBottom: 16,
+    color: "#8A9690",
+    fontSize: 13,
   },
 
   nextCollectionCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: "#F8FAF9",
     borderRadius: 14,
     padding: 16,
     marginBottom: 24,
   },
-  mutedLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginBottom: 10,
-  },
-  nextCollectionDate: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.textPrimary,
-    marginBottom: 4,
-  },
-  nextCollectionTime: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    marginBottom: 10,
-  },
-  nextCollectionLocation: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.textSecondary,
+
+  nextHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 22,
   },
 
-  acceptsLabel: {
+  nextLabel: {
     fontFamily: FONTS.medium,
+    color: "#8A9690",
+    fontSize: 13,
+    marginBottom: 10,
+  },
+
+  nextDate: {
+    fontFamily: FONTS.bold,
+    fontSize: 19,
+    color: COLORS.textPrimary,
+  },
+
+  nextTime: {
+    fontFamily: FONTS.semiBold,
     fontSize: 15,
-    color: COLORS.textSecondary,
-    marginBottom: 14,
-    paddingLeft: 10,
+    marginTop: 4,
+    marginBottom: 5,
   },
-  acceptsRow: {
-    flexDirection: "row",
-    gap: 16,
+
+  cancelBtn: {
+    borderWidth: 1,
+    borderColor: "#FF3B30",
+    borderRadius: 28,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+  },
+
+  cancelBtnText: {
+    color: "#FF3B30",
+    fontFamily: FONTS.medium,
+    fontSize: 11,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modalContainer: {
+    width: "70%",
+    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    padding: 20,
+    alignItems: "center",
+  },
+
+  modalTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 19,
+    color: COLORS.textPrimary,
     marginBottom: 12,
-    paddingLeft: 5,
   },
-  acceptsIconWrap: {
-    width: 60,
-    height: 60,
-    borderRadius: 32,
-    backgroundColor: "#8FE3A4",
+
+  modalMessage: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+
+  modalButtons: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+  },
+
+  keepBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    paddingVertical: 12,
+    marginRight: 8,
+    alignItems: "center",
+  },
+
+  keepBtnText: {
+    fontFamily: FONTS.semiBold,
+    color: COLORS.textPrimary,
+    fontSize: 12,
+  },
+
+  confirmCancelBtn: {
+    flex: 1,
+    backgroundColor: "#E53935",
+    borderRadius: 14,
+    paddingVertical: 12,
+    marginLeft: 8,
+    alignItems: "center",
+  },
+
+  confirmCancelText: {
+    fontFamily: FONTS.semiBold,
+    color: COLORS.white,
+    fontSize: 12,
+  },
+
+  materialsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 18,
+    marginBottom: 18,
+  },
+
+  materialCard: {
+    width: 92,
+    height: 100,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+
+  materialIconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 35,
+    backgroundColor: "#8EF08A",
     alignItems: "center",
     justifyContent: "center",
   },
 
-  footer: {
-    padding: 18,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
+  materialText: {
+    fontFamily: FONTS.bold,
+    fontSize: 14,
+    color: "#707070",
   },
+
+  editText: {
+    fontFamily: FONTS.bold,
+    color: COLORS.primary,
+    fontSize: 15,
+    textDecorationLine: "underline",
+    marginTop: 10,
+  },
+
+  footer: {
+    paddingHorizontal: 22,
+    paddingVertical: 20,
+  },
+
   confirmBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -334,8 +472,8 @@ const styles = StyleSheet.create({
   },
 
   confirmBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 16,
-    color: COLORS.white,
+    color: "#FFF",
+    fontFamily: FONTS.bold,
+    fontSize: 15,
   },
 });

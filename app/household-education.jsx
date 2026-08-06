@@ -1,6 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -11,6 +13,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { registerHousehold } from "../lib/auth";
+import { saveSession } from "../lib/session";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -24,6 +29,7 @@ const COLORS = {
   warnText: "#C23B2E",
   ecoBadgeBg: "#F6E7C9",
   white: "#FFFFFF",
+  error: "#D14343",
 };
 
 const MATERIALS = [
@@ -55,17 +61,42 @@ const MATERIALS = [
 
 export default function RecyclablesInfo() {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const { fullName, email, state, area, landmark } = useLocalSearchParams();
+  const { data } = useHouseholdOnboarding();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleGotIt = () => {
-    router.replace("/household/home");
+  const handleGotIt = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await registerHousehold({
+        phone: data.phone,
+        otp: data.otp,
+        pin: data.pin,
+        first_name: fullName,
+        state,
+        area,
+        landmark,
+        service_zone: `${area} Zone A`,
+      });
+      await saveSession(result.data.token, {
+        ...result.data.user,
+        first_name: result.data.household_profile?.first_name,
+        reference_code: result.data.household_profile?.reference_code,
+      });
+      router.replace("/household/home");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
@@ -119,15 +150,24 @@ export default function RecyclablesInfo() {
             </Text>
           </View>
         </View>
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
 
       <TouchableOpacity
-        style={styles.gotItBtn}
+        style={[styles.gotItBtn, submitting && styles.gotItBtnDisabled]}
         activeOpacity={0.85}
+        disabled={submitting}
         onPress={handleGotIt}
       >
-        <Text style={styles.gotItText}>Got it, let&apos;s go!</Text>
-        <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
+        {submitting ? (
+          <ActivityIndicator color={COLORS.white} />
+        ) : (
+          <>
+            <Text style={styles.gotItText}>Got it, let&apos;s go!</Text>
+            <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
+          </>
+        )}
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -145,7 +185,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 18,
-    color: COLORS.textPrimaryprimary,
+    color: COLORS.textPrimary,
   },
   scroll: {
     paddingHorizontal: 24,
@@ -256,6 +296,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.textSecondary,
   },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: COLORS.error,
+    textAlign: "center",
+    marginTop: 12,
+  },
   gotItBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -266,6 +313,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginHorizontal: 24,
     marginBottom: 28,
+  },
+  gotItBtnDisabled: {
+    opacity: 0.6,
   },
   gotItText: {
     fontFamily: FONTS.semiBold,

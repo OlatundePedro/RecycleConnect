@@ -24,6 +24,12 @@ export default function AccountSuccess() {
   const isCollector = type === "collector";
 
   const handleCreatePin = () => {
+    console.log("type =", type);
+    console.log(
+      "Going to =",
+      isCollector ? "/create-pin-collector" : "/create-pin",
+    );
+
     router.push({
       pathname: isCollector ? "/create-pin-collector" : "/create-pin",
       params: { type },

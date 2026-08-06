@@ -80,13 +80,6 @@ export default function NotificationsScreen() {
 
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => handleCancel(pickup)}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={() =>
                   router.push({
@@ -142,7 +135,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     lineHeight: 28,
   },
-
   card: {
     backgroundColor: COLORS.white,
     borderRadius: 14,
@@ -151,13 +143,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
   },
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: 18,
   },
-
   materialText: {
     fontFamily: FONTS.bold,
     fontSize: 18,
@@ -171,7 +161,6 @@ const styles = StyleSheet.create({
     color: "#8B92A6",
     lineHeight: 24,
   },
-
   amountText: {
     fontFamily: FONTS.bold,
     fontSize: 23,
@@ -180,39 +169,28 @@ const styles = StyleSheet.create({
   },
 
   buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  cancelButton: {
-    flex: 0.46,
-    height: 42,
-    borderRadius: 23,
-    borderWidth: 1,
-    borderColor: "#B5B5B5",
-    backgroundColor: "#EDF3F1",
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: 10,
   },
 
   confirmButton: {
-    flex: 0.46,
-    height: 42,
-    borderRadius: 29,
+    width: "100%",
+    height: 46,
+    borderRadius: 31,
     backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
-  },
 
-  cancelText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 16,
-    color: COLORS.primary,
+    borderColor: "#49C17A",
   },
 
   confirmText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
+    color: COLORS.white,
+  },
+  confirmText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
     color: COLORS.white,
   },
 });

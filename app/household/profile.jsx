@@ -1,6 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   ScrollView,
   StatusBar,
@@ -11,6 +14,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../../constants/typography";
+import { useProfile } from "../../context/profileContext";
+import { getUser } from "../../lib/session";
 
 const COLORS = {
   primary: "#188A5A",
@@ -27,9 +32,7 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-const USER = {
-  name: "Chidi Adebayo",
-  phone: "+234 803 123 4567",
+const STATS = {
   co2Kg: 124,
   treesEquivalent: 6,
   level: 4,
@@ -38,18 +41,62 @@ const USER = {
 };
 
 const MENU_ITEMS = [
-  { key: "account", icon: "person-circle-outline", label: "Account Settings" },
+  {
+    key: "account",
+    icon: "person-circle-outline",
+    label: "Account Settings",
+    route: "/(profile)/setting",
+  },
   {
     key: "notifications",
     icon: "notifications-outline",
     label: "Notification Preferences",
+    route: "/(profile)/notification",
   },
-  { key: "help", icon: "help-circle-outline", label: "Help & Support" },
+  {
+    key: "help",
+    icon: "help-circle-outline",
+    label: "Help & Support",
+    route: "/(profile)/help-support",
+  },
 ];
 
 export default function HouseholdProfile() {
   const router = useRouter();
-  const handleEditAvatar = () => {};
+  const [user, setUser] = useState(null);
+  const { avatar, setAvatar } = useProfile();
+  useEffect(() => {
+    (async () => {
+      const stored = await getUser();
+      setUser(stored);
+    })();
+  }, []);
+
+  const fullName =
+    user?.full_name ||
+    `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim() ||
+    "User";
+
+  const phone = user?.phone || user?.phone_number || "No phone number";
+  const handleEditAvatar = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission Required", "Please allow access to your photos.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
+  };
 
   const handleLogout = () => {
     router.replace("/signIn");
@@ -77,7 +124,11 @@ export default function HouseholdProfile() {
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
-              source={require("../../assets/images/Ellipse 51.png")}
+              source={
+                avatar
+                  ? { uri: avatar }
+                  : require("../../assets/images/Ellipse 51.png")
+              }
               style={styles.avatar}
             />
             <TouchableOpacity
@@ -88,8 +139,8 @@ export default function HouseholdProfile() {
               <Ionicons name="pencil" size={14} color={COLORS.white} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{USER.name}</Text>
-          <Text style={styles.phone}>{USER.phone}</Text>
+          <Text style={styles.name}>{fullName}</Text>
+          <Text style={styles.phone}>{phone}</Text>
         </View>
 
         <View style={styles.impactCard}>
@@ -97,15 +148,15 @@ export default function HouseholdProfile() {
             <View style={{ flex: 1 }}>
               <Text style={styles.impactLabel}>ENVIRONMENTAL IMPACT</Text>
               <Text style={styles.impactValue}>
-                {USER.co2Kg}kg CO<Text style={styles.subscript}>2</Text>
+                {STATS.co2Kg}kg CO<Text style={styles.subscript}>2</Text>
               </Text>
               <Text style={styles.impactSubtext}>
-                Equivalent to planting {USER.treesEquivalent} trees
+                Equivalent to planting {STATS.treesEquivalent} trees
               </Text>
             </View>
             <View style={styles.levelBadge}>
               <Ionicons name="leaf" size={18} color={COLORS.primaryDark} />
-              <Text style={styles.levelText}>Level {USER.level}</Text>
+              <Text style={styles.levelText}>Level {STATS.level}</Text>
             </View>
           </View>
 
@@ -113,12 +164,12 @@ export default function HouseholdProfile() {
             <View
               style={[
                 styles.progressFill,
-                { width: `${USER.progressPercent}%` },
+                { width: `${STATS.progressPercent}%` },
               ]}
             />
           </View>
           <Text style={styles.progressCaption}>
-            {USER.kgUntilNextReward}kg away from your next reward
+            {STATS.kgUntilNextReward}kg away from your next reward
           </Text>
         </View>
 
@@ -131,6 +182,7 @@ export default function HouseholdProfile() {
                 index < MENU_ITEMS.length - 1 && styles.menuRowDivider,
               ]}
               activeOpacity={0.7}
+              onPress={() => router.push(item.route)}
             >
               <View style={styles.menuIconWrap}>
                 <Ionicons name={item.icon} size={20} color={COLORS.primary} />
@@ -311,7 +363,7 @@ const styles = StyleSheet.create({
   },
   menuLabel: {
     flex: 1,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
   },

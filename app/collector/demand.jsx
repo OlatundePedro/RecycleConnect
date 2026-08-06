@@ -98,7 +98,7 @@ export default function Demand() {
             activeOpacity={0.75}
             onPress={() =>
               router.push({
-                pathname: "/collector/demand-detail",
+                pathname: "/(collect)/demand-detail",
                 params: { streetId: item.id },
               })
             }

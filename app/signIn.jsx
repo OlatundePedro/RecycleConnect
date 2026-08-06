@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -13,6 +14,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { getUserProfile, loginWithPin } from "../lib/auth";
+import { normalizePhone } from "../lib/phone";
+import { saveSession } from "../lib/session";
 
 const PIN_LENGTH = 4;
 
@@ -20,6 +24,8 @@ export default function Login() {
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const pinRefs = useRef([]);
 
   const handleChangeDigit = (index, value) => {
@@ -29,6 +35,7 @@ export default function Login() {
       next[index] = char;
       return next;
     });
+    if (error) setError("");
     if (char && index < PIN_LENGTH - 1) {
       pinRefs.current[index + 1]?.focus();
     }
@@ -46,11 +53,30 @@ export default function Login() {
   };
 
   const pinCode = pin.join("");
-  const canLogin = phone.trim().length > 0 && pinCode.length === PIN_LENGTH;
+  const canLogin =
+    phone.trim().length > 0 && pinCode.length === PIN_LENGTH && !loading;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!canLogin) return;
-    router.replace("/household/home");
+    const normalizedPhone = normalizePhone(phone);
+    setLoading(true);
+    setError("");
+    try {
+      const result = await loginWithPin(normalizedPhone, pinCode);
+      const profile = await getUserProfile();
+      await saveSession(result.data.token, {
+        ...result.data.user,
+        first_name: profile.data.householdProfile?.first_name,
+        reference_code: profile.data.householdProfile?.reference_code,
+      });
+      router.replace("/household/home");
+    } catch (err) {
+      setError(err.message);
+      setPin(Array(PIN_LENGTH).fill(""));
+      pinRefs.current[0]?.focus();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,6 +108,7 @@ export default function Login() {
             placeholder="+234xxxxxxxxxx"
             placeholderTextColor={COLORS.muted}
             keyboardType="phone-pad"
+            editable={!loading}
           />
         </View>
 
@@ -98,10 +125,13 @@ export default function Login() {
               secureTextEntry
               maxLength={1}
               textAlign="center"
+              editable={!loading}
               style={[styles.pinBox, digit && styles.pinBoxFilled]}
             />
           ))}
         </View>
+
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
           style={[styles.loginBtn, !canLogin && styles.loginBtnDisabled]}
@@ -109,7 +139,11 @@ export default function Login() {
           activeOpacity={0.85}
           disabled={!canLogin}
         >
-          <Text style={styles.loginBtnText}>Login</Text>
+          {loading ? (
+            <ActivityIndicator color={COLORS.white} />
+          ) : (
+            <Text style={styles.loginBtnText}>Login</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -179,7 +213,7 @@ const styles = StyleSheet.create({
   pinRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 40,
+    marginBottom: 16,
     alignSelf: "center",
     width: "90%",
   },
@@ -196,6 +230,13 @@ const styles = StyleSheet.create({
   pinBoxFilled: {
     backgroundColor: COLORS.white,
   },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "#D64545",
+    textAlign: "center",
+    marginBottom: 20,
+  },
   loginBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -204,6 +245,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "95%",
     alignSelf: "center",
+  },
+  loginBtnDisabled: {
+    opacity: 0.5,
   },
   loginBtnText: {
     fontFamily: FONTS.semiBold,

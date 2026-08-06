@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { forgotPin } from "../lib/auth";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -49,7 +50,7 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
 export default function ResetPin() {
   const router = useRouter();
   const { phone, type } = useLocalSearchParams();
-
+  const [submitting, setSubmitting] = useState(false);
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
   const [confirmPin, setConfirmPin] = useState(Array(PIN_LENGTH).fill(""));
   const [error, setError] = useState("");
@@ -95,7 +96,7 @@ export default function ResetPin() {
   const canContinue =
     pinCode.length === PIN_LENGTH && confirmCode.length === PIN_LENGTH;
 
-  const handleResetPin = () => {
+  const handleResetPin = async () => {
     if (!canContinue) return;
     if (pinCode !== confirmCode) {
       setError("PINs don't match. Try again.");
@@ -103,10 +104,16 @@ export default function ResetPin() {
       confirmRefs.current[0]?.focus();
       return;
     }
-    router.replace({
-      pathname: "/reset-success",
-      params: { type },
-    });
+    setSubmitting(true);
+    setError("");
+    try {
+      await forgotPin(phone, otp, pinCode);
+      router.replace({ pathname: "/reset-success", params: { type } });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

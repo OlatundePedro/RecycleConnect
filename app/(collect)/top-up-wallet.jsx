@@ -14,11 +14,26 @@ import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000];
-
 const PAYMENT_METHODS = [
-  { id: "card", label: "Debit / Credit Card", icon: "card-outline" },
-  { id: "bank-transfer", label: "Bank Transfer", icon: "apps-outline" },
-  { id: "ussd", label: "USSD", icon: "business-outline" },
+  {
+    id: "card",
+    label: "Debit / Credit Card",
+    icon: "card-outline",
+    right: "card",
+  },
+  {
+    id: "bank-transfer",
+    label: "Bank Transfer",
+    icon: "business-outline",
+    right: "radio",
+  },
+  {
+    id: "ussd",
+    label: "USSD",
+    icon: "keypad-outline",
+    right: "text",
+    text: "*123#",
+  },
 ];
 
 export default function TopUpWallet() {
@@ -55,9 +70,9 @@ export default function TopUpWallet() {
   };
 
   const canContinue = Number(amount) > 0 && selectedMethod;
-
   const handleContinue = () => {
     if (!canContinue) return;
+
     router.push({
       pathname: "/(collect)/payment-confirm",
       params: { amount, method: selectedMethod },
@@ -65,18 +80,23 @@ export default function TopUpWallet() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      translucent={false}
+      backgroundColor={COLORS.primaryDark}
+      barStyle="light-content"
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="chevron-back" size={24} color={COLORS.primaryDark} />
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={34} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Top Up Wallet</Text>
-        <View style={{ width: 26 }} />
-      </View>
 
+        <Text style={styles.headerTitle}>Top Up Wallet</Text>
+
+        <View style={{ width: 34 }} />
+      </View>
       <ScrollView
-        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
       >
         <Text style={styles.sectionLabel}>Enter amount</Text>
         <View style={styles.amountInputBox}>
@@ -132,21 +152,52 @@ export default function TopUpWallet() {
             </Text>
           </TouchableOpacity>
         </View>
-
         <Text style={styles.sectionLabel}>Payment Method</Text>
+
         {PAYMENT_METHODS.map((method) => {
-          const active = method.id === selectedMethod;
+          const active = selectedMethod === method.id;
+
           return (
             <TouchableOpacity
               key={method.id}
-              style={[styles.methodRow, active && styles.methodRowActive]}
+              style={styles.methodCard}
+              activeOpacity={0.8}
               onPress={() => setSelectedMethod(method.id)}
-              activeOpacity={0.85}
             >
-              <View style={styles.methodIconWrap}>
-                <Ionicons name={method.icon} size={22} color={COLORS.primary} />
+              <View style={styles.methodLeft}>
+                <View style={styles.methodIconBox}>
+                  <Ionicons
+                    name={method.icon}
+                    size={28}
+                    color={COLORS.primary}
+                  />
+                </View>
+
+                <Text style={styles.methodTitle}>{method.label}</Text>
               </View>
-              <Text style={styles.methodLabel}>{method.label}</Text>
+
+              <View style={styles.methodRight}>
+                {method.id === "card" && (
+                  <View style={styles.cardLogos}>
+                    <Text style={styles.visa}>VISA</Text>
+
+                    <View style={styles.mastercard}>
+                      <View style={styles.redCircle} />
+                      <View style={styles.orangeCircle} />
+                    </View>
+                  </View>
+                )}
+
+                {method.id === "ussd" && (
+                  <Text style={styles.ussdText}>*123#</Text>
+                )}
+
+                <View
+                  style={[styles.radioOuter, active && styles.radioOuterActive]}
+                >
+                  {active && <View style={styles.radioInner} />}
+                </View>
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -180,128 +231,200 @@ export default function TopUpWallet() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
   header: {
+    backgroundColor: COLORS.primaryDark,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingVertical: 16,
+    paddingHorizontal: 22,
+    paddingTop: 18,
+    paddingBottom: 32,
   },
+
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 19,
-    color: COLORS.textPrimary,
+    fontSize: 22,
+    color: COLORS.white,
   },
-  scroll: { paddingHorizontal: 20, paddingTop: 30, paddingBottom: 35 },
+
+  scroll: {
+    paddingHorizontal: 32,
+    paddingTop: 38,
+    paddingBottom: 40,
+  },
 
   sectionLabel: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 19,
     color: COLORS.textPrimary,
-    marginBottom: 10,
+    marginBottom: 18,
   },
 
   amountInputBox: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.0,
+    borderWidth: 2,
     borderColor: COLORS.primary,
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 13,
-    marginBottom: 20,
+    borderRadius: 22,
+    height: 98,
+    paddingHorizontal: 18,
+    marginBottom: 34,
+    backgroundColor: COLORS.white,
   },
+
   nairaPrefix: {
     fontFamily: FONTS.bold,
-    fontSize: 23,
+    fontSize: 28,
     color: COLORS.textPrimary,
-    marginRight: 6,
+    marginRight: 4,
   },
+
   amountInput: {
     flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 30,
     color: COLORS.textPrimary,
     padding: 0,
   },
+
   quickAmountsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 32,
+    justifyContent: "space-between",
+    rowGap: 18,
+    marginBottom: 52,
   },
+
   quickAmountBtn: {
-    width: "31%",
-    borderWidth: 1.0,
-    borderColor: COLORS.border,
+    width: "30.5%",
+    height: 74,
+    borderWidth: 2,
+    borderColor: "#D5D5D5",
     borderRadius: 14,
-    paddingVertical: 15,
+    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: COLORS.white,
   },
-  quickAmountBtnActive: { borderColor: COLORS.primary },
+
+  quickAmountBtnActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+  },
+
   quickAmountText: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: COLORS.textPrimary,
+    fontSize: 18,
+    color: "#4F5E5B",
   },
-  quickAmountTextActive: { color: COLORS.primary },
+
+  quickAmountTextActive: {
+    color: COLORS.primary,
+  },
 
   methodRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    borderWidth: 1.0,
-    borderColor: COLORS.border,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#D7D7D7",
+    borderRadius: 18,
+    height: 86,
+    paddingHorizontal: 18,
+    marginBottom: 18,
+    backgroundColor: COLORS.white,
   },
-  methodRowActive: { borderColor: COLORS.primary },
-  methodIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    borderWidth: 1.0,
+
+  methodRowActive: {
     borderColor: COLORS.primary,
+  },
+
+  methodIconWrap: {
+    width: 46,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 18,
   },
+
   methodLabel: {
+    flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 15,
+    fontSize: 18,
     color: COLORS.textPrimary,
+  },
+
+  methodRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  paymentText: {
+    fontFamily: FONTS.bold,
+    fontSize: 17,
+    color: COLORS.textPrimary,
+  },
+
+  radioOuter: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "#64748B",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  radioOuterActive: {
+    borderColor: COLORS.primary,
+  },
+
+  radioInner: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: COLORS.primary,
   },
 
   secureBanner: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 14,
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 16,
-    padding: 15,
-    marginTop: 5,
-    marginBottom: 28,
+    alignItems: "center",
+    backgroundColor: "#EAF6F0",
+    borderRadius: 22,
+    paddingHorizontal: 22,
+    paddingVertical: 22,
+    marginTop: 18,
+    marginBottom: 65,
   },
+
   secureText: {
     flex: 1,
-    fontFamily: FONTS.semiBold,
-    fontSize: 12,
-    lineHeight: 18,
+    marginLeft: 18,
+    fontFamily: FONTS.medium,
+    fontSize: 16,
+    lineHeight: 28,
     color: COLORS.primary,
   },
 
   continueBtn: {
+    height: 72,
     backgroundColor: COLORS.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+    borderRadius: 22,
+    justifyContent: "center",
     alignItems: "center",
+    marginBottom: 20,
   },
-  continueBtnDisabled: { opacity: 0.45 },
+
+  continueBtnDisabled: {
+    opacity: 0.45,
+  },
+
   continueBtnText: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
+    fontSize: 21,
     color: COLORS.white,
   },
 });

@@ -36,6 +36,13 @@ const WALLET = {
 
 const QUICK_ACTIONS = [
   {
+    key: "withdraw",
+    icon: "bank",
+    iconSet: "MaterialCommunityIcons",
+    bg: COLORS.pillBgYellow,
+    label: "Withdraw to Bank",
+  },
+  {
     key: "airtime",
     icon: "call",
     iconSet: "Ionicons",
@@ -48,13 +55,6 @@ const QUICK_ACTIONS = [
     iconSet: "Ionicons",
     bg: COLORS.pillBg,
     label: "Data",
-  },
-  {
-    key: "withdraw",
-    icon: "bank",
-    iconSet: "MaterialCommunityIcons",
-    bg: COLORS.pillBgYellow,
-    label: "Withdraw to Bank",
   },
   {
     key: "bills",
@@ -84,7 +84,7 @@ const FEATURED_REWARDS = [
 
 const ECO_STATUS = {
   title: "Eco-Warrior Status",
-  subtitle: "750 pts to Eco-Champion",
+  subtitle: "Eco-Champion",
   progressPercent: 65,
 };
 
@@ -136,23 +136,7 @@ export default function HouseholdRewards() {
           </View>
 
           <View style={styles.walletBottomRow}>
-            <View style={styles.pointsDotsRow}>
-              <View
-                style={[styles.pointsDot, { backgroundColor: COLORS.white }]}
-              >
-                <Ionicons
-                  name="leaf-outline"
-                  size={16}
-                  color={COLORS.primary}
-                />
-              </View>
-              <View style={[styles.pointsDot, styles.pointsDotYellow]}>
-                <Ionicons name="flash" size={16} color={COLORS.primaryDark} />
-              </View>
-            </View>
-            <TouchableOpacity style={styles.historyPill} activeOpacity={0.85}>
-              <Text style={styles.historyPillText}>History</Text>
-            </TouchableOpacity>
+            <View style={styles.pointsDotsRow}></View>
           </View>
         </View>
 
@@ -197,51 +181,10 @@ export default function HouseholdRewards() {
           ))}
         </View>
 
-        <Text style={[styles.sectionTitle, styles.featuredTitle]}>
-          Featured Rewards
-        </Text>
-
-        <View style={styles.featuredRow}>
-          {FEATURED_REWARDS.map((reward) => (
-            <View key={reward.key} style={styles.featuredCard}>
-              <View style={styles.featuredTopRow}>
-                <View style={styles.featuredIconWrap}>
-                  <Ionicons
-                    name={reward.icon}
-                    size={20}
-                    color={COLORS.primaryDark}
-                  />
-                </View>
-                <View style={styles.ptsPill}>
-                  <Text style={styles.ptsPillText}>{reward.points}</Text>
-                </View>
-              </View>
-              <Text style={styles.featuredCardTitle}>{reward.title}</Text>
-              <Text style={styles.featuredCardSubtitle}>{reward.subtitle}</Text>
-            </View>
-          ))}
-        </View>
-
-        <TouchableOpacity style={styles.voucherCard} activeOpacity={0.85}>
-          <Image
-            source={require("../../assets/images/grocery.png")}
-            style={styles.voucherImage}
-            resizeMode="cover"
-          />
-          <View style={styles.voucherText}>
-            <Text style={styles.voucherTitle}>Grocery Voucher</Text>
-            <Text style={styles.voucherSubtitle}>Shoprite Nigeria</Text>
-          </View>
-          <View style={styles.voucherPointsWrap}>
-            <Text style={styles.voucherPoints}>2,500</Text>
-            <Text style={styles.voucherPointsLabel}>pts</Text>
-          </View>
-        </TouchableOpacity>
-
         <View style={styles.ecoCard}>
           <View style={styles.ecoTopRow}>
             <View style={styles.ecoStarWrap}>
-              <Ionicons name="star" size={22} color={COLORS.white} />
+              <Ionicons name="star" size={18} color={COLORS.white} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.ecoTitle}>{ECO_STATUS.title}</Text>
@@ -288,7 +231,7 @@ const styles = StyleSheet.create({
   walletCard: {
     backgroundColor: COLORS.primaryDark,
     borderRadius: 14,
-    padding: 20,
+    padding: 17,
     marginBottom: 18,
   },
   walletTopRow: {
@@ -305,15 +248,15 @@ const styles = StyleSheet.create({
   },
   walletBalance: {
     fontFamily: FONTS.bold,
-    fontSize: 30,
+    fontSize: 32,
     color: COLORS.white,
   },
   walletBalanceDecimals: {
     fontSize: 18,
   },
   walletIcon: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 130,
   },
   walletBottomRow: {
     flexDirection: "row",
@@ -336,17 +279,6 @@ const styles = StyleSheet.create({
   pointsDotYellow: {
     backgroundColor: COLORS.pillBgYellow,
   },
-  historyPill: {
-    backgroundColor: COLORS.pillBg,
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  historyPillText: {
-    fontFamily: FONTS.bold,
-    fontSize: 12,
-    color: COLORS.primaryDark,
-  },
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -355,12 +287,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 25,
+    fontSize: 23,
     color: COLORS.primaryDark,
   },
   viewAllText: {
     fontFamily: FONTS.semiBold,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.primary,
   },
   quickActionsRow: {
@@ -373,8 +305,8 @@ const styles = StyleSheet.create({
     width: "23%",
   },
   quickActionIcon: {
-    width: 64,
-    height: 64,
+    width: 60,
+    height: 60,
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
@@ -385,36 +317,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textPrimary,
     textAlign: "center",
-  },
-  featuredTitle: {
-    fontSize: 20,
-    marginBottom: 16,
-  },
-  featuredRow: {
-    flexDirection: "row",
-    gap: 14,
-    marginBottom: 15,
-  },
-  featuredCard: {
-    flex: 1,
-    borderWidth: 1.0,
-    borderColor: COLORS.cardBorder,
-    borderRadius: 14,
-    padding: 16,
-  },
-  featuredTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
-  featuredIconWrap: {
-    width: 30,
-    height: 30,
-    borderRadius: 12,
-    backgroundColor: COLORS.ecoCardBg,
-    alignItems: "center",
-    justifyContent: "center",
   },
   ptsPill: {
     backgroundColor: COLORS.ptsPillBg,
@@ -438,51 +340,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-  voucherCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.voucherCardBg,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 24,
-  },
-  voucherImage: {
-    width: 54,
-    height: 54,
-    borderRadius: 14,
-    marginRight: 16,
-    backgroundColor: COLORS.white,
-  },
-  voucherText: {
-    flex: 1,
-  },
-  voucherTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 17,
-    color: COLORS.textPrimary,
-    marginBottom: 4,
-  },
-  voucherSubtitle: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  voucherPointsWrap: {
-    alignItems: "flex-end",
-  },
-  voucherPoints: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.primaryDark,
-  },
-  voucherPointsLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
   ecoCard: {
     backgroundColor: COLORS.ecoCardBg,
-    borderWidth: 1.5,
+    borderWidth: 1.0,
     borderColor: COLORS.ecoCardBorder,
     borderRadius: 14,
     padding: 20,
@@ -493,8 +353,8 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   ecoStarWrap: {
-    width: 38,
-    height: 38,
+    width: 35,
+    height: 35,
     borderRadius: 24,
     backgroundColor: COLORS.primary,
     alignItems: "center",
@@ -513,7 +373,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   ecoProgressTrack: {
-    height: 8,
+    height: 6,
     borderRadius: 5,
     backgroundColor: COLORS.trackBg,
     overflow: "hidden",

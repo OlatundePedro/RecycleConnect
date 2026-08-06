@@ -13,20 +13,33 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { sendOtp } from "../lib/auth";
+import { normalizePhone } from "../lib/phone";
 
 export default function CreateAccountCollector() {
   const router = useRouter();
+  const { updateData } = useHouseholdOnboarding();
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const canContinue = phone.trim().length > 0;
 
-  const handleVerifyPhone = () => {
+  const handleVerifyPhone = async () => {
     if (!canContinue) return;
-
-    router.push({
-      pathname: "/create-otp-collector",
-      params: { phone },
-    });
+    const normalizedPhone = normalizePhone(phone);
+    setLoading(true);
+    setError(null);
+    try {
+      await sendOtp(normalizedPhone);
+      updateData({ phone: normalizedPhone });
+      router.push("/create-otp-collector");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

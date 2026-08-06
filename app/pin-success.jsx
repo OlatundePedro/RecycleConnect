@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -18,6 +19,8 @@ const COLORS = {
 };
 
 export default function PinSuccess() {
+  const { data } = useHouseholdOnboarding();
+  console.log("Onboarding data so far:", data);
   const router = useRouter();
   const { type } = useLocalSearchParams();
   const isCollector = type === "collector";

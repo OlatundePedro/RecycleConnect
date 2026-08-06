@@ -64,7 +64,7 @@ export default function Stock() {
 
   const handleAccept = () => {
     router.push({
-      pathname: "/collector/buyer-interest",
+      pathname: "/(collect)/buyer-interest",
       params: { interestId: BUYER_INTEREST.id, action: "accept" },
     });
   };
@@ -137,14 +137,7 @@ export default function Stock() {
                 onPress={handleAccept}
                 activeOpacity={0.85}
               >
-                <Text style={styles.acceptBtnText}>Accept & share contact</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.declineBtn}
-                onPress={handleDecline}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.declineBtnText}>Decline</Text>
+                <Text style={styles.acceptBtnText}>Review Offer</Text>
               </TouchableOpacity>
             </View>
           </View>
