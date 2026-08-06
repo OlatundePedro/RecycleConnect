@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Where the button below sends the collector next.
 const NEXT_ROUTE = "/collector/home";
 
 export default function PaymentConfirm() {
@@ -27,7 +26,7 @@ export default function PaymentConfirm() {
           style={styles.badgeImage}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Paid{"\n"}Successfully</Text>
+        <Text style={styles.title}>Payment{"\n"}Confirmed</Text>
       </View>
 
       <View style={styles.footer}>
@@ -36,11 +35,6 @@ export default function PaymentConfirm() {
           onPress={() => router.replace(NEXT_ROUTE)}
           activeOpacity={0.85}
         >
-          {/* Your screenshot labels this "Register" — that reads like it
-              may be leftover from a shared success-screen template rather
-              than copy meant for a top-up confirmation. Left it as-is;
-              swap the label/route below if this should say something
-              like "Done" or "Back to wallet" instead. */}
           <Text style={styles.actionBtnText}>Back to Home</Text>
         </TouchableOpacity>
       </View>
@@ -62,11 +56,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   title: {
-    fontFamily: FONTS.bold,
+    fontFamily: FONTS.semiBold,
     fontSize: 32,
     color: COLORS.textPrimary,
     textAlign: "center",
-    lineHeight: 35,
+    lineHeight: 45,
   },
   footer: {
     paddingHorizontal: 20,

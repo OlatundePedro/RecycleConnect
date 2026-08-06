@@ -25,7 +25,6 @@ export default function OfferAccepted() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Success */}
         <View style={styles.successSection}>
           <Image
             source={require("../../assets/images/check.png")}
@@ -36,7 +35,6 @@ export default function OfferAccepted() {
           <Text style={styles.successTitle}>Deal locked in</Text>
         </View>
 
-        {/* Deal Summary */}
         <Text style={styles.sectionTitle}>DEAL SUMMARY</Text>
 
         <View style={styles.summaryCard}>
@@ -56,12 +54,7 @@ export default function OfferAccepted() {
             <Text style={styles.totalValue}>₦114,000</Text>
           </View>
         </View>
-
-        {/* Timeline */}
-
         <View style={styles.timeline}>
-          {/* Step 1 */}
-
           <View style={styles.timelineRow}>
             <View style={styles.timelineLeft}>
               <View style={styles.completedCircle}>
@@ -77,8 +70,6 @@ export default function OfferAccepted() {
               <Text style={styles.timelineSubtitle}>Just now</Text>
             </View>
           </View>
-
-          {/* Step 2 */}
 
           <View style={styles.timelineRow}>
             <View style={styles.timelineLeft}>
@@ -100,8 +91,6 @@ export default function OfferAccepted() {
             </View>
           </View>
 
-          {/* Step 3 */}
-
           <View style={styles.timelineRow}>
             <View style={styles.timelineLeft}>
               <View style={styles.numberCircle}>
@@ -118,8 +107,6 @@ export default function OfferAccepted() {
             </View>
           </View>
         </View>
-
-        {/* Button */}
 
         <TouchableOpacity
           style={styles.homeButton}
@@ -145,8 +132,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  /* Success */
-
   successSection: {
     alignItems: "center",
     marginTop: 40,
@@ -160,22 +145,20 @@ const styles = StyleSheet.create({
   },
 
   successTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 32,
+    fontFamily: FONTS.semiBold,
+    fontSize: 30,
     color: COLORS.textPrimary,
-    marginBottom: 8,
+    marginBottom: 3,
   },
 
   successSubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 22,
     paddingHorizontal: 25,
   },
-
-  /* Section */
 
   sectionTitle: {
     marginBottom: 18,
@@ -184,8 +167,6 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     letterSpacing: 0.5,
   },
-
-  /* Summary Card */
 
   summaryCard: {
     backgroundColor: COLORS.white,
@@ -231,9 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: COLORS.primary,
   },
-
-  /* Timeline */
-
   timeline: {
     marginBottom: 42,
   },
@@ -251,7 +229,7 @@ const styles = StyleSheet.create({
   completedCircle: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: 14,
     backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
@@ -260,7 +238,7 @@ const styles = StyleSheet.create({
   numberCircle: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: "#D4D4D4",
     backgroundColor: COLORS.white,
@@ -270,7 +248,7 @@ const styles = StyleSheet.create({
 
   numberText: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textSecondary,
   },
 
@@ -290,33 +268,31 @@ const styles = StyleSheet.create({
 
   timelineTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
 
   timelineSubtitle: {
     marginTop: 4,
     fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
-
-  /* Button */
 
   homeButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    height: 56,
+    borderRadius: 14,
+    height: 46,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
     marginBottom: 20,
   },
 
   homeButtonText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.white,
   },
 });

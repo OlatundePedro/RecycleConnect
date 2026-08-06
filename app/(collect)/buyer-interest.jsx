@@ -43,17 +43,12 @@ export default function BuyerOffer() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons
-              name="chevron-back"
-              size={28}
-              color={COLORS.textPrimary}
-            />
+            <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
           </TouchableOpacity>
 
           <Text style={styles.headerTitle}>Buyer Offer</Text>
@@ -63,10 +58,9 @@ export default function BuyerOffer() {
 
         <View style={styles.headerDivider} />
 
-        {/* Company Section */}
         <View style={styles.companyRow}>
           <View style={styles.companyIcon}>
-            <Ionicons name="business" size={30} color={COLORS.white} />
+            <Ionicons name="business" size={20} color={COLORS.white} />
           </View>
 
           <View style={styles.companyInfo}>
@@ -78,7 +72,6 @@ export default function BuyerOffer() {
           </View>
         </View>
 
-        {/* Badges */}
         <View style={styles.badgesRow}>
           <View style={styles.verifiedBadge}>
             <Ionicons
@@ -93,7 +86,7 @@ export default function BuyerOffer() {
             <Text style={styles.dealsText}>{OFFER.deals} past deals</Text>
           </View>
         </View>
-        {/* Offer Details */}
+
         <Text style={styles.sectionTitle}>OFFER DETAILS</Text>
 
         <View style={styles.card}>
@@ -119,7 +112,7 @@ export default function BuyerOffer() {
             <Text style={styles.totalValue}>₦114,000</Text>
           </View>
         </View>
-        {/* Market Comparison */}
+
         <View style={styles.marketBanner}>
           <Ionicons
             name="trending-up"
@@ -134,7 +127,7 @@ export default function BuyerOffer() {
             <Text style={styles.marketBold}>8% above market.</Text>
           </Text>
         </View>
-        {/* Pickup */}
+
         <Text style={styles.sectionTitle}>PICKUP</Text>
 
         <View style={styles.card}>
@@ -173,8 +166,6 @@ export default function BuyerOffer() {
             </View>
           </View>
         </View>
-        {/* Action Buttons */}
-        {/* Action Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.acceptButton}
@@ -200,6 +191,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 15,
   },
 
   content: {
@@ -221,40 +213,20 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
+    fontSize: 19,
+    color: COLORS.primary,
   },
 
   headerDivider: {
     height: 1,
     backgroundColor: COLORS.border,
-    marginBottom: 28,
+    marginBottom: 18,
   },
 
   companyRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-  },
-
-  companyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#F4A300",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-
-  companyInfo: {
-    flex: 1,
-  },
-
-  companyName: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
   },
 
   companyLocation: {
@@ -270,8 +242,8 @@ const styles = StyleSheet.create({
   },
 
   companyIcon: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 30,
     backgroundColor: "#F4A100",
     justifyContent: "center",
@@ -285,22 +257,22 @@ const styles = StyleSheet.create({
 
   companyName: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 20,
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
 
   companyLocation: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
 
   badgesRow: {
     flexDirection: "row",
     marginBottom: 28,
+    justifyContent: "space-between",
   },
-
   verifiedBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -314,7 +286,7 @@ const styles = StyleSheet.create({
   verifiedText: {
     marginLeft: 6,
     fontFamily: FONTS.semiBold,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.primary,
   },
 
@@ -324,6 +296,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
+    marginRight: 135,
   },
 
   dealsText: {
@@ -333,19 +306,19 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textPrimary,
-    marginBottom: 14,
+    marginBottom: 12,
     letterSpacing: 0.6,
   },
 
   card: {
     backgroundColor: COLORS.white,
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 18,
-    marginBottom: 22,
+    padding: 10,
+    marginBottom: 20,
   },
 
   detailRow: {
@@ -357,41 +330,41 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
 
   detailValue: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 13,
     color: COLORS.textPrimary,
   },
 
   cardDivider: {
     height: 1,
     backgroundColor: COLORS.border,
-    marginBottom: 18,
+    marginBottom: 15,
   },
 
   totalLabel: {
     fontFamily: FONTS.semiBold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textSecondary,
   },
 
   totalValue: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 18,
     color: COLORS.primary,
   },
   marketBanner: {
     flexDirection: "row",
     alignItems: "flex-start",
     backgroundColor: "#EAF7EF",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 28,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginBottom: 18,
   },
 
   marketIcon: {
@@ -403,7 +376,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONTS.regular,
     fontSize: 14,
-    lineHeight: 22,
+    lineHeight: 20,
     color: COLORS.primary,
   },
 
@@ -418,7 +391,7 @@ const styles = StyleSheet.create({
   pickupIcon: {
     width: 42,
     height: 42,
-    borderRadius: 21,
+    borderRadius: 14,
     backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
@@ -438,13 +411,13 @@ const styles = StyleSheet.create({
 
   pickupValue: {
     fontFamily: FONTS.bold,
-    fontSize: 17,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 
   pickupAddress: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 
@@ -513,7 +486,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 14,
     color: COLORS.primary,
-    lineHeight: 22,
+    lineHeight: 2,
   },
   buttonRow: {
     flexDirection: "row",
@@ -524,14 +497,14 @@ const styles = StyleSheet.create({
   acceptButton: {
     flex: 1,
     backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingVertical: 14,
     alignItems: "center",
   },
 
   acceptButtonText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.white,
   },
 
@@ -540,14 +513,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.white,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingVertical: 14,
     alignItems: "center",
   },
 
   declineButtonText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
 });

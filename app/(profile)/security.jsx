@@ -32,8 +32,6 @@ export default function SecurityPin() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >
-        {/* Header */}
-
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
@@ -43,14 +41,12 @@ export default function SecurityPin() {
 
           <View style={{ width: 30 }} />
         </View>
-        {/* Banner */}
 
         <Image
           source={require("../../assets/images/headerimage.png")}
           style={styles.banner}
           resizeMode="cover"
         />
-        {/* PIN Management */}
 
         <Text style={styles.sectionTitle}>PIN Management</Text>
         <TouchableOpacity
@@ -78,8 +74,6 @@ export default function SecurityPin() {
 
           <Ionicons name="chevron-forward" size={22} color="#C7CEC4" />
         </TouchableOpacity>
-
-        {/* Quick Access */}
 
         <Text style={styles.sectionTitle}>Quick Access</Text>
 
@@ -109,7 +103,6 @@ export default function SecurityPin() {
             ios_backgroundColor="#D8D8D8"
           />
         </View>
-        {/* About Security */}
 
         <Text style={styles.sectionTitle}>About Security</Text>
         <View style={styles.infoCard}>
@@ -136,7 +129,6 @@ export default function SecurityPin() {
             </Text>
           </View>
         </View>
-        {/* Footer */}
 
         <View style={styles.footer}>
           <View style={styles.footerRow}>

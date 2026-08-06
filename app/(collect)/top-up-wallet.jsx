@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
   ScrollView,
@@ -9,7 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
@@ -18,7 +22,7 @@ const PAYMENT_METHODS = [
   {
     id: "card",
     label: "Debit / Credit Card",
-    icon: "card-outline",
+    icon: "wallet-outline",
     right: "card",
   },
   {
@@ -39,6 +43,7 @@ const PAYMENT_METHODS = [
 export default function TopUpWallet() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
   const [amount, setAmount] = useState(
     params.amount ? String(params.amount) : "5000",
@@ -80,153 +85,159 @@ export default function TopUpWallet() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      translucent={false}
-      backgroundColor={COLORS.primaryDark}
-      barStyle="light-content"
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={34} color={COLORS.white} />
+    <View style={styles.safeArea}>
+      <StatusBar translucent backgroundColor="transparent" style="light" />
+
+      {/* Header — extends behind the status bar to the top edge of the screen */}
+      <View style={[styles.header, { paddingTop: insets.top + 14 }]}>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
+          <Ionicons name="chevron-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Top Up Wallet</Text>
 
-        <View style={{ width: 34 }} />
+        <View style={{ width: 30 }} />
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
-        <Text style={styles.sectionLabel}>Enter amount</Text>
-        <View style={styles.amountInputBox}>
-          <Text style={styles.nairaPrefix}>₦</Text>
-          <TextInput
-            style={styles.amountInput}
-            value={amount ? Number(amount).toLocaleString() : ""}
-            onChangeText={handleAmountChange}
-            keyboardType="number-pad"
-            placeholder="0"
-            placeholderTextColor={COLORS.muted}
-            autoFocus={customMode}
-          />
-        </View>
 
-        <View style={styles.quickAmountsGrid}>
-          {QUICK_AMOUNTS.map((value) => {
-            const active = selectedQuickAmount === value;
+      <SafeAreaView style={{ flex: 1 }} edges={["bottom"]}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+        >
+          <Text style={styles.sectionLabel}>Enter amount</Text>
+          <View style={styles.amountInputBox}>
+            <Text style={styles.nairaPrefix}>₦</Text>
+            <TextInput
+              style={styles.amountInput}
+              value={amount ? Number(amount).toLocaleString() : ""}
+              onChangeText={handleAmountChange}
+              keyboardType="number-pad"
+              placeholder="0"
+              placeholderTextColor={COLORS.muted}
+              autoFocus={customMode}
+            />
+          </View>
+
+          <View style={styles.quickAmountsGrid}>
+            {QUICK_AMOUNTS.map((value) => {
+              const active = selectedQuickAmount === value;
+              return (
+                <TouchableOpacity
+                  key={value}
+                  style={[
+                    styles.quickAmountBtn,
+                    active && styles.quickAmountBtnActive,
+                  ]}
+                  onPress={() => handleQuickAmount(value)}
+                >
+                  <Text
+                    style={[
+                      styles.quickAmountText,
+                      active && styles.quickAmountTextActive,
+                    ]}
+                  >
+                    ₦{value.toLocaleString()}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            <TouchableOpacity
+              style={[
+                styles.quickAmountBtn,
+                customMode && styles.quickAmountBtnActive,
+              ]}
+              onPress={handleOther}
+            >
+              <Text
+                style={[
+                  styles.quickAmountText,
+                  customMode && styles.quickAmountTextActive,
+                ]}
+              >
+                Other
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.sectionLabel}>Payment Method</Text>
+
+          {PAYMENT_METHODS.map((method) => {
+            const active = selectedMethod === method.id;
+
             return (
               <TouchableOpacity
-                key={value}
-                style={[
-                  styles.quickAmountBtn,
-                  active && styles.quickAmountBtnActive,
-                ]}
-                onPress={() => handleQuickAmount(value)}
+                key={method.id}
+                style={[styles.methodCard, active && styles.methodCardActive]}
+                activeOpacity={0.8}
+                onPress={() => setSelectedMethod(method.id)}
               >
-                <Text
-                  style={[
-                    styles.quickAmountText,
-                    active && styles.quickAmountTextActive,
-                  ]}
-                >
-                  ₦{value.toLocaleString()}
-                </Text>
+                <View style={styles.methodLeft}>
+                  <View style={styles.methodIconBox}>
+                    <Ionicons
+                      name={method.icon}
+                      size={22}
+                      color={COLORS.primary}
+                    />
+                  </View>
+
+                  <Text style={styles.methodTitle}>{method.label}</Text>
+                </View>
+
+                <View style={styles.methodRight}>
+                  {method.id === "card" && (
+                    <View style={styles.cardLogos}>
+                      <Text style={styles.visa}>VISA</Text>
+
+                      <View style={styles.mastercard}>
+                        <View style={styles.redCircle} />
+                        <View style={styles.orangeCircle} />
+                      </View>
+                    </View>
+                  )}
+
+                  {method.id === "ussd" && (
+                    <Text style={styles.ussdText}>{method.text}</Text>
+                  )}
+
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      active && styles.radioOuterActive,
+                    ]}
+                  >
+                    {active && <View style={styles.radioInner} />}
+                  </View>
+                </View>
               </TouchableOpacity>
             );
           })}
+
+          <View style={styles.secureBanner}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={22}
+              color={COLORS.primary}
+            />
+            <Text style={styles.secureText}>
+              Your payment is secure and encrypted.{"\n"}We do not store your
+              card details.
+            </Text>
+          </View>
+
           <TouchableOpacity
             style={[
-              styles.quickAmountBtn,
-              customMode && styles.quickAmountBtnActive,
+              styles.continueBtn,
+              !canContinue && styles.continueBtnDisabled,
             ]}
-            onPress={handleOther}
+            onPress={handleContinue}
+            disabled={!canContinue}
+            activeOpacity={0.85}
           >
-            <Text
-              style={[
-                styles.quickAmountText,
-                customMode && styles.quickAmountTextActive,
-              ]}
-            >
-              Other
-            </Text>
+            <Text style={styles.continueBtnText}>Continue</Text>
           </TouchableOpacity>
-        </View>
-        <Text style={styles.sectionLabel}>Payment Method</Text>
-
-        {PAYMENT_METHODS.map((method) => {
-          const active = selectedMethod === method.id;
-
-          return (
-            <TouchableOpacity
-              key={method.id}
-              style={styles.methodCard}
-              activeOpacity={0.8}
-              onPress={() => setSelectedMethod(method.id)}
-            >
-              <View style={styles.methodLeft}>
-                <View style={styles.methodIconBox}>
-                  <Ionicons
-                    name={method.icon}
-                    size={28}
-                    color={COLORS.primary}
-                  />
-                </View>
-
-                <Text style={styles.methodTitle}>{method.label}</Text>
-              </View>
-
-              <View style={styles.methodRight}>
-                {method.id === "card" && (
-                  <View style={styles.cardLogos}>
-                    <Text style={styles.visa}>VISA</Text>
-
-                    <View style={styles.mastercard}>
-                      <View style={styles.redCircle} />
-                      <View style={styles.orangeCircle} />
-                    </View>
-                  </View>
-                )}
-
-                {method.id === "ussd" && (
-                  <Text style={styles.ussdText}>*123#</Text>
-                )}
-
-                <View
-                  style={[styles.radioOuter, active && styles.radioOuterActive]}
-                >
-                  {active && <View style={styles.radioInner} />}
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        <View style={styles.secureBanner}>
-          <Ionicons
-            name="lock-closed-outline"
-            size={22}
-            color={COLORS.primary}
-          />
-          <Text style={styles.secureText}>
-            Your payment is secure and encrypted.{"\n"}We do not store your card
-            details.
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.continueBtn,
-            !canContinue && styles.continueBtnDisabled,
-          ]}
-          onPress={handleContinue}
-          disabled={!canContinue}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.continueBtnText}>Continue</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -237,49 +248,48 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: COLORS.primaryDark,
+    backgroundColor: COLORS.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 22,
-    paddingTop: 18,
-    paddingBottom: 32,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
 
   headerTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
     color: COLORS.white,
   },
 
   scroll: {
-    paddingHorizontal: 32,
-    paddingTop: 38,
+    paddingHorizontal: 24,
+    paddingTop: 28,
     paddingBottom: 40,
   },
 
   sectionLabel: {
-    fontFamily: FONTS.bold,
-    fontSize: 19,
+    fontFamily: FONTS.semiBold,
+    fontSize: 18,
     color: COLORS.textPrimary,
-    marginBottom: 18,
+    marginBottom: 16,
   },
 
   amountInputBox: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: COLORS.primary,
-    borderRadius: 22,
-    height: 98,
+    borderRadius: 14,
+    height: 55,
     paddingHorizontal: 18,
-    marginBottom: 34,
+    marginBottom: 28,
     backgroundColor: COLORS.white,
   },
 
   nairaPrefix: {
     fontFamily: FONTS.bold,
-    fontSize: 28,
+    fontSize: 19,
     color: COLORS.textPrimary,
     marginRight: 4,
   },
@@ -287,7 +297,7 @@ const styles = StyleSheet.create({
   amountInput: {
     flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 30,
+    fontSize: 19,
     color: COLORS.textPrimary,
     padding: 0,
   },
@@ -296,16 +306,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: 18,
-    marginBottom: 52,
+    rowGap: 14,
+    marginBottom: 25,
   },
 
   quickAmountBtn: {
-    width: "30.5%",
-    height: 74,
-    borderWidth: 2,
+    width: "31%",
+    height: 42,
+    borderWidth: 1.0,
     borderColor: "#D5D5D5",
-    borderRadius: 14,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.white,
@@ -317,8 +327,8 @@ const styles = StyleSheet.create({
   },
 
   quickAmountText: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontFamily: FONTS.semiBold,
+    fontSize: 16,
     color: "#4F5E5B",
   },
 
@@ -326,54 +336,94 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  methodRow: {
+  methodCard: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 2,
+    justifyContent: "space-between",
+    borderWidth: 1.0,
     borderColor: "#D7D7D7",
-    borderRadius: 18,
-    height: 86,
-    paddingHorizontal: 18,
-    marginBottom: 18,
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 14,
     backgroundColor: COLORS.white,
   },
 
-  methodRowActive: {
+  methodCardActive: {
     borderColor: COLORS.primary,
   },
 
-  methodIconWrap: {
-    width: 46,
+  methodLeft: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginRight: 18,
+    flexShrink: 1,
   },
 
-  methodLabel: {
-    flex: 1,
+  methodIconBox: {
+    width: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+
+  methodTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 
   methodRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
   },
 
-  paymentText: {
-    fontFamily: FONTS.bold,
-    fontSize: 17,
+  cardLogos: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 4,
+  },
+
+  visa: {
+    fontFamily: FONTS.semiBold,
+
+    fontSize: 14,
+    color: "#1A1F71",
+    marginRight: 8,
+  },
+
+  mastercard: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  redCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#EB001B",
+  },
+
+  orangeCircle: {
+    width: 17,
+    height: 17,
+    borderRadius: 9,
+    backgroundColor: "#F79E1B",
+    marginLeft: -8,
+  },
+
+  ussdText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
 
   radioOuter: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 19,
+    height: 19,
+    borderRadius: 14,
     borderWidth: 2,
-    borderColor: "#64748B",
+    borderColor: "#94A3A0",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -383,9 +433,9 @@ const styles = StyleSheet.create({
   },
 
   radioInner: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 8,
+    height: 8,
+    borderRadius: 14,
     backgroundColor: COLORS.primary,
   },
 
@@ -393,29 +443,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#EAF6F0",
-    borderRadius: 22,
-    paddingHorizontal: 22,
-    paddingVertical: 22,
-    marginTop: 18,
-    marginBottom: 65,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginTop: 10,
+    marginBottom: 24,
   },
 
   secureText: {
     flex: 1,
-    marginLeft: 18,
+    marginLeft: 14,
     fontFamily: FONTS.medium,
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 12,
+    lineHeight: 22,
     color: COLORS.primary,
   },
 
   continueBtn: {
-    height: 72,
+    height: 52,
     backgroundColor: COLORS.primary,
-    borderRadius: 22,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
 
   continueBtnDisabled: {
@@ -424,7 +474,7 @@ const styles = StyleSheet.create({
 
   continueBtnText: {
     fontFamily: FONTS.bold,
-    fontSize: 21,
+    fontSize: 14,
     color: COLORS.white,
   },
 });

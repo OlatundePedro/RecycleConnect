@@ -90,7 +90,6 @@ export default function DemandDetail() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backBtn}
@@ -110,7 +109,6 @@ export default function DemandDetail() {
           <Image source={COLLECTOR.avatar} style={styles.avatar} />
         </View>
 
-        {/* Summary card */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryDeadline}>{street.deadlineLabel}</Text>
           <View style={styles.summaryStatsRow}>
@@ -153,7 +151,6 @@ export default function DemandDetail() {
           </View>
         ))}
 
-        {/* Explainer banner */}
         <View style={styles.explainerBanner}>
           <Text style={styles.explainerText}>
             This is what households have marked ready so far. Numbers keep

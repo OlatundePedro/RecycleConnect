@@ -15,9 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Kept in sync with mark-as-ready.jsx's MATERIALS list — same ids,
-// icons, and labels, so a material id passed through route params
-// resolves back to the right display here.
 const MATERIAL_DISPLAY = {
   plastic: { label: "Plastic", icon: "water-outline" },
   paper: { label: "Paper", icon: "document-text-outline" },
@@ -43,7 +40,6 @@ export default function CollectionPartners() {
   const router = useRouter();
   const { materials } = useLocalSearchParams();
 
-  // Whatever the household checked off on mark-as-ready, in order.
   const selectedMaterialIds = (materials ?? "")
     .toString()
     .split(",")
@@ -67,7 +63,6 @@ export default function CollectionPartners() {
               "Your scheduled collection has been cancelled.",
             );
 
-            // Go back to the pickup screen
             router.replace("/(pickup)/mark-as-ready");
           },
         },
@@ -105,7 +100,6 @@ export default function CollectionPartners() {
           Your Materials have been Confirmed!
         </Text>
 
-        {/* Partner */}
         <View style={styles.partnerCard}>
           <Text style={styles.partnerName}>{selectedPartner.name}</Text>
 
@@ -119,8 +113,6 @@ export default function CollectionPartners() {
             <Text style={styles.areaText}>{selectedPartner.area}</Text>
           </View>
         </View>
-
-        {/* Next Collection */}
 
         <View style={styles.nextCollectionCard}>
           <View style={styles.nextHeaderRow}>
@@ -152,8 +144,6 @@ export default function CollectionPartners() {
           </View>
         </View>
 
-        {/* Materials — whatever the household selected on mark-as-ready,
-            not the partner's full accepted list. */}
         <View style={styles.materialsRow}>
           {selectedMaterialIds.map((id) => {
             const material = MATERIAL_DISPLAY[id];

@@ -49,15 +49,12 @@ export default function LanguageScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
 
   const handleSave = () => {
-    // Save language here later
     router.back();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-
-      {/* Header */}
 
       <View style={styles.header}>
         <View style={styles.backRow}>
@@ -73,8 +70,6 @@ export default function LanguageScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >
-        {/* Hero */}
-
         <View style={styles.heroIconWrap}>
           <Ionicons
             name="language-outline"
@@ -87,7 +82,6 @@ export default function LanguageScreen() {
           Choose your preferred language to customize your environmental impact
           tracking experience.
         </Text>
-        {/* Language List */}
 
         {LANGUAGES.map((item) => {
           const selected = selectedLanguage === item.id;
@@ -126,15 +120,11 @@ export default function LanguageScreen() {
           );
         })}
 
-        {/* Preview */}
-
         <Image
           source={require("../../assets/images/Decorative Element.png")}
           style={styles.previewImage}
           resizeMode="cover"
         />
-
-        {/* Save Button */}
 
         <TouchableOpacity
           style={styles.saveButton}
