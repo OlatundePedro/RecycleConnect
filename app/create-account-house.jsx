@@ -14,8 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { sendOtp } from "../lib/auth";
-import { normalizePhone } from "../lib/phone";
 
 export default function CreateAccount() {
   const router = useRouter();
@@ -28,20 +26,25 @@ export default function CreateAccount() {
 
   const handleVerifyPhone = async () => {
     if (!canContinue) return;
-    const normalizedPhone = normalizePhone(phone);
+
     setLoading(true);
     setError(null);
+
     try {
-      await sendOtp(normalizedPhone);
-      updateData({ phone: normalizedPhone });
+      // Simulate a network request
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Save the phone number in the onboarding context
+      updateData({ phone });
+
+      // Move to the OTP screen
       router.push("/create-otp-house");
     } catch (err) {
-      setError(err.message);
+      setError("Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />

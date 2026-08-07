@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { sendOtp } from "../lib/auth";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -87,32 +86,43 @@ export default function VerifyOtp() {
 
   const handleResend = async () => {
     if (secondsLeft > 0 || resending) return;
+
     setResending(true);
     setError(null);
-    try {
-      await sendOtp(phone);
-      setDigits(Array(OTP_LENGTH).fill(""));
-      setSecondsLeft(RESEND_SECONDS);
-      inputRefs.current[0]?.focus();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setResending(false);
-    }
+
+    // Fake resend delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    setDigits(Array(OTP_LENGTH).fill(""));
+    setSecondsLeft(RESEND_SECONDS);
+    inputRefs.current[0]?.focus();
+
+    setResending(false);
   };
 
   const code = digits.join("");
   const canContinue = code.length === OTP_LENGTH && !verifying;
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (!canContinue) return;
-    updateData({ otp: code });
+
+    setVerifying(true);
+    setError(null);
+
+    // Fake verification delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    updateData({
+      otp: code,
+    });
+
+    setVerifying(false);
+
     router.replace({
       pathname: "/account-success",
       params: { type: ACCOUNT_TYPE },
     });
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
@@ -181,7 +191,9 @@ export default function VerifyOtp() {
           disabled={!canContinue}
           onPress={handleVerify}
         >
-          <Text style={styles.verifyBtnText}>Verify</Text>
+          <Text style={styles.verifyBtnText}>
+            {verifying ? "Verifying..." : "Verify"}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity

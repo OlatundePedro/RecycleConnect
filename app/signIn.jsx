@@ -14,9 +14,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
-import { getUserProfile, loginWithPin } from "../lib/auth";
-import { normalizePhone } from "../lib/phone";
-import { saveSession } from "../lib/session";
 
 const PIN_LENGTH = 4;
 
@@ -58,22 +55,19 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!canLogin) return;
-    const normalizedPhone = normalizePhone(phone);
+
     setLoading(true);
     setError("");
+
     try {
-      const result = await loginWithPin(normalizedPhone, pinCode);
-      const profile = await getUserProfile();
-      await saveSession(result.data.token, {
-        ...result.data.user,
-        first_name: profile.data.householdProfile?.first_name,
-        reference_code: profile.data.householdProfile?.reference_code,
-      });
+      // Fake loading
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Navigate directly to the home screen
       router.replace("/household/home");
     } catch (err) {
-      setError(err.message);
-      setPin(Array(PIN_LENGTH).fill(""));
-      pinRefs.current[0]?.focus();
+      console.log(err);
+      setError(err.message || "Unable to sign in.");
     } finally {
       setLoading(false);
     }

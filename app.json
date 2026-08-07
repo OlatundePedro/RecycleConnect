@@ -31,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/Household profile.png",
+          "image": "./assets/images/splash-full (1).png",
           "imageWidth": 1284,
           "resizeMode": "contain",
           "backgroundColor": "#188A5A"
@@ -43,6 +43,18 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b417b9f6-1a12-4e95-aee5-e3e2901690b7"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b417b9f6-1a12-4e95-aee5-e3e2901690b7"
     }
   }
 }

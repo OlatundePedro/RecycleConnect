@@ -1,8 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRouter } from "expo-router";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -13,9 +11,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
-import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { registerHousehold } from "../lib/auth";
-import { saveSession } from "../lib/session";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -39,8 +34,8 @@ const MATERIALS = [
     description: "Bottles, Jars, Detergent containers, and Food tubs.",
     icon: (
       <MaterialCommunityIcons
-        name="bottle-soda-classic-outline"
-        size={30}
+        name="bottle-soda"
+        size={28}
         color={COLORS.primary}
       />
     ),
@@ -49,48 +44,28 @@ const MATERIALS = [
     key: "metal",
     title: "Metal",
     description: "Soda cans, Food tins, Aluminum foil, and Scrap metal bits.",
-    icon: <Ionicons name="cube-outline" size={28} color={COLORS.primary} />,
+    icon: (
+      <MaterialCommunityIcons name="can" size={28} color={COLORS.primary} />
+    ),
   },
   {
     key: "paper",
     title: "Paper",
     description: "Boxes, Newspapers, Office paper, and Clean cardboard.",
-    icon: <Ionicons name="document-outline" size={28} color={COLORS.primary} />,
+    icon: (
+      <MaterialCommunityIcons
+        name="file-document-outline"
+        size={28}
+        color={COLORS.primary}
+      />
+    ),
   },
 ];
 
 export default function RecyclablesInfo() {
   const router = useRouter();
-  const { fullName, email, state, area, landmark } = useLocalSearchParams();
-  const { data } = useHouseholdOnboarding();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleGotIt = async () => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      const result = await registerHousehold({
-        phone: data.phone,
-        otp: data.otp,
-        pin: data.pin,
-        first_name: fullName,
-        state,
-        area,
-        landmark,
-        service_zone: `${area} Zone A`,
-      });
-      await saveSession(result.data.token, {
-        ...result.data.user,
-        first_name: result.data.household_profile?.first_name,
-        reference_code: result.data.household_profile?.reference_code,
-      });
-      router.replace("/household/home");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
+  const handleGotIt = () => {
+    router.replace("/household/home");
   };
 
   return (
@@ -150,24 +125,17 @@ export default function RecyclablesInfo() {
             </Text>
           </View>
         </View>
-
-        {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
 
       <TouchableOpacity
-        style={[styles.gotItBtn, submitting && styles.gotItBtnDisabled]}
+        style={styles.gotItBtn}
         activeOpacity={0.85}
-        disabled={submitting}
         onPress={handleGotIt}
       >
-        {submitting ? (
-          <ActivityIndicator color={COLORS.white} />
-        ) : (
-          <>
-            <Text style={styles.gotItText}>Got it, let&apos;s go!</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
-          </>
-        )}
+        <>
+          <Text style={styles.gotItText}>Got it, let's go!</Text>
+          <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
+        </>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -296,13 +264,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.textSecondary,
   },
-  errorText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: COLORS.error,
-    textAlign: "center",
-    marginTop: 12,
-  },
+
   gotItBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -314,9 +276,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     marginBottom: 28,
   },
-  gotItBtnDisabled: {
-    opacity: 0.6,
-  },
+
   gotItText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,

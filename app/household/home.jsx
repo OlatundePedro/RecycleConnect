@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -15,8 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 import { useProfile } from "../../context/profileContext";
-import { getUser } from "../../lib/session";
-
 const HOUSEHOLD = {
   firstName: "Chidi!",
   avatar: require("../../assets/images/Ellipse 51.png"),
@@ -82,19 +80,11 @@ export default function HouseholdHome() {
   const router = useRouter();
   const { avatar } = useProfile();
   const [copied, setCopied] = useState(false);
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const stored = await getUser();
-      setUser(stored);
-    })();
-  }, []);
-
-  const firstName = user?.first_name || "there";
-  const referenceCode = user?.reference_code || "—";
+  const firstName = "Chidi";
+  const referenceCode = "JULIET-6674";
 
   const handleCopyCode = async () => {
-    await Clipboard.setStringAsync(HOUSEHOLD.code);
+    await Clipboard.setStringAsync(referenceCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
