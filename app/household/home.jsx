@@ -1,8 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -12,108 +12,205 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS } from "../../constants/colors";
+
 import { FONTS } from "../../constants/typography";
-import { useProfile } from "../../context/profileContext";
-const HOUSEHOLD = {
-  firstName: "Chidi!",
-  avatar: require("../../assets/images/Ellipse 51.png"),
-  code: "JULIET-6674",
+import { supabase } from "../../lib/supabase";
+
+const COLORS = {
+  primary: "#2D7A46",
+  primaryDark: "#173D2A",
+  primaryLight: "#8FE3A6",
+  accentGold: "#E8A33D",
+  textPrimary: "#111111",
+  textSecondary: "#6B7A75",
+  background: "#FFFFFF",
+  surface: "#F4F7F6",
+  border: "#E4EAE7",
+  white: "#FFFFFF",
+  success: "#2D7A46",
+  error: "#D14343",
 };
 
-const NEXT_COLLECTION = {
+const MOCK_NEXT_COLLECTION = {
   date: "Saturday, May 15",
-  time: "9:00 AM - 12:30 PM",
+  window: "9:00 AM - 12:30 PM",
 };
 
-const PARTNER = {
+const MOCK_PARTNER = {
   name: "GreenCycle Lagos",
+  verified: true,
   location: "Ikorodu, Lagos",
 };
 
-const BUYING_PRICES = [
+const MOCK_PRICES = [
   {
-    id: "plastic",
+    key: "plastic",
     label: "Plastic",
-    price: "₦300.00/kg",
-    icon: "water-outline",
+    price: "N300.00/kg",
+    icon: "bottle-soda",
   },
   {
-    id: "paper",
+    key: "paper",
     label: "Paper",
-    price: "₦200.00/kg",
-    icon: "document-text-outline",
+    price: "N200.00/kg",
+    icon: "file-document-outline",
   },
-  {
-    id: "metal",
-    label: "Metal",
-    price: "₦1,000.00/kg",
-    icon: "hardware-chip-outline",
-  },
-  { id: "glass", label: "Glass", price: "₦500.00/kg", icon: "wine-outline" },
+  { key: "metal", label: "Metal", price: "N1,000.00/kg", icon: "recycle" },
+  { key: "glass", label: "Glass", price: "N500.00/kg", icon: "bottle-wine" },
 ];
 
-const RECENT = [
+const MOCK_ACTIVITY = [
   {
-    id: "1",
-    icon: "trash-outline",
-    iconBg: COLORS.primaryLight,
-    iconColor: COLORS.primary,
+    key: "act1",
     title: "Plastic Collection",
-    subtitle: "4.2kg collected on Oct 12",
-    points: "+25 pts",
-    positive: true,
+    subtitle: "4.2 kg • Oct 24, 2026",
+    amount: "N3,350.00",
+    amountColor: COLORS.success,
+    badge: "VERIFIED",
+    badgeBg: COLORS.surface,
+    badgeColor: COLORS.textSecondary,
+    icon: "bottle-soda",
+    iconBg: "#E4F0E8",
   },
   {
-    id: "2",
-    icon: "gift-outline",
-    iconBg: "#FBE4C4",
-    iconColor: "#B9741E",
-    title: "Reward Redeemed",
-    subtitle: "Data Top-up (500MB)",
-    points: "-150 pts",
-    positive: false,
+    key: "act2",
+    title: "Withdraw to Bank",
+    subtitle: "*****9473 • Oct 21, 2026",
+    amount: "N2,700.00",
+    amountColor: COLORS.error,
+    badge: "SUCCESS",
+    badgeBg: "#D9F2DF",
+    badgeColor: COLORS.primary,
+    icon: "bank",
+    iconBg: "#FBE9CF",
   },
 ];
 
 export default function HouseholdHome() {
   const router = useRouter();
-  const { avatar } = useProfile();
-  const [copied, setCopied] = useState(false);
-  const firstName = "Chidi";
-  const referenceCode = "JULIET-6674";
 
-  const handleCopyCode = async () => {
-    await Clipboard.setStringAsync(referenceCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+
+      // Get currently logged-in Supabase user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.log("GET USER ERROR:", userError);
+        return;
+      }
+
+      if (!user) {
+        console.log("NO AUTHENTICATED USER");
+        router.replace("/signIn");
+        return;
+      }
+
+      console.log("AUTH USER:", user);
+
+      // Get profile information from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select(
+          `
+        id,
+        full_name,
+        email,
+        reference_code,
+        avatar_url
+      `,
+        )
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.log("GET PROFILE ERROR:", profileError);
+        return;
+      }
+
+      console.log("PROFILE DATA:", profileData);
+
+      setProfile({
+        ...profileData,
+
+        // Email comes from profiles if available,
+        // otherwise use Supabase Auth email
+        email: profileData?.email || user.email || "",
+
+        // Profile picture comes from profiles.avatar_url
+        avatar_url: profileData?.avatar_url || null,
+      });
+    } catch (error) {
+      console.log("LOAD PROFILE EXCEPTION:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading your dashboard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const firstName =
+    profile?.first_name || profile?.full_name?.split(" ")[0] || "User";
+
+  const referenceCode =
+    profile?.reference_code || profile?.referenceCode || "N/A";
+
+  const avatar =
+    profile?.avatar_url ||
+    profile?.profile_image_url ||
+    profile?.avatar ||
+    null;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+
       <ScrollView
-        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
       >
+        {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Image
-              source={
-                avatar
-                  ? { uri: avatar }
-                  : require("../../assets/images/Ellipse 51.png")
-              }
-              style={styles.avatar}
-            />
+            <View style={styles.avatarWrap}>
+              {avatar ? (
+                <Image source={{ uri: avatar }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Ionicons name="person" size={22} color={COLORS.primary} />
+                </View>
+              )}
+            </View>
+
             <View>
-              <Text style={styles.helloText}>Hello,</Text>
+              <Text style={styles.greeting}>Hello,</Text>
               <Text style={styles.nameText}>{firstName}!</Text>
             </View>
           </View>
+
           <TouchableOpacity
-            hitSlop={12}
-            onPress={() => router.push("/(redeem)/notification")}
+            style={styles.bellButton}
+            onPress={() => router.push("/(profile)/notification")}
           >
             <Ionicons
               name="notifications-outline"
@@ -122,433 +219,580 @@ export default function HouseholdHome() {
             />
           </TouchableOpacity>
         </View>
-        <Text style={styles.subGreeting}>What would you like to do?</Text>
 
+        <Text style={styles.sectionPrompt}>What would you like to do?</Text>
+
+        {/* HOUSEHOLD CODE CARD */}
         <View style={styles.codeCard}>
-          <View style={styles.codeCardTextWrap}>
-            <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
-            <Text style={styles.codeValue}>{referenceCode}</Text>
-            <Text style={styles.codeHint}>
-              Share this for your pickup or drop-off collection
-            </Text>
-          </View>
-          <TouchableOpacity onPress={handleCopyCode} hitSlop={10}>
-            <Ionicons
-              name={copied ? "checkmark" : "copy-outline"}
-              size={18}
-              color={COLORS.textSecondary}
-            />
-          </TouchableOpacity>
+          <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
+          <Text style={styles.codeValue}>{referenceCode}</Text>
+          <Text style={styles.codeHelper}>
+            Share this for your pickup or drop-off collection
+          </Text>
         </View>
+
+        {/* NEXT COLLECTION */}
         <View style={styles.nextCollectionRow}>
-          <View style={styles.nextCollectionIconWrap}>
+          <View style={styles.calendarIcon}>
             <Ionicons
               name="calendar-outline"
-              size={18}
-              color={COLORS.primaryBlack}
+              size={21}
+              color={COLORS.primary}
             />
           </View>
+
           <View>
-            <Text style={styles.mutedLabel}>Next Collection</Text>
+            <Text style={styles.nextCollectionLabel}>Next Collection</Text>
             <Text style={styles.nextCollectionDate}>
-              {NEXT_COLLECTION.date}
+              {MOCK_NEXT_COLLECTION.date}
             </Text>
-            <Text style={styles.nextCollectionTime}>
-              {NEXT_COLLECTION.time}
+            <Text style={styles.nextCollectionWindow}>
+              {MOCK_NEXT_COLLECTION.window}
             </Text>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.partnerCard}
-          onPress={() => router.push("/(pickup)/collection-partners")}
-          activeOpacity={0.85}
-        >
-          <View style={styles.partnerStarWrap}>
-            <Ionicons name="star" size={15} color={COLORS.accent} />
-          </View>
-          <View style={styles.partnerTextWrap}>
-            <Text style={styles.partnerName}>{PARTNER.name}</Text>
-            <View style={styles.verifiedPill}>
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={12}
-                color={COLORS.primaryLight}
-              />
-              <Text style={styles.verifiedPillText}>Verified Partner</Text>
+        {/* COLLECTION PARTNER CARD */}
+        <View style={styles.partnerCard}>
+          <View style={styles.partnerHeaderRow}>
+            <View style={styles.partnerStarBadge}>
+              <Ionicons name="star" size={15} color={COLORS.accentGold} />
             </View>
-            <Text style={styles.partnerLocation}>
-              Your Collection Partner - {PARTNER.location}
-            </Text>
-          </View>
-        </TouchableOpacity>
 
+            <View style={{ flex: 1 }}>
+              <Text style={styles.partnerName}>{MOCK_PARTNER.name}</Text>
+
+              {MOCK_PARTNER.verified && (
+                <View style={styles.verifiedBadge}>
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={12}
+                    color={COLORS.white}
+                  />
+                  <Text style={styles.verifiedBadgeText}>Verified Partner</Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          <Text style={styles.partnerLocation}>
+            Your Collection Partner - {MOCK_PARTNER.location}
+          </Text>
+        </View>
+
+        {/* MARK AS READY */}
         <View style={styles.readyCard}>
-          <Text style={styles.mutedLabel}>Mark your materials as</Text>
-          <Text style={styles.readyHeading}>Ready for Collection</Text>
-          <Text style={styles.readySubtext}>
+          <Text style={styles.readyLabel}>Mark your materials as</Text>
+          <Text style={styles.readyTitle}>Ready for Collection</Text>
+          <Text style={styles.readySubtitle}>
             Let your collector know you have materials ready
           </Text>
+
           <TouchableOpacity
-            style={styles.markReadyBtn}
+            style={styles.readyBtn}
+            activeOpacity={0.85}
             onPress={() => router.push("/(pickup)/mark-as-ready")}
-            activeOpacity={0.85}
           >
-            <Text style={styles.markReadyBtnText}>Mark as Ready</Text>
+            <Text style={styles.readyBtnText}>Mark as Ready</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.dropoffSection}>
-          <Text style={styles.dropoffHeading}>Find a Drop-off Location</Text>
-          <Text style={styles.dropoffSubtext}>
-            Drop-off your materials at a nearby collection hub
-          </Text>
-          <TouchableOpacity
-            style={styles.dropoffBtn}
-            onPress={() => router.push("/(dropoff)/collection-hub")}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.dropoffBtnText}>Find Drop-off Hub</Text>
-          </TouchableOpacity>
+        {/* DROP-OFF */}
+        <Text style={styles.dropoffTitle}>Find a Drop-off Location</Text>
+        <Text style={styles.dropoffSubtitle}>
+          Drop-off your materials at a nearby collection hub
+        </Text>
+
+        <TouchableOpacity
+          style={styles.dropoffBtn}
+          activeOpacity={0.85}
+          onPress={() => router.push("/(dropoff)/collection-hub")}
+        >
+          <Text style={styles.dropoffBtnText}>Find Drop-off hub</Text>
+        </TouchableOpacity>
+
+        {/* BUYING PRICES */}
+        <View style={styles.pricesHeaderRow}>
+          <Text style={styles.sectionTitle}>Today's buying prices</Text>
+          <Text style={styles.pricesUpdated}>UPDATED 1H AGO</Text>
         </View>
 
-        <View style={styles.pricesSection}>
-          <View style={styles.pricesHeader}>
-            <Text style={styles.pricesHeading}>Today's buying prices</Text>
-            <Text style={styles.pricesUpdated}>UPDATED 1H AGO</Text>
-          </View>
-          {BUYING_PRICES.map((item) => (
-            <View key={item.id} style={styles.priceRow}>
-              <View style={styles.priceIconWrap}>
-                <Ionicons name={item.icon} size={16} color={COLORS.primary} />
+        <View style={styles.pricesList}>
+          {MOCK_PRICES.map((item) => (
+            <View key={item.key} style={styles.priceRow}>
+              <View style={styles.priceLeft}>
+                <View style={styles.priceIconCircle}>
+                  <MaterialCommunityIcons
+                    name={item.icon}
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                </View>
+                <Text style={styles.priceLabel}>{item.label}</Text>
               </View>
-              <Text style={styles.priceLabel}>{item.label}</Text>
+
               <Text style={styles.priceValue}>{item.price}</Text>
             </View>
           ))}
         </View>
 
-        <View style={styles.recentHeader}>
+        {/* RECENT ACTIVITY */}
+        <View style={styles.activityHeaderRow}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <TouchableOpacity onPress={() => router.navigate("/household/track")}>
-            <Text style={styles.viewAllText}>View History</Text>
+
+          <TouchableOpacity onPress={() => router.push("/household/track")}>
+            <Text style={styles.viewHistoryText}>View History</Text>
           </TouchableOpacity>
         </View>
 
-        {RECENT.map((item) => (
-          <View key={item.id} style={styles.activityCard}>
-            <View
-              style={[
-                styles.activityIconWrap,
-                { backgroundColor: item.iconBg },
-              ]}
-            >
-              <Ionicons name={item.icon} size={20} color={item.iconColor} />
+        <View style={styles.activityList}>
+          {MOCK_ACTIVITY.map((item) => (
+            <View key={item.key} style={styles.activityRow}>
+              <View
+                style={[styles.activityIcon, { backgroundColor: item.iconBg }]}
+              >
+                <MaterialCommunityIcons
+                  name={item.icon}
+                  size={20}
+                  color={COLORS.primary}
+                />
+              </View>
+
+              <View style={styles.activityText}>
+                <Text style={styles.activityTitle}>{item.title}</Text>
+                <Text style={styles.activitySubtitle}>{item.subtitle}</Text>
+              </View>
+
+              <View style={styles.activityRight}>
+                <Text
+                  style={[styles.activityAmount, { color: item.amountColor }]}
+                >
+                  {item.amount}
+                </Text>
+                <View
+                  style={[
+                    styles.activityBadge,
+                    { backgroundColor: item.badgeBg },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.activityBadgeText,
+                      { color: item.badgeColor },
+                    ]}
+                  >
+                    {item.badge}
+                  </Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityTitle}>{item.title}</Text>
-              <Text style={styles.activitySub}>{item.subtitle}</Text>
-            </View>
-            <Text
-              style={[
-                styles.activityPoints,
-                { color: item.positive ? COLORS.primary : COLORS.danger },
-              ]}
-            >
-              {item.points}
-            </Text>
-          </View>
-        ))}
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 20, paddingTop: 32, paddingBottom: 24 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
 
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 40,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    marginTop: 12,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  headerLeft: { flexDirection: "row", alignItems: "center" },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    marginRight: 14,
-    backgroundColor: COLORS.surface,
-  },
-  helloText: {
-    fontFamily: FONTS.regular,
-    fontSize: 16,
-    color: COLORS.textSecondary,
-  },
-  nameText: {
-    fontFamily: FONTS.bold,
-    fontSize: 24,
-    color: COLORS.textPrimary,
-  },
-  subGreeting: {
-    fontFamily: FONTS.regular,
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    marginBottom: 10,
+    marginBottom: 15,
   },
 
-  codeCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    backgroundColor: COLORS.primaryDark,
-    borderRadius: 14,
-    padding: 15,
-    marginBottom: 25,
-  },
-  codeCardTextWrap: { flex: 1, paddingRight: 12 },
-  codeLabel: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 11,
-    color: "rgba(255,255,255,0.7)",
-    letterSpacing: 0.6,
-    marginBottom: 6,
-  },
-  codeValue: {
-    fontFamily: FONTS.bold,
-    fontSize: 19,
-    color: COLORS.white,
-    marginBottom: 6,
-  },
-  codeHint: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.75)",
-    marginBottom: 14,
-  },
-
-  nextCollectionRow: {
+  headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
   },
-  nextCollectionIconWrap: {
+
+  avatarWrap: {
+    marginRight: 12,
+  },
+
+  avatarImage: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+  },
+
+  avatarPlaceholder: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "#E4F0E8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  greeting: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+
+  nameText: {
+    fontFamily: FONTS.bold,
+    fontSize: 22,
+    color: COLORS.textPrimary,
+    marginTop: 2,
+  },
+
+  bellButton: {
     width: 40,
     height: 40,
     borderRadius: 22,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 14,
-  },
-  mutedLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  nextCollectionDate: {
-    fontFamily: FONTS.bold,
-    fontSize: 17,
-    color: COLORS.textPrimary,
-  },
-  nextCollectionTime: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
-    color: COLORS.textSecondary,
   },
 
-  partnerCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+  sectionPrompt: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 14,
+  },
+  codeCard: {
     backgroundColor: COLORS.primaryDark,
     borderRadius: 14,
-    padding: 13,
-    marginBottom: 15,
+    padding: 18,
+    marginBottom: 22,
   },
-  partnerStarWrap: {
-    width: 35,
-    height: 35,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-    marginTop: 15,
+
+  codeLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    color: "rgba(255,255,255,0.75)",
+    marginBottom: 6,
   },
-  partnerTextWrap: { flex: 1 },
-  partnerName: {
-    fontFamily: FONTS.bold,
-    fontSize: 16,
+
+  codeValue: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 20,
     color: COLORS.white,
     marginBottom: 5,
   },
-  verifiedPill: {
+
+  codeHelper: {
+    fontFamily: FONTS.regular,
+    fontSize: 11,
+    color: "rgba(255,255,255,0.8)",
+  },
+  nextCollectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  calendarIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 22,
+    backgroundColor: "#E4F0E8",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+
+  nextCollectionLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 2,
+  },
+
+  nextCollectionDate: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+  },
+
+  nextCollectionWindow: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 12,
+    color: COLORS.textPrimary,
+  },
+  partnerCard: {
+    backgroundColor: COLORS.primaryDark,
+    borderRadius: 14,
+    padding: 15,
+    marginBottom: 18,
+  },
+
+  partnerHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  partnerStarBadge: {
+    width: 30,
+    height: 30,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  partnerName: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.white,
+    marginBottom: 6,
+  },
+
+  verifiedBadge: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    gap: 4,
-    backgroundColor: "#188A5A",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 5,
   },
-  verifiedPillText: {
-    fontFamily: FONTS.semiBold,
+
+  verifiedBadgeText: {
+    fontFamily: FONTS.regular,
     fontSize: 9,
-    color: COLORS.primaryLight,
+    color: COLORS.white,
   },
+
   partnerLocation: {
     fontFamily: FONTS.regular,
     fontSize: 10,
-    color: "rgba(255,255,255,0.75)",
+    color: "rgba(255,255,255,0.85)",
   },
-
   readyCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 14,
-    padding: 13,
-    marginBottom: 20,
+    padding: 18,
+    marginBottom: 22,
   },
-  readyHeading: {
+
+  readyLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 4,
+  },
+
+  readyTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+  },
+
+  readySubtitle: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    lineHeight: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 15,
+  },
+
+  readyBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: "center",
+  },
+
+  readyBtnText: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.white,
+  },
+
+  dropoffTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 6,
+    paddingHorizontal: 18,
   },
-  readySubtext: {
+
+  dropoffSubtitle: {
     fontFamily: FONTS.regular,
     fontSize: 12,
     color: COLORS.textSecondary,
     marginBottom: 16,
-  },
-  markReadyBtn: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  markReadyBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.white,
-  },
-  dropoffBtn: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-    width: "95%",
-    alignSelf: "center",
-  },
-  dropoffBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.white,
-  },
-  dropoffSection: { marginBottom: 28, padding: 2 },
-  dropoffHeading: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.textPrimary,
-    marginBottom: 6,
-  },
-  dropoffSubtext: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginBottom: 13,
+    paddingHorizontal: 18,
   },
 
-  pricesSection: { marginBottom: 24 },
-  pricesHeader: {
+  dropoffBtn: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignSelf: "center",
+    marginBottom: 20,
+    paddingHorizontal: 18,
+    width: 340,
+  },
+
+  dropoffBtnText: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.white,
+    textAlign: "center",
+  },
+
+  pricesHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 14,
+    paddingHorizontal: 18,
   },
-  pricesHeading: {
+
+  sectionTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.textPrimary,
   },
+
   pricesUpdated: {
     fontFamily: FONTS.medium,
-    fontSize: 10,
+    fontSize: 9,
+    letterSpacing: 0.3,
     color: COLORS.textSecondary,
-    letterSpacing: 0.4,
   },
+
+  pricesList: {
+    marginBottom: 18,
+    paddingHorizontal: 18,
+  },
+
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
+    justifyContent: "space-between",
+    paddingVertical: 10,
   },
-  priceIconWrap: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+
+  priceLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  priceIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 17,
     backgroundColor: COLORS.surface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
+
   priceLabel: {
-    flex: 1,
-    fontFamily: FONTS.regular,
-    fontSize: 15,
+    fontFamily: FONTS.medium,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
+
   priceValue: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
-    color: COLORS.textPrimary,
-  },
-  recentHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-  viewAllText: {
-    fontFamily: FONTS.semiBold,
     fontSize: 14,
+    color: COLORS.textPrimary,
+  },
+
+  activityHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+    paddingHorizontal: 18,
+  },
+
+  viewHistoryText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 12,
     color: COLORS.primary,
   },
-  activityCard: {
+
+  activityList: {
+    gap: 14,
+    paddingHorizontal: 18,
+  },
+
+  activityRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
   },
-  activityIconWrap: {
-    width: 44,
-    height: 44,
+
+  activityIcon: {
+    width: 42,
+    height: 42,
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginRight: 14,
   },
-  activityInfo: { flex: 1 },
+
+  activityText: {
+    flex: 1,
+  },
+
   activityTitle: {
     fontFamily: FONTS.semiBold,
-    fontSize: 15,
+    fontSize: 14,
     color: COLORS.textPrimary,
+    marginBottom: 3,
   },
-  activitySub: {
+
+  activitySubtitle: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginTop: 2,
   },
-  activityPoints: {
+
+  activityRight: {
+    alignItems: "flex-end",
+  },
+
+  activityAmount: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
+    fontSize: 14,
+    marginBottom: 5,
+  },
+
+  activityBadge: {
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+
+  activityBadgeText: {
+    fontFamily: FONTS.bold,
+    fontSize: 8,
+    letterSpacing: 0.3,
   },
 });

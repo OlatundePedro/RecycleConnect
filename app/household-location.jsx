@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Modal,
@@ -15,6 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -27,6 +30,7 @@ const COLORS = {
   placeholder: "#9AA9A3",
   reliabilityBg: "#D9F2DF",
   white: "#FFFFFF",
+  error: "#D14343",
 };
 
 const NIGERIA_STATES = [
@@ -109,20 +113,71 @@ function StateListModal({ visible, selected, onSelect, onClose }) {
 
 export default function HouseholdProfile() {
   const router = useRouter();
-  const { fullName, email } = useLocalSearchParams();
+  const { updateData } = useHouseholdOnboarding();
 
   const [state, setState] = useState("");
   const [area, setArea] = useState("");
   const [landmark, setLandmark] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState("");
   const [stateModalVisible, setStateModalVisible] = useState(false);
 
-  const handleUseCurrentLocation = () => {};
+  const handleUseCurrentLocation = async () => {
+    setLocationError("");
+    setLocating(true);
+
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setLocationError(
+          "Location permission denied. You can still enter your address manually.",
+        );
+        return;
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      setLatitude(position.coords.latitude);
+      setLongitude(position.coords.longitude);
+
+      // Best-effort reverse geocode to prefill state/area — falls back
+      // silently to just having lat/long if it fails.
+      try {
+        const [place] = await Location.reverseGeocodeAsync({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+
+        if (place?.region) setState(place.region);
+        if (place?.district || place?.subregion) {
+          setArea(place.district || place.subregion);
+        }
+      } catch (geocodeErr) {
+        console.log("REVERSE GEOCODE ERROR:", geocodeErr);
+      }
+    } catch (err) {
+      console.log("GET LOCATION ERROR:", err);
+      setLocationError("Couldn't get your location. Please try again.");
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const handleSaveLocation = () => {
-    router.replace({
-      pathname: "/household-education",
-      params: { fullName, email, state, area, landmark },
+    updateData({
+      state,
+      area,
+      landmark,
+      latitude,
+      longitude,
     });
+
+    router.replace("/household-education");
   };
 
   return (
@@ -155,12 +210,27 @@ export default function HouseholdProfile() {
           style={styles.currentLocationCard}
           activeOpacity={0.85}
           onPress={handleUseCurrentLocation}
+          disabled={locating}
         >
           <View style={styles.pinBadge}>
-            <Ionicons name="location" size={26} color={COLORS.primary} />
+            {locating ? (
+              <ActivityIndicator size="small" color={COLORS.primary} />
+            ) : (
+              <Ionicons name="location" size={26} color={COLORS.primary} />
+            )}
           </View>
-          <Text style={styles.currentLocationText}>Use current location</Text>
+          <Text style={styles.currentLocationText}>
+            {locating
+              ? "Getting your location..."
+              : latitude
+                ? "Location captured ✓"
+                : "Use current location"}
+          </Text>
         </TouchableOpacity>
+
+        {!!locationError && (
+          <Text style={styles.locationErrorText}>{locationError}</Text>
+        )}
 
         <Text style={styles.fieldLabel}>State</Text>
         <TouchableOpacity
@@ -288,7 +358,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 25,
     alignItems: "center",
-    marginBottom: 18,
+    marginBottom: 8,
   },
   pinBadge: {
     width: 50,
@@ -303,6 +373,13 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     fontSize: 14,
     color: COLORS.primary,
+  },
+  locationErrorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 12,
+    color: COLORS.error,
+    textAlign: "center",
+    marginBottom: 12,
   },
   fieldLabel: {
     fontFamily: FONTS.semiBold,

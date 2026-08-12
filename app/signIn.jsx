@@ -1,3 +1,5 @@
+// app/signIn.jsx
+
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -12,37 +14,49 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { supabase } from "../lib/supabase";
 
-const PIN_LENGTH = 4;
+const PIN_LENGTH = 6;
 
 export default function Login() {
   const router = useRouter();
-  const [phone, setPhone] = useState("");
+
+  const [email, setEmail] = useState("");
+
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const pinRefs = useRef([]);
 
   const handleChangeDigit = (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
-    setPin((prev) => {
-      const next = [...prev];
+
+    setPin((previous) => {
+      const next = [...previous];
       next[index] = char;
       return next;
     });
-    if (error) setError("");
+
+    if (error) {
+      setError("");
+    }
+
     if (char && index < PIN_LENGTH - 1) {
       pinRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyPress = (index, e) => {
-    if (e.nativeEvent.key === "Backspace" && !pin[index] && index > 0) {
+  const handleKeyPress = (index, event) => {
+    if (event.nativeEvent.key === "Backspace" && !pin[index] && index > 0) {
       pinRefs.current[index - 1]?.focus();
-      setPin((prev) => {
-        const next = [...prev];
+
+      setPin((previous) => {
+        const next = [...previous];
         next[index - 1] = "";
         return next;
       });
@@ -50,8 +64,9 @@ export default function Login() {
   };
 
   const pinCode = pin.join("");
+
   const canLogin =
-    phone.trim().length > 0 && pinCode.length === PIN_LENGTH && !loading;
+    email.trim().length > 0 && pinCode.length === PIN_LENGTH && !loading;
 
   const handleLogin = async () => {
     if (!canLogin) return;
@@ -60,14 +75,62 @@ export default function Login() {
     setError("");
 
     try {
-      // Fake loading
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const formattedEmail = email.trim().toLowerCase();
 
-      // Navigate directly to the home screen
+      console.log("LOGIN EMAIL:", formattedEmail);
+
+      const { data: authData, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email: formattedEmail,
+          password: pinCode,
+        });
+
+      if (loginError) {
+        console.log("LOGIN ERROR:", loginError);
+
+        setError("Invalid email or PIN.");
+
+        return;
+      }
+
+      if (!authData?.user) {
+        setError("Unable to find your account.");
+
+        return;
+      }
+
+      console.log("LOGIN SUCCESS:", authData.user.id);
+
+      /*
+       * Check that the profile exists.
+       */
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authData.user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.log("PROFILE FETCH ERROR:", profileError);
+
+        setError("Unable to load your profile.");
+
+        return;
+      }
+
+      if (!profile) {
+        setError("Your account profile has not been completed.");
+
+        return;
+      }
+
+      console.log("PROFILE LOADED:", profile);
+
       router.replace("/household/home");
     } catch (err) {
-      console.log(err);
-      setError(err.message || "Unable to sign in.");
+      console.log("LOGIN EXCEPTION:", err);
+
+      setError(err?.message || "Unable to sign in.");
     } finally {
       setLoading(false);
     }
@@ -83,6 +146,7 @@ export default function Login() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Welcome Back</Text>
+
         <Text style={styles.subtitle}>Sign in to continue</Text>
 
         <View style={styles.illustrationWrap}>
@@ -93,28 +157,40 @@ export default function Login() {
           />
         </View>
 
-        <Text style={styles.fieldLabel}>Phone Number</Text>
+        <Text style={styles.fieldLabel}>Email Address</Text>
+
         <View style={styles.fieldWrap}>
           <TextInput
             style={styles.fieldInput}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+234xxxxxxxxxx"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+
+              if (error) {
+                setError("");
+              }
+            }}
+            placeholder="yourname@example.com"
             placeholderTextColor={COLORS.muted}
-            keyboardType="phone-pad"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
             editable={!loading}
           />
         </View>
 
         <Text style={styles.fieldLabel}>PIN</Text>
+
         <View style={styles.pinRow}>
           {pin.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (pinRefs.current[index] = ref)}
+              ref={(ref) => {
+                pinRefs.current[index] = ref;
+              }}
               value={digit}
               onChangeText={(value) => handleChangeDigit(index, value)}
-              onKeyPress={(e) => handleKeyPress(index, e)}
+              onKeyPress={(event) => handleKeyPress(index, event)}
               keyboardType="number-pad"
               secureTextEntry
               maxLength={1}
@@ -144,9 +220,12 @@ export default function Login() {
           onPress={() =>
             router.push({
               pathname: "/forget-password",
-              params: { type: "household" },
+              params: {
+                type: "household",
+              },
             })
           }
+          disabled={loading}
         >
           <Text style={styles.forgotBottom}>Forgot PIN</Text>
         </TouchableOpacity>
@@ -156,8 +235,17 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 24, paddingTop: 85, paddingBottom: 32 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 85,
+    paddingBottom: 32,
+  },
+
   title: {
     fontFamily: FONTS.bold,
     fontSize: 28,
@@ -165,6 +253,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
   },
+
   subtitle: {
     fontFamily: FONTS.regular,
     fontSize: 14,
@@ -172,14 +261,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 36,
   },
+
   illustrationWrap: {
     alignItems: "center",
     marginBottom: 24,
   },
+
   illustration: {
     width: 250,
     height: 220,
   },
+
   fieldLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
@@ -188,8 +280,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginLeft: 20,
   },
+
   fieldWrap: {
-    borderWidth: 1.0,
+    borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: 14,
     paddingHorizontal: 16,
@@ -198,12 +291,14 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
+
   fieldInput: {
     fontFamily: FONTS.regular,
     fontSize: 16,
     color: COLORS.textPrimary,
     padding: 0,
   },
+
   pinRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -211,19 +306,22 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: "90%",
   },
+
   pinBox: {
-    width: 60,
+    width: 48,
     height: 60,
-    borderWidth: 1.0,
+    borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: 14,
     fontFamily: FONTS.bold,
     fontSize: 22,
     color: COLORS.textPrimary,
   },
+
   pinBoxFilled: {
     backgroundColor: COLORS.white,
   },
+
   errorText: {
     fontFamily: FONTS.medium,
     fontSize: 13,
@@ -231,6 +329,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+
   loginBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -240,14 +339,17 @@ const styles = StyleSheet.create({
     width: "95%",
     alignSelf: "center",
   },
+
   loginBtnDisabled: {
     opacity: 0.5,
   },
+
   loginBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.white,
   },
+
   forgotBottom: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,

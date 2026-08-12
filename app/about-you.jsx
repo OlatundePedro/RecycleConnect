@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -31,13 +32,16 @@ export default function AboutYou() {
   const [email, setEmail] = useState("");
 
   const canContinue = fullName.trim().length > 0;
-
+  const { updateData } = useHouseholdOnboarding();
   const handleContinue = () => {
     if (!canContinue) return;
-    router.push({
-      pathname: "/household-location",
-      params: { fullName, email },
+
+    updateData({
+      fullName: fullName.trim(),
+      email: email.trim(),
     });
+
+    router.push("/household-location");
   };
 
   return (

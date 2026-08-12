@@ -1,6 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -11,6 +13,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
+import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { useProfile } from "../context/profileContext";
+import { createProfile } from "../lib/profile";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -64,8 +69,42 @@ const MATERIALS = [
 
 export default function RecyclablesInfo() {
   const router = useRouter();
-  const handleGotIt = () => {
-    router.replace("/household/home");
+  const { data } = useHouseholdOnboarding();
+  const { setProfile } = useProfile();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleGotIt = async () => {
+    if (submitting) return;
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const newProfile = await createProfile({
+        account_type: "household",
+        phone: data.phone,
+        full_name: data.fullName,
+        email: data.email || null,
+        state: data.state,
+        area: data.area,
+        landmark: data.landmark,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      });
+
+      setProfile(newProfile);
+      router.replace("/household/home");
+    } catch (err) {
+      console.log("PROFILE CREATION ERROR:", err);
+      setError(
+        err?.message ||
+          "We couldn't create your profile. Please check your connection and try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -125,17 +164,24 @@ export default function RecyclablesInfo() {
             </Text>
           </View>
         </View>
+
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
 
       <TouchableOpacity
-        style={styles.gotItBtn}
+        style={[styles.gotItBtn, submitting && styles.gotItBtnDisabled]}
         activeOpacity={0.85}
         onPress={handleGotIt}
+        disabled={submitting}
       >
-        <>
-          <Text style={styles.gotItText}>Got it, let's go!</Text>
-          <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
-        </>
+        {submitting ? (
+          <ActivityIndicator size="small" color={COLORS.white} />
+        ) : (
+          <>
+            <Text style={styles.gotItText}>Got it, let's go!</Text>
+            <Ionicons name="chevron-forward" size={18} color={COLORS.white} />
+          </>
+        )}
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -264,7 +310,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.textSecondary,
   },
-
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: COLORS.error,
+    textAlign: "center",
+    marginTop: 16,
+  },
   gotItBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -276,7 +328,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     marginBottom: 28,
   },
-
+  gotItBtnDisabled: {
+    opacity: 0.6,
+  },
   gotItText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,

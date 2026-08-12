@@ -1,3 +1,5 @@
+// app/create-account.jsx
+
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,40 +13,63 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
+import { supabase } from "../lib/supabase";
 
 export default function CreateAccount() {
   const router = useRouter();
+
   const { updateData } = useHouseholdOnboarding();
-  const [phone, setPhone] = useState("");
+
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const canContinue = phone.trim().length > 0 && !loading;
+  const canContinue = email.trim().length > 0 && !loading;
 
-  const handleVerifyPhone = async () => {
+  const handleVerifyEmail = async () => {
     if (!canContinue) return;
 
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
-      // Simulate a network request
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const formattedEmail = email.trim().toLowerCase();
 
-      // Save the phone number in the onboarding context
-      updateData({ phone });
+      console.log("SENDING OTP TO:", formattedEmail);
 
-      // Move to the OTP screen
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: formattedEmail,
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (otpError) {
+        console.log("SEND OTP ERROR:", otpError);
+        setError(otpError.message || "Unable to send verification code.");
+        return;
+      }
+
+      updateData({
+        email: formattedEmail,
+      });
+
+      console.log("OTP SENT SUCCESSFULLY");
+
       router.push("/create-otp-house");
     } catch (err) {
-      setError("Something went wrong.");
+      console.log("SEND OTP EXCEPTION:", err);
+
+      setError(err?.message || "Something went wrong while sending the code.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
@@ -55,6 +80,7 @@ export default function CreateAccount() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Welcome</Text>
+
         <Text style={styles.subtitle}>Sign up to continue</Text>
 
         <View style={styles.illustrationWrap}>
@@ -65,33 +91,44 @@ export default function CreateAccount() {
           />
         </View>
 
-        <Text style={styles.fieldLabel}>Phone Number</Text>
+        <Text style={styles.fieldLabel}>Email Address</Text>
+
         <View style={styles.fieldWrap}>
           <TextInput
             style={styles.fieldInput}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+23480 xxxx xxxx"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+
+              if (error) {
+                setError("");
+              }
+            }}
+            placeholder="yourname@example.com"
             placeholderTextColor={COLORS.muted}
-            keyboardType="phone-pad"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
           />
         </View>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
-          onPress={handleVerifyPhone}
+          onPress={handleVerifyEmail}
           activeOpacity={0.85}
           disabled={!canContinue}
         >
           <Text style={styles.verifyBtnText}>
-            {loading ? "Sending..." : "Verify Phone Number"}
+            {loading ? "Sending..." : "Send Verification Code"}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.signinRow}>
           <Text style={styles.signinText}>Already have an account? </Text>
+
           <TouchableOpacity onPress={() => router.push("/signIn")}>
             <Text style={styles.signinLink}>Sign in</Text>
           </TouchableOpacity>
@@ -102,8 +139,17 @@ export default function CreateAccount() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { paddingHorizontal: 24, paddingTop: 105, paddingBottom: 32 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 105,
+    paddingBottom: 32,
+  },
+
   title: {
     fontFamily: FONTS.bold,
     fontSize: 28,
@@ -111,6 +157,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 5,
   },
+
   subtitle: {
     fontFamily: FONTS.regular,
     fontSize: 14,
@@ -118,34 +165,40 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 48,
   },
+
   illustrationWrap: {
     alignItems: "center",
     marginBottom: 28,
   },
+
   illustration: {
     width: "75%",
     height: 260,
   },
+
   fieldLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 10,
   },
+
   fieldWrap: {
     borderWidth: 1.5,
     borderColor: COLORS.border,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    marginBottom: 48,
+    marginBottom: 24,
   },
+
   fieldInput: {
     fontFamily: FONTS.regular,
     fontSize: 16,
     color: COLORS.textPrimary,
     padding: 0,
   },
+
   errorText: {
     fontFamily: FONTS.medium,
     fontSize: 13,
@@ -153,6 +206,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 16,
   },
+
   verifyBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -160,23 +214,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
+
   verifyBtnDisabled: {
     opacity: 0.5,
   },
+
   verifyBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.white,
   },
+
   signinRow: {
     flexDirection: "row",
     justifyContent: "center",
   },
+
   signinText: {
     fontFamily: FONTS.regular,
     fontSize: 14,
     color: COLORS.textSecondary,
   },
+
   signinLink: {
     fontFamily: FONTS.semiBold,
     fontSize: 14,
