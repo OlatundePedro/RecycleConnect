@@ -1,5 +1,3 @@
-// app/create-account.jsx
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,7 +11,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
@@ -21,9 +18,7 @@ import { supabase } from "../lib/supabase";
 
 export default function CreateAccount() {
   const router = useRouter();
-
   const { updateData } = useHouseholdOnboarding();
-
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -128,7 +123,6 @@ export default function CreateAccount() {
 
         <View style={styles.signinRow}>
           <Text style={styles.signinText}>Already have an account? </Text>
-
           <TouchableOpacity onPress={() => router.push("/signIn")}>
             <Text style={styles.signinLink}>Sign in</Text>
           </TouchableOpacity>

@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { getMyProfile } from "../lib/profile";
+import { getMyProfile, updateAvatar } from "../lib/profile";
 import { supabase } from "../lib/supabase";
 
 const ProfileContext = createContext();
@@ -29,6 +29,13 @@ export function ProfileProvider({ children }) {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const uploadAvatar = useCallback(async (fileUri, mimeType, fileName) => {
+    const updated = await updateAvatar(fileUri, mimeType, fileName);
+    setProfile(updated);
+    setAvatar(updated.avatar_url);
+    return updated;
   }, []);
 
   useEffect(() => {
@@ -63,6 +70,7 @@ export function ProfileProvider({ children }) {
         setProfile,
         loading,
         refreshProfile,
+        uploadAvatar,
       }}
     >
       {children}

@@ -11,7 +11,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 import { supabase } from "../lib/supabase";
@@ -32,45 +31,30 @@ const ACCOUNT_TYPE = "household";
 
 function maskEmail(email) {
   if (!email) return "";
-
   const clean = String(email).trim();
-
   const [username, domain] = clean.split("@");
-
   if (!username || !domain) {
     return clean;
   }
-
   if (username.length <= 2) {
     return `${username[0] || ""}***@${domain}`;
   }
-
   const first = username[0];
   const last = username[username.length - 1];
-
   return `${first}***${last}@${domain}`;
 }
 
 export default function VerifyOtp() {
   const router = useRouter();
-
   const { data, updateData } = useHouseholdOnboarding();
-
   const email = data?.email;
-
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(""));
-
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
-
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState(null);
-
   const inputRefs = useRef([]);
 
-  /*
-   * Countdown timer
-   */
   useEffect(() => {
     if (secondsLeft <= 0) return;
 
@@ -90,9 +74,7 @@ export default function VerifyOtp() {
 
     return () => clearTimeout(timer);
   }, []);
-  /*
-   * Handle OTP input
-   */
+
   const handleChangeDigit = (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
 
@@ -111,9 +93,6 @@ export default function VerifyOtp() {
     }
   };
 
-  /*
-   * Handle backspace
-   */
   const handleKeyPress = (index, e) => {
     if (e.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -126,9 +105,6 @@ export default function VerifyOtp() {
     }
   };
 
-  /*
-   * RESEND EMAIL OTP
-   */
   const handleResend = async () => {
     if (secondsLeft > 0 || resending) {
       return;
@@ -178,9 +154,6 @@ export default function VerifyOtp() {
 
   const canContinue = code.length === OTP_LENGTH && !verifying;
 
-  /*
-   * VERIFY EMAIL OTP
-   */
   const handleVerify = async () => {
     if (!canContinue) return;
 
@@ -213,19 +186,12 @@ export default function VerifyOtp() {
       console.log("OTP VERIFIED SUCCESSFULLY");
       console.log("User:", authData?.user);
 
-      /*
-       * Save OTP and Supabase user ID
-       * in the onboarding context.
-       */
       updateData({
         otp: code,
         userId: authData?.user?.id,
         email: email.trim().toLowerCase(),
       });
 
-      /*
-       * Move to account success screen.
-       */
       router.replace({
         pathname: "/account-success",
         params: {
@@ -266,7 +232,6 @@ export default function VerifyOtp() {
           />
         </View>
 
-        {/* OTP INPUTS */}
         <View style={styles.otpRow}>
           {digits.map((digit, index) => (
             <TextInput
@@ -288,7 +253,6 @@ export default function VerifyOtp() {
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
-        {/* RESEND */}
         <View style={styles.resendWrap}>
           <Text style={styles.resendPrompt}>Didn't receive it?</Text>
 
@@ -311,7 +275,6 @@ export default function VerifyOtp() {
           </TouchableOpacity>
         </View>
 
-        {/* VERIFY BUTTON */}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
           activeOpacity={0.85}
@@ -323,7 +286,6 @@ export default function VerifyOtp() {
           </Text>
         </TouchableOpacity>
 
-        {/* BACK */}
         <TouchableOpacity
           style={styles.backRow}
           onPress={() => router.push("/signIn")}

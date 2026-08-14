@@ -14,29 +14,52 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { sendOtp } from "../lib/auth";
-import { normalizePhone } from "../lib/phone";
+import { supabase } from "../lib/supabase";
 
 export default function CreateAccountCollector() {
   const router = useRouter();
   const { updateData } = useHouseholdOnboarding();
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const canContinue = phone.trim().length > 0;
+  const canContinue = email.trim().length > 0 && !loading;
 
-  const handleVerifyPhone = async () => {
+  const handleVerifyEmail = async () => {
     if (!canContinue) return;
-    const normalizedPhone = normalizePhone(phone);
+
     setLoading(true);
-    setError(null);
+    setError("");
+
     try {
-      await sendOtp(normalizedPhone);
-      updateData({ phone: normalizedPhone });
+      const formattedEmail = email.trim().toLowerCase();
+
+      console.log("SENDING OTP TO:", formattedEmail);
+
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: formattedEmail,
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (otpError) {
+        console.log("SEND OTP ERROR:", otpError);
+        setError(otpError.message || "Unable to send verification code.");
+        return;
+      }
+
+      updateData({
+        email: formattedEmail,
+      });
+
+      console.log("OTP SENT SUCCESSFULLY");
+
       router.push("/create-otp-collector");
     } catch (err) {
-      setError(err.message);
+      console.log("SEND OTP EXCEPTION:", err);
+
+      setError(err?.message || "Something went wrong while sending the code.");
     } finally {
       setLoading(false);
     }
@@ -62,25 +85,36 @@ export default function CreateAccountCollector() {
           />
         </View>
 
-        <Text style={styles.fieldLabel}>Phone Number</Text>
+        <Text style={styles.fieldLabel}>Email Address</Text>
         <View style={styles.fieldWrap}>
           <TextInput
             style={styles.fieldInput}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+234xxxxxxxxxx"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+
+              if (error) {
+                setError("");
+              }
+            }}
+            placeholder="yourname@example.com"
             placeholderTextColor={COLORS.muted}
-            keyboardType="phone-pad"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
           />
         </View>
-
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
-          onPress={handleVerifyPhone}
+          onPress={handleVerifyEmail}
           activeOpacity={0.85}
           disabled={!canContinue}
         >
-          <Text style={styles.verifyBtnText}>Verify Phone Number</Text>
+          <Text style={styles.verifyBtnText}>
+            {loading ? "Sending..." : "Send Verification Code"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.signinRow}>

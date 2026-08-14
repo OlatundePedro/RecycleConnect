@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
-import { sendOtp } from "../lib/auth";
+import { supabase } from "../lib/supabase";
 
 const COLORS = {
   primary: "#2D7A46",
@@ -24,25 +24,29 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-const OTP_LENGTH = 4;
-const RESEND_SECONDS = 60;
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 120;
 const ACCOUNT_TYPE = "collector";
 
-function maskPhone(phone) {
-  if (!phone) return "";
-  const clean = String(phone).replace(/\s+/g, "");
-  if (clean.length <= 7) return clean;
-  const hasPlus = clean.startsWith("+");
-  const head = clean.slice(0, hasPlus ? 7 : 6);
-  const tail = clean.slice(-4);
-  return `${head} *** ${tail}`;
+function maskEmail(email) {
+  if (!email) return "";
+  const clean = String(email).trim();
+  const [username, domain] = clean.split("@");
+  if (!username || !domain) {
+    return clean;
+  }
+  if (username.length <= 2) {
+    return `${username[0] || ""}***@${domain}`;
+  }
+  const first = username[0];
+  const last = username[username.length - 1];
+  return `${first}***${last}@${domain}`;
 }
 
 export default function VerifyOtpCollector() {
   const router = useRouter();
   const { data, updateData } = useHouseholdOnboarding();
-  const phone = data.phone;
-
+  const email = data?.email;
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
   const [verifying, setVerifying] = useState(false);
@@ -52,22 +56,37 @@ export default function VerifyOtpCollector() {
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
+
     const timer = setInterval(() => {
       setSecondsLeft((s) => Math.max(0, s - 1));
     }, 1000);
+
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
   const formattedTimer = `00:${String(secondsLeft).padStart(2, "0")}`;
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      inputRefs.current[0]?.focus();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleChangeDigit = (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
+
     setDigits((prev) => {
       const next = [...prev];
       next[index] = char;
       return next;
     });
-    if (error) setError(null);
+
+    if (error) {
+      setError(null);
+    }
+
     if (char && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -76,6 +95,7 @@ export default function VerifyOtpCollector() {
   const handleKeyPress = (index, e) => {
     if (e.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
+
       setDigits((prev) => {
         const next = [...prev];
         next[index - 1] = "";
@@ -85,32 +105,109 @@ export default function VerifyOtpCollector() {
   };
 
   const handleResend = async () => {
-    if (secondsLeft > 0 || resending) return;
+    if (secondsLeft > 0 || resending) {
+      return;
+    }
+
+    if (!email) {
+      setError("Email address is missing.");
+      return;
+    }
+
     setResending(true);
     setError(null);
+
     try {
-      await sendOtp(phone);
+      console.log("Resending OTP to:", email);
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+      });
+
+      if (error) {
+        console.log("RESEND OTP ERROR:", error);
+
+        setError(error.message || "Unable to resend verification code.");
+
+        return;
+      }
+
+      console.log("OTP resent successfully.");
+
       setDigits(Array(OTP_LENGTH).fill(""));
       setSecondsLeft(RESEND_SECONDS);
+
       inputRefs.current[0]?.focus();
     } catch (err) {
-      setError(err.message);
+      console.log("RESEND OTP EXCEPTION:", err);
+
+      setError(
+        err?.message || "Something went wrong while resending the code.",
+      );
     } finally {
       setResending(false);
     }
   };
 
   const code = digits.join("");
+
   const canContinue = code.length === OTP_LENGTH && !verifying;
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (!canContinue) return;
-    updateData({ otp: code });
-    router.replace({
-      pathname: "/account-success",
-      params: { type: ACCOUNT_TYPE },
-    });
+
+    if (!email) {
+      setError("Email address is missing.");
+      return;
+    }
+
+    setVerifying(true);
+    setError(null);
+
+    try {
+      console.log("Verifying OTP:", code);
+      console.log("Email:", email);
+
+      const { data: authData, error } = await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token: code,
+        type: "email",
+      });
+
+      if (error) {
+        console.log("VERIFY OTP ERROR:", error);
+
+        setError(error.message || "Invalid verification code.");
+
+        return;
+      }
+
+      console.log("OTP VERIFIED SUCCESSFULLY");
+      console.log("User:", authData?.user);
+
+      updateData({
+        otp: code,
+        userId: authData?.user?.id,
+        email: email.trim().toLowerCase(),
+      });
+
+      router.replace({
+        pathname: "/account-success",
+        params: {
+          type: ACCOUNT_TYPE,
+        },
+      });
+    } catch (err) {
+      console.log("VERIFY OTP EXCEPTION:", err);
+
+      setError(
+        err?.message || "Something went wrong while verifying the code.",
+      );
+    } finally {
+      setVerifying(false);
+    }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
@@ -122,8 +219,8 @@ export default function VerifyOtpCollector() {
       >
         <Text style={styles.title}>Enter Verification Code</Text>
 
-        <Text style={styles.subtitle}>We've sent a 4-digit code to</Text>
-        <Text style={styles.phoneText}>{maskPhone(phone)}</Text>
+        <Text style={styles.subtitle}>We've sent a 6-digit code to</Text>
+        <Text style={styles.emailText}>{maskEmail(email)}</Text>
 
         <View style={styles.illustrationWrap}>
           <Image
@@ -137,28 +234,40 @@ export default function VerifyOtpCollector() {
           {digits.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
+              ref={(ref) => {
+                inputRefs.current[index] = ref;
+              }}
               value={digit}
               onChangeText={(value) => handleChangeDigit(index, value)}
               onKeyPress={(e) => handleKeyPress(index, e)}
               keyboardType="number-pad"
               maxLength={1}
               textAlign="center"
+              editable={!verifying}
               style={[styles.otpBox, digit && styles.otpBoxFilled]}
             />
           ))}
         </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.resendWrap}>
           <Text style={styles.resendPrompt}>Didn't receive it?</Text>
-          <TouchableOpacity onPress={handleResend} disabled={secondsLeft > 0}>
+
+          <TouchableOpacity
+            onPress={handleResend}
+            disabled={secondsLeft > 0 || resending}
+          >
             <Text
               style={[
                 styles.resendAction,
-                secondsLeft > 0 && styles.resendActionDisabled,
+                (secondsLeft > 0 || resending) && styles.resendActionDisabled,
               ]}
             >
-              {secondsLeft > 0 ? `Resend in ${formattedTimer}` : "Resend Code"}
+              {resending
+                ? "Resending..."
+                : secondsLeft > 0
+                  ? `Resend in ${formattedTimer}`
+                  : "Resend Code"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -169,12 +278,14 @@ export default function VerifyOtpCollector() {
           disabled={!canContinue}
           onPress={handleVerify}
         >
-          <Text style={styles.verifyBtnText}>Verify</Text>
+          <Text style={styles.verifyBtnText}>
+            {verifying ? "Verifying..." : "Verify"}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.backRow}
-          onPress={() => router.push("/login")}
+          onPress={() => router.push("/signIn-collector")}
         >
           <Text style={styles.backText}>Back to Login</Text>
         </TouchableOpacity>
@@ -205,7 +316,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 6,
   },
-  phoneText: {
+  emailText: {
     fontFamily: FONTS.bold,
     fontSize: 18,
     color: COLORS.textPrimary,
@@ -228,8 +339,8 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   otpBox: {
-    width: 60,
-    height: 60,
+    width: 48,
+    height: 55,
     borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: 14,

@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -13,20 +14,57 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
+import { supabase } from "../lib/supabase";
 
 export default function ForgetPassword() {
   const router = useRouter();
   const { type } = useLocalSearchParams();
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const canContinue = phone.trim().length > 0;
+  const canContinue = email.trim().length > 0 && !loading;
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!canContinue) return;
-    router.push({
-      pathname: "/reset-otp",
-      params: { phone, type },
-    });
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const formattedEmail = email.trim().toLowerCase();
+
+      console.log("SENDING RESET OTP TO:", formattedEmail);
+
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: formattedEmail,
+        options: {
+          // Don't create a new account for a "forgot PIN" flow —
+          // if there's no existing user with this email, this
+          // should fail rather than silently sign someone up.
+          shouldCreateUser: false,
+        },
+      });
+
+      if (otpError) {
+        console.log("RESET OTP ERROR:", otpError);
+        setError(
+          otpError.message ||
+            "Unable to send a reset code. Please check the email and try again.",
+        );
+        return;
+      }
+
+      router.push({
+        pathname: "/reset-otp",
+        params: { email: formattedEmail, type },
+      });
+    } catch (err) {
+      console.log("RESET OTP EXCEPTION:", err);
+      setError(err?.message || "Something went wrong while sending the code.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,17 +86,25 @@ export default function ForgetPassword() {
           />
         </View>
 
-        <Text style={styles.fieldLabel}>Phone Number</Text>
+        <Text style={styles.fieldLabel}>Email Address</Text>
         <View style={styles.fieldWrap}>
           <TextInput
             style={styles.fieldInput}
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+234xxxxxxxxxx"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+              if (error) setError("");
+            }}
+            placeholder="yourname@example.com"
             placeholderTextColor={COLORS.muted}
-            keyboardType="phone-pad"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
           />
         </View>
+
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
           style={[styles.sendBtn, !canContinue && styles.sendBtnDisabled]}
@@ -66,7 +112,11 @@ export default function ForgetPassword() {
           activeOpacity={0.85}
           disabled={!canContinue}
         >
-          <Text style={styles.sendBtnText}>Send OTP</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color={COLORS.white} />
+          ) : (
+            <Text style={styles.sendBtnText}>Send OTP</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -83,14 +133,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 40,
   },
-  illustrationWrap: {
-    alignItems: "center",
-    marginBottom: 44,
-  },
-  illustration: {
-    width: "85%",
-    height: 260,
-  },
+  illustrationWrap: { alignItems: "center", marginBottom: 44 },
+  illustration: { width: "85%", height: 260 },
   fieldLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
@@ -103,7 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    marginBottom: 42,
+    marginBottom: 24,
   },
   fieldInput: {
     fontFamily: FONTS.regular,
@@ -111,12 +155,20 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "#D14343",
+    textAlign: "center",
+    marginBottom: 18,
+  },
   sendBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 18,
     alignItems: "center",
   },
+  sendBtnDisabled: { opacity: 0.5 },
   sendBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,

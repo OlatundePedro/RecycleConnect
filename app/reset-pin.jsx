@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -11,20 +12,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
-import { forgotPin } from "../lib/auth";
+import { updatePin } from "../lib/auth";
 
-const COLORS = {
-  primary: "#2D7A46",
-  textPrimary: "#111111",
-  textSecondary: "#6B7A75",
-  background: "#FFFFFF",
-  surface: "#F4F7F6",
-  white: "#FFFFFF",
-  error: "#D64545",
-};
-
-const PIN_LENGTH = 4;
+const PIN_LENGTH = 6;
 
 function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
   return (
@@ -32,7 +25,9 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
       {digits.map((digit, index) => (
         <TextInput
           key={index}
-          ref={(ref) => (refs.current[index] = ref)}
+          ref={(ref) => {
+            refs.current[index] = ref;
+          }}
           value={digit}
           onChangeText={(value) => onChangeDigit(index, value)}
           onKeyPress={(e) => onKeyPressDigit(index, e)}
@@ -40,6 +35,7 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
           secureTextEntry
           maxLength={1}
           textAlign="center"
+          editable={true}
           style={[styles.pinBox, digit && styles.pinBoxFilled]}
         />
       ))}
@@ -49,10 +45,11 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
 
 export default function ResetPin() {
   const router = useRouter();
-  const { phone, type } = useLocalSearchParams();
-  const [submitting, setSubmitting] = useState(false);
+  const { email, type } = useLocalSearchParams();
+
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
   const [confirmPin, setConfirmPin] = useState(Array(PIN_LENGTH).fill(""));
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const pinRefs = useRef([]);
@@ -60,19 +57,19 @@ export default function ResetPin() {
 
   const makeChangeHandler = (setDigits, refs) => (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
+    setError("");
     setDigits((prev) => {
       const next = [...prev];
       next[index] = char;
       return next;
     });
-    if (error) setError("");
     if (char && index < PIN_LENGTH - 1) {
       refs.current[index + 1]?.focus();
     }
   };
 
-  const makeKeyPressHandler = (digits, setDigits, refs) => (index, e) => {
-    if (e.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
+  const makeKeyPressHandler = (digits, setDigits, refs) => (index, event) => {
+    if (event.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
       refs.current[index - 1]?.focus();
       setDigits((prev) => {
         const next = [...prev];
@@ -93,24 +90,46 @@ export default function ResetPin() {
 
   const pinCode = pin.join("");
   const confirmCode = confirmPin.join("");
+
   const canContinue =
-    pinCode.length === PIN_LENGTH && confirmCode.length === PIN_LENGTH;
+    pinCode.length === PIN_LENGTH &&
+    confirmCode.length === PIN_LENGTH &&
+    !submitting;
 
   const handleResetPin = async () => {
     if (!canContinue) return;
+
     if (pinCode !== confirmCode) {
       setError("PINs don't match. Try again.");
       setConfirmPin(Array(PIN_LENGTH).fill(""));
-      confirmRefs.current[0]?.focus();
+      setTimeout(() => confirmRefs.current[0]?.focus(), 100);
       return;
     }
-    setSubmitting(true);
-    setError("");
+
+    if (!email) {
+      setError(
+        "Email information is missing. Please restart the password reset process.",
+      );
+      return;
+    }
+
     try {
-      await forgotPin(phone, otp, pinCode);
-      router.replace({ pathname: "/reset-success", params: { type } });
+      setSubmitting(true);
+      setError("");
+
+      console.log("RESETTING PIN FOR:", email);
+
+      await updatePin(pinCode);
+
+      console.log("PIN RESET SUCCESSFULLY");
+
+      router.replace({
+        pathname: "/reset-success",
+        params: { type: type || "forgot-pin" },
+      });
     } catch (err) {
-      setError(err.message);
+      console.log("RESET PIN ERROR:", err);
+      setError(err?.message || "Unable to reset your PIN. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -135,7 +154,14 @@ export default function ResetPin() {
           />
         </View>
 
-        <Text style={styles.fieldLabel}>Create PIN</Text>
+        {email && (
+          <View style={styles.emailInfo}>
+            <Text style={styles.emailLabel}>Resetting PIN for</Text>
+            <Text style={styles.emailText}>{email}</Text>
+          </View>
+        )}
+
+        <Text style={styles.fieldLabel}>Create 6-digit PIN</Text>
         <PinRow
           digits={pin}
           onChangeDigit={handlePinChange}
@@ -144,7 +170,7 @@ export default function ResetPin() {
         />
 
         <Text style={[styles.fieldLabel, styles.confirmLabel]}>
-          Confirm PIN
+          Confirm 6-digit PIN
         </Text>
         <PinRow
           digits={confirmPin}
@@ -162,7 +188,11 @@ export default function ResetPin() {
         disabled={!canContinue}
         onPress={handleResetPin}
       >
-        <Text style={styles.createBtnText}>Reset PIN</Text>
+        {submitting ? (
+          <ActivityIndicator size="small" color={COLORS.white} />
+        ) : (
+          <Text style={styles.createBtnText}>Reset PIN</Text>
+        )}
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -175,8 +205,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   scroll: {
-    paddingTop: 105,
-    paddingBottom: 24,
+    paddingTop: 80,
+    paddingBottom: 30,
   },
   title: {
     fontFamily: FONTS.bold,
@@ -187,18 +217,33 @@ const styles = StyleSheet.create({
   },
   illustrationWrap: {
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 25,
   },
   illustration: {
     width: 260,
     height: 200,
+  },
+  emailInfo: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  emailLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: 5,
+  },
+  emailText: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 15,
+    color: COLORS.textPrimary,
   },
   fieldLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
     marginBottom: 14,
-    marginLeft: 30,
+    marginLeft: 5,
   },
   confirmLabel: {
     marginTop: 32,
@@ -207,17 +252,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignSelf: "center",
-    width: "85%",
+    width: "100%",
   },
   pinBox: {
-    width: 60,
+    width: 48,
     height: 60,
-    borderWidth: 1.0,
+    borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: 14,
     fontFamily: FONTS.bold,
     fontSize: 22,
     color: COLORS.textPrimary,
+    backgroundColor: COLORS.white,
   },
   pinBoxFilled: {
     backgroundColor: COLORS.white,
@@ -228,6 +274,7 @@ const styles = StyleSheet.create({
     color: COLORS.error,
     textAlign: "center",
     marginTop: 16,
+    lineHeight: 19,
   },
   createBtn: {
     backgroundColor: COLORS.primary,
@@ -235,7 +282,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 98,
+    marginBottom: 75,
+    minHeight: 54,
+  },
+  createBtnDisabled: {
+    opacity: 0.5,
   },
   createBtnText: {
     fontFamily: FONTS.semiBold,

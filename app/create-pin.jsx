@@ -11,7 +11,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { FONTS } from "../constants/typography";
 import { useHouseholdOnboarding } from "../context/HouseholdOnboardingContext";
 import { supabase } from "../lib/supabase";
@@ -51,33 +50,25 @@ function PinRow({ digits, onChangeDigit, onKeyPressDigit, refs }) {
 
 export default function CreatePin() {
   const router = useRouter();
-
   const { updateData } = useHouseholdOnboarding();
-
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
-
   const [confirmPin, setConfirmPin] = useState(Array(PIN_LENGTH).fill(""));
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const pinRefs = useRef([]);
   const confirmRefs = useRef([]);
 
   const handleChange = (setDigits, refs) => {
     return (index, value) => {
       const char = value.slice(-1).replace(/[^0-9]/g, "");
-
       setDigits((previous) => {
         const next = [...previous];
         next[index] = char;
         return next;
       });
-
       if (error) {
         setError("");
       }
-
       if (char && index < PIN_LENGTH - 1) {
         refs.current[index + 1]?.focus();
       }
@@ -103,11 +94,8 @@ export default function CreatePin() {
   };
 
   const handlePinChange = handleChange(setPin, pinRefs);
-
   const handleConfirmChange = handleChange(setConfirmPin, confirmRefs);
-
   const handlePinKeyPress = handleKeyPress(pin, setPin, pinRefs);
-
   const handleConfirmKeyPress = handleKeyPress(
     confirmPin,
     setConfirmPin,
@@ -124,56 +112,34 @@ export default function CreatePin() {
 
   const handleCreatePin = async () => {
     if (!canContinue) return;
-
     if (pinCode !== confirmCode) {
       setError("PINs don't match.");
-
       setConfirmPin(Array(PIN_LENGTH).fill(""));
       confirmRefs.current[0]?.focus();
-
       return;
     }
-
     setLoading(true);
     setError("");
-
     try {
       console.log("CREATING PIN");
-
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
-
       if (userError || !user) {
         console.log("GET USER ERROR:", userError);
-
         setError(
           "Your account session could not be found. Please verify your email again.",
         );
-
         return;
       }
-
       console.log("AUTH USER:", user.id);
-
-      /*
-       * IMPORTANT:
-       *
-       * The 6-digit PIN is stored as the
-       * Supabase Auth password.
-       *
-       * It is NOT stored in profiles.
-       */
       const { error: passwordError } = await supabase.auth.updateUser({
         password: pinCode,
       });
-
       if (passwordError) {
         console.log("CREATE PIN ERROR:", passwordError);
-
         setError(passwordError.message || "Unable to create your PIN.");
-
         return;
       }
 

@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StatusBar,
@@ -13,12 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
-
-const COLLECTOR = {
-  businessName: "Greencycle Lagos",
-  avatar: require("../../assets/images/profile.png"),
-  verified: true,
-};
+import { useProfile } from "../../context/profileContext";
 
 const WALLET = { balance: "5,240.00" };
 
@@ -33,10 +29,7 @@ const NEXT_TRIP = {
   estVolumeKg: 185,
 };
 
-const TODAY_STATS = {
-  confirmed: 2,
-  paymentMade: 3728,
-};
+const TODAY_STATS = { confirmed: 2, paymentMade: 3728 };
 
 const BUYER_INTEREST = {
   company: "Lagos Fibre & Pulp Co.",
@@ -91,12 +84,30 @@ const LATEST_ACTIVITY = [
   },
 ];
 
-// Where tapping the avatar sends the collector.
 const PROFILE_ROUTE = "/(collect)/profile";
+const DEFAULT_AVATAR = require("../../assets/images/profile.png");
 
 export default function CollectorHome() {
   const router = useRouter();
   const [showBalance, setShowBalance] = useState(true);
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.screen}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const businessName =
+    profile?.business_name || profile?.full_name || "Your business";
+  const isVerified = profile?.verification_status === "approved";
+  const avatarSource = profile?.avatar_url
+    ? { uri: profile.avatar_url }
+    : DEFAULT_AVATAR;
 
   return (
     <View style={styles.screen}>
@@ -105,25 +116,22 @@ export default function CollectorHome() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.headerBlock}>
-          {/* Top Row */}
           <View style={styles.headerTopRow}>
             <View style={styles.headerLeft}>
               <TouchableOpacity
                 onPress={() => router.push(PROFILE_ROUTE)}
                 activeOpacity={0.8}
               >
-                <Image source={COLLECTOR.avatar} style={styles.avatar} />
+                <Image source={avatarSource} style={styles.avatar} />
               </TouchableOpacity>
 
               <View style={styles.headerTextWrap}>
                 <Text style={styles.headerLabel}>Collection Partner</Text>
 
                 <View style={styles.businessNameRow}>
-                  <Text style={styles.businessName}>
-                    {COLLECTOR.businessName}
-                  </Text>
+                  <Text style={styles.businessName}>{businessName}</Text>
 
-                  {COLLECTOR.verified && (
+                  {isVerified && (
                     <Ionicons
                       name="checkmark-circle"
                       size={18}
@@ -132,6 +140,10 @@ export default function CollectorHome() {
                     />
                   )}
                 </View>
+
+                {!isVerified && (
+                  <Text style={styles.pendingText}>Verification pending</Text>
+                )}
               </View>
             </View>
 
@@ -144,12 +156,10 @@ export default function CollectorHome() {
             </TouchableOpacity>
           </View>
 
-          {/* Wallet */}
           <View style={styles.walletRow}>
             <View>
               <View style={styles.walletLabelRow}>
                 <Text style={styles.walletLabel}>Wallet Balance</Text>
-
                 <TouchableOpacity onPress={() => setShowBalance(!showBalance)}>
                   <Ionicons
                     name={showBalance ? "eye-outline" : "eye-off-outline"}
@@ -372,91 +382,59 @@ export default function CollectorHome() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.background },
   topInset: { backgroundColor: COLORS.primary },
-
-  headerTextWrap: { flex: 1 },
-  headerLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.8)",
-    marginBottom: 1,
-  },
+  loadingContainer: { flex: 1, alignItems: "center", justifyContent: "center" },
   headerBlock: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: 22,
     paddingTop: 18,
     paddingBottom: 72,
   },
-
   headerTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 26,
   },
-
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    marginRight: 12,
-  },
-
+  headerLeft: { flexDirection: "row", alignItems: "center", flex: 1 },
+  avatar: { width: 46, height: 46, borderRadius: 23, marginRight: 12 },
+  headerTextWrap: { flex: 1 },
   headerLabel: {
     fontFamily: FONTS.medium,
     fontSize: 13,
     color: "rgba(255,255,255,0.9)",
   },
-
-  businessNameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 2,
-  },
-
+  businessNameRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
   businessName: {
     fontFamily: FONTS.bold,
     fontSize: 20,
     color: COLORS.white,
+    flexShrink: 1,
   },
-
-  verifiedIcon: {
-    marginLeft: 6,
+  verifiedIcon: { marginLeft: 6 },
+  pendingText: {
+    fontFamily: FONTS.regular,
+    fontSize: 11,
+    color: "rgba(255,255,255,0.75)",
+    marginTop: 2,
   },
-
   walletRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-
   walletLabelRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
   },
-
   walletLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.white,
     marginRight: 10,
   },
-
-  walletBalance: {
-    fontFamily: FONTS.bold,
-    fontSize: 30,
-    color: COLORS.white,
-  },
-
-  walletBalanceDecimals: {
-    fontSize: 18,
-  },
-
+  walletBalance: { fontFamily: FONTS.bold, fontSize: 30, color: COLORS.white },
+  walletBalanceDecimals: { fontSize: 18 },
   addFundsBtn: {
     width: 68,
     height: 68,
@@ -465,13 +443,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  content: {
-    paddingHorizontal: 20,
-    marginTop: -40,
-    paddingBottom: 32,
-  },
-
+  content: { paddingHorizontal: 20, marginTop: -40, paddingBottom: 32 },
   tripCard: {
     backgroundColor: COLORS.white,
     borderRadius: 14,
@@ -559,11 +531,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginBottom: 13,
   },
-  logBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.white,
-  },
+  logBtnText: { fontFamily: FONTS.semiBold, fontSize: 14, color: COLORS.white },
   statBoxRow: { flexDirection: "row", gap: 10, marginBottom: 15 },
   statBox: {
     flex: 1,
@@ -635,19 +603,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.white,
   },
-  declineBtn: {
-    flex: 1,
-    borderWidth: 1.0,
-    borderColor: COLORS.border,
-    borderRadius: 14,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  declineBtnText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -659,11 +614,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textPrimary,
   },
-  linkText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 13,
-    color: COLORS.primary,
-  },
+  linkText: { fontFamily: FONTS.semiBold, fontSize: 13, color: COLORS.primary },
   listCard: {
     borderWidth: 1.0,
     borderColor: COLORS.border,
@@ -671,10 +622,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     overflow: "hidden",
   },
-  rowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.border },
   householdRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -759,17 +707,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textPrimary,
   },
-  statusPill: {
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
+  statusPill: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
   statusPillConfirmed: { backgroundColor: "#8FE3A4" },
   statusPillPending: { backgroundColor: COLORS.accent },
-  statusPillText: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 10,
-  },
+  statusPillText: { fontFamily: FONTS.semiBold, fontSize: 10 },
   statusPillTextConfirmed: { color: COLORS.primaryDark },
   statusPillTextPending: { color: COLORS.primaryDark },
 });

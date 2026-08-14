@@ -1,7 +1,7 @@
-// app/signIn.jsx
-
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -14,12 +14,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/typography";
 import { supabase } from "../lib/supabase";
 
 const PIN_LENGTH = 6;
+const REMEMBERED_EMAIL_KEY = "remembered_email";
 
 export default function Login() {
   const router = useRouter();
@@ -28,10 +28,29 @@ export default function Login() {
 
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
 
+  const [rememberMe, setRememberMe] = useState(true);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const pinRefs = useRef([]);
+
+  useEffect(() => {
+    const loadRememberedEmail = async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem(REMEMBERED_EMAIL_KEY);
+
+        if (savedEmail) {
+          setEmail(savedEmail);
+          setRememberMe(true);
+        }
+      } catch (err) {
+        console.log("LOAD REMEMBERED EMAIL ERROR:", err);
+      }
+    };
+
+    loadRememberedEmail();
+  }, []);
 
   const handleChangeDigit = (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
@@ -101,9 +120,6 @@ export default function Login() {
 
       console.log("LOGIN SUCCESS:", authData.user.id);
 
-      /*
-       * Check that the profile exists.
-       */
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -125,6 +141,16 @@ export default function Login() {
       }
 
       console.log("PROFILE LOADED:", profile);
+
+      try {
+        if (rememberMe) {
+          await AsyncStorage.setItem(REMEMBERED_EMAIL_KEY, formattedEmail);
+        } else {
+          await AsyncStorage.removeItem(REMEMBERED_EMAIL_KEY);
+        }
+      } catch (storageErr) {
+        console.log("SAVE REMEMBERED EMAIL ERROR:", storageErr);
+      }
 
       router.replace("/household/home");
     } catch (err) {
@@ -200,6 +226,21 @@ export default function Login() {
             />
           ))}
         </View>
+
+        <TouchableOpacity
+          style={styles.rememberRow}
+          activeOpacity={0.7}
+          onPress={() => setRememberMe((prev) => !prev)}
+          disabled={loading}
+        >
+          <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+            {rememberMe && (
+              <Ionicons name="checkmark" size={14} color={COLORS.white} />
+            )}
+          </View>
+
+          <Text style={styles.rememberText}>Remember me</Text>
+        </TouchableOpacity>
 
         {!!error && <Text style={styles.errorText}>{error}</Text>}
 
@@ -320,6 +361,35 @@ const styles = StyleSheet.create({
 
   pinBoxFilled: {
     backgroundColor: COLORS.white,
+  },
+
+  rememberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    width: "90%",
+    marginBottom: 20,
+  },
+
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  checkboxChecked: {
+    backgroundColor: COLORS.primary,
+  },
+
+  rememberText: {
+    fontFamily: FONTS.medium,
+    fontSize: 14,
+    color: COLORS.textPrimary,
   },
 
   errorText: {
