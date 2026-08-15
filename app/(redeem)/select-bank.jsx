@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { BANK_LOGOS } from "../../constants/bankLogos";
 import { NIGERIAN_BANKS } from "../../constants/banks";
 import { FONTS } from "../../constants/typography";
@@ -29,16 +30,39 @@ const COLORS = {
   placeholder: "#9AA9A3",
   white: "#FFFFFF",
 };
-const POPULAR_BANKS = [
-  { key: "access", name: "Access Bank", logo: BANK_LOGOS.access },
-  { key: "gtbank", name: "GTBank", logo: BANK_LOGOS.gtbank },
-  { key: "firstbank", name: "First Bank", logo: BANK_LOGOS.firstbank },
-  { key: "uba", name: "UBA", logo: BANK_LOGOS.uba },
-];
 
-function slugifyBankName(name) {
-  return name.toLowerCase().replace(/[()]/g, "").replace(/\s+/g, "-");
-}
+/**
+ * Popular banks
+ *
+ * These use the same key/logoKey structure
+ * as NIGERIAN_BANKS and BANK_LOGOS.
+ */
+const POPULAR_BANKS = [
+  {
+    key: "access-bank",
+    name: "Access Bank",
+    bankCode: "044",
+    logoKey: "access-bank",
+  },
+  {
+    key: "guaranty-trust-bank-gtbank",
+    name: "GTBank",
+    bankCode: "058",
+    logoKey: "guaranty-trust-bank-gtbank",
+  },
+  {
+    key: "first-bank-of-nigeria",
+    name: "First Bank",
+    bankCode: "011",
+    logoKey: "first-bank-of-nigeria",
+  },
+  {
+    key: "united-bank-for-africa-uba",
+    name: "UBA",
+    bankCode: "033",
+    logoKey: "united-bank-for-africa-uba",
+  },
+];
 
 function BankBadge({ logo }) {
   return (
@@ -58,44 +82,70 @@ function BankBadge({ logo }) {
 
 export default function SelectBank() {
   const router = useRouter();
+
   const { selectedBankKey } = useLocalSearchParams();
+
   const [query, setQuery] = useState("");
   const [moreBanksVisible, setMoreBanksVisible] = useState(false);
   const [moreBanksQuery, setMoreBanksQuery] = useState("");
+
+  // --------------------------------------------------
+  // SEARCH POPULAR BANKS
+  // --------------------------------------------------
 
   const filteredBanks = POPULAR_BANKS.filter((bank) =>
     bank.name.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
-  const filteredAllBanks = NIGERIAN_BANKS.filter((name) =>
-    name.toLowerCase().includes(moreBanksQuery.trim().toLowerCase()),
+  // --------------------------------------------------
+  // SEARCH ALL BANKS
+  //
+  // IMPORTANT:
+  // NIGERIAN_BANKS contains OBJECTS, not strings.
+  // --------------------------------------------------
+
+  const filteredAllBanks = NIGERIAN_BANKS.filter((bank) =>
+    bank.name.toLowerCase().includes(moreBanksQuery.trim().toLowerCase()),
   );
 
-  const goToLinkAccount = (bankKey, bankName, bankLogoKey) => {
+  // --------------------------------------------------
+  // GO TO LINK BANK ACCOUNT
+  // --------------------------------------------------
+
+  const goToLinkAccount = (bankKey, bankName, bankLogoKey, bankCode) => {
     router.push({
       pathname: "/link-bank-account",
       params: {
         bankKey,
         bankName,
         bankLogo: bankLogoKey,
+        bankCode,
       },
     });
   };
 
-  const handleSelectBank = (bank) => {
-    goToLinkAccount(bank.key, bank.name, bank.key);
-  };
+  // --------------------------------------------------
+  // POPULAR BANK
+  // --------------------------------------------------
 
-  const handleSelectFromAllBanks = (bankName) => {
-    const key = slugifyBankName(bankName);
+  const handleSelectBank = (bank) => {
+    goToLinkAccount(bank.key, bank.name, bank.key, bank.bankCode);
+  };
+  // --------------------------------------------------
+  // BANK FROM "SEE MORE"
+  // --------------------------------------------------
+
+  const handleSelectFromAllBanks = (bank) => {
     setMoreBanksVisible(false);
     setMoreBanksQuery("");
-    goToLinkAccount(key, bankName, key);
-  };
 
+    goToLinkAccount(bank.key, bank.name, bank.key, bank.bankCode);
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
+
+      {/* HEADER */}
 
       <View style={styles.header}>
         <TouchableOpacity
@@ -104,6 +154,7 @@ export default function SelectBank() {
           style={styles.backRow}
         >
           <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
+
           <Text style={styles.headerTitle}>Link Bank Account</Text>
         </TouchableOpacity>
       </View>
@@ -115,6 +166,8 @@ export default function SelectBank() {
       >
         <Text style={styles.title}>Select Your Bank</Text>
 
+        {/* SEARCH */}
+
         <View style={styles.searchWrap}>
           <Ionicons
             name="search"
@@ -122,6 +175,7 @@ export default function SelectBank() {
             color={COLORS.placeholder}
             style={{ marginRight: 10 }}
           />
+
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -131,27 +185,37 @@ export default function SelectBank() {
           />
         </View>
 
+        {/* POPULAR BANKS */}
+
         <Text style={styles.sectionLabel}>Popular Banks</Text>
 
-        {filteredBanks.map((bank) => (
-          <TouchableOpacity
-            key={bank.key}
-            style={[
-              styles.bankRow,
-              bank.key === selectedBankKey && styles.bankRowSelected,
-            ]}
-            activeOpacity={0.7}
-            onPress={() => handleSelectBank(bank)}
-          >
-            <BankBadge logo={bank.logo} />
-            <Text style={styles.bankName}>{bank.name}</Text>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={COLORS.textPrimary}
-            />
-          </TouchableOpacity>
-        ))}
+        {filteredBanks.map((bank) => {
+          const logo = BANK_LOGOS[bank.logoKey];
+
+          return (
+            <TouchableOpacity
+              key={bank.key}
+              style={[
+                styles.bankRow,
+                bank.key === selectedBankKey && styles.bankRowSelected,
+              ]}
+              activeOpacity={0.7}
+              onPress={() => handleSelectBank(bank)}
+            >
+              <BankBadge logo={logo} />
+
+              <Text style={styles.bankName}>{bank.name}</Text>
+
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={COLORS.textPrimary}
+              />
+            </TouchableOpacity>
+          );
+        })}
+
+        {/* SEE MORE */}
 
         <TouchableOpacity
           style={styles.bankRow}
@@ -165,7 +229,9 @@ export default function SelectBank() {
               color={COLORS.textPrimary}
             />
           </View>
+
           <Text style={styles.bankName}>see more banks</Text>
+
           <Ionicons
             name="chevron-forward"
             size={20}
@@ -173,6 +239,8 @@ export default function SelectBank() {
           />
         </TouchableOpacity>
       </ScrollView>
+
+      {/* ALL BANKS MODAL */}
 
       <Modal
         visible={moreBanksVisible}
@@ -182,8 +250,11 @@ export default function SelectBank() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
+            {/* MODAL HEADER */}
+
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Your Bank</Text>
+
               <TouchableOpacity
                 onPress={() => setMoreBanksVisible(false)}
                 hitSlop={12}
@@ -192,6 +263,8 @@ export default function SelectBank() {
               </TouchableOpacity>
             </View>
 
+            {/* MODAL SEARCH */}
+
             <View style={styles.modalSearchWrap}>
               <Ionicons
                 name="search"
@@ -199,6 +272,7 @@ export default function SelectBank() {
                 color={COLORS.placeholder}
                 style={{ marginRight: 8 }}
               />
+
               <TextInput
                 value={moreBanksQuery}
                 onChangeText={setMoreBanksQuery}
@@ -209,25 +283,32 @@ export default function SelectBank() {
               />
             </View>
 
+            {/* ALL BANKS */}
+
             <FlatList
               data={filteredAllBanks}
-              keyExtractor={(item) => item}
+              keyExtractor={(item) => item.key}
               style={{ maxHeight: 420 }}
               keyboardShouldPersistTaps="handled"
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalBankRow}
-                  onPress={() => handleSelectFromAllBanks(item)}
-                >
-                  <BankBadge logo={BANK_LOGOS[slugifyBankName(item)]} />
-                  <Text style={styles.modalBankName}>{item}</Text>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={18}
-                    color={COLORS.textPrimary}
-                  />
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                const logo = BANK_LOGOS[item.logoKey];
+
+                return (
+                  <TouchableOpacity
+                    style={styles.modalBankRow}
+                    onPress={() => handleSelectFromAllBanks(item)}
+                  >
+                    <BankBadge logo={BANK_LOGOS[item.key]} />
+                    <Text style={styles.modalBankName}>{item.name}</Text>
+
+                    <Ionicons
+                      name="chevron-forward"
+                      size={18}
+                      color={COLORS.textPrimary}
+                    />
+                  </TouchableOpacity>
+                );
+              }}
               ListEmptyComponent={
                 <Text style={styles.modalEmptyText}>
                   No banks match "{moreBanksQuery}"
@@ -242,43 +323,53 @@ export default function SelectBank() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
   header: {
     paddingHorizontal: 20,
     paddingTop: 25,
     paddingBottom: 5,
   },
+
   backRow: {
     flexDirection: "row",
     alignItems: "center",
   },
+
   headerTitle: {
     fontFamily: FONTS.semiBold,
     fontSize: 18,
     color: COLORS.primary,
     marginLeft: 105,
   },
+
   scroll: {
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 24,
   },
+
   title: {
     fontFamily: FONTS.bold,
     fontSize: 23,
     color: COLORS.textPrimary,
     marginBottom: 19,
   },
+
   searchWrap: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.0,
+    borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 32,
   },
+
   searchInput: {
     flex: 1,
     fontFamily: FONTS.regular,
@@ -286,12 +377,14 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+
   sectionLabel: {
     fontFamily: FONTS.bold,
     fontSize: 19,
     color: COLORS.textPrimary,
     marginBottom: 16,
   },
+
   bankRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -302,9 +395,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: -1,
   },
+
   bankRowSelected: {
     backgroundColor: COLORS.selectedBg,
   },
+
   bankBadge: {
     width: 42,
     height: 42,
@@ -315,10 +410,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   bankLogo: {
     width: "100%",
     height: "100%",
   },
+
   moreBanksIcon: {
     width: 42,
     height: 42,
@@ -326,6 +423,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 16,
   },
+
   bankName: {
     flex: 1,
     fontFamily: FONTS.bold,
@@ -333,12 +431,16 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
 
-  // All-banks modal
+  // --------------------------------------------------
+  // MODAL
+  // --------------------------------------------------
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(16, 56, 47, 0.4)",
     justifyContent: "flex-end",
   },
+
   modalSheet: {
     backgroundColor: COLORS.background,
     borderTopLeftRadius: 20,
@@ -348,6 +450,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     maxHeight: "65%",
   },
+
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -357,21 +460,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+
   modalTitle: {
     fontFamily: FONTS.bold,
     fontSize: 17,
     color: COLORS.textPrimary,
   },
+
   modalSearchWrap: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1.0,
+    borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 16,
   },
+
   modalSearchInput: {
     flex: 1,
     fontFamily: FONTS.regular,
@@ -379,6 +485,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+
   modalBankRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -386,12 +493,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#F1F5F3",
   },
+
   modalBankName: {
     flex: 1,
     fontFamily: FONTS.semiBold,
     fontSize: 15,
     color: COLORS.textPrimary,
   },
+
   modalEmptyText: {
     fontFamily: FONTS.regular,
     fontSize: 13,

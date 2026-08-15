@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FONTS } from "../../constants/typography";
 import { useProfile } from "../../context/profileContext";
 import { getUser } from "../../lib/session";
+import { supabase } from "../../lib/supabase";
 
 const COLORS = {
   primary: "#188A5A",
@@ -98,7 +99,91 @@ export default function HouseholdSettings() {
     `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim() ||
     "User";
 
-  const handleDeleteAccount = () => {};
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to permanently delete your account?\n\nThis action cannot be undone. Your profile and account data will be permanently erased.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          onPress: confirmDeleteAccount,
+        },
+      ],
+    );
+  };
+
+  const confirmDeleteAccount = async () => {
+    try {
+      // Get currently authenticated user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        throw userError;
+      }
+
+      if (!user) {
+        Alert.alert("Session Expired", "Please log in again.");
+        router.replace("/signIn");
+        return;
+      }
+
+      console.log("DELETING USER:", user.id);
+
+      // Call the secure Edge Function
+      const { data, error } = await supabase.functions.invoke(
+        "delete-account",
+        {
+          body: {
+            user_id: user.id,
+          },
+        },
+      );
+
+      if (error) {
+        console.log("DELETE ACCOUNT ERROR:", error);
+        throw error;
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.message || "Unable to delete your account.");
+      }
+
+      // Sign out locally
+      await supabase.auth.signOut();
+
+      // Clear local profile/avatar if necessary
+      setAvatar(null);
+      setUser(null);
+
+      Alert.alert(
+        "Account Deleted",
+        "Your account has been permanently deleted.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/signIn"),
+          },
+        ],
+        { cancelable: false },
+      );
+    } catch (error) {
+      console.log("DELETE ACCOUNT EXCEPTION:", error);
+
+      Alert.alert(
+        "Unable to Delete Account",
+        error?.message ||
+          "Something went wrong while deleting your account. Please try again.",
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>

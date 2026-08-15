@@ -100,7 +100,7 @@ export default function HelpSupport() {
           <TouchableOpacity
             style={styles.contactCard}
             activeOpacity={0.85}
-            onPress={() => Linking.openURL("tel:+2348000000000")}
+            onPress={() => Linking.openURL("tel:+2348021326598")}
           >
             <View style={styles.contactIcon}>
               <Ionicons name="call-outline" size={24} color={COLORS.primary} />
@@ -116,7 +116,7 @@ export default function HelpSupport() {
           <TouchableOpacity
             style={styles.contactCard}
             activeOpacity={0.85}
-            onPress={() => Linking.openURL("https://wa.me/2348000000000")}
+            onPress={() => Linking.openURL("https://wa.me/2348021326598")}
           >
             <View style={styles.contactIcon}>
               <Ionicons name="logo-whatsapp" size={24} color="#25D366" />

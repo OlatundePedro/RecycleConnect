@@ -105,6 +105,28 @@ export default function CreateAccountCollector() {
             editable={!loading}
           />
         </View>
+
+        <Text style={styles.termsText}>
+          By clicking signing up, you agree to our{" "}
+          <Text style={styles.termsLink} onPress={() => router.push("/terms")}>
+            Terms
+          </Text>
+          ,{" "}
+          <Text
+            style={styles.termsLink}
+            onPress={() => router.push("/privacy-policy")}
+          >
+            Privacy Policies
+          </Text>{" "}
+          &{" "}
+          <Text
+            style={styles.termsLink}
+            onPress={() => router.push("/cookies-policy")}
+          >
+            Cookies Policies
+          </Text>
+        </Text>
+
         {!!error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity
           style={[styles.verifyBtn, !canContinue && styles.verifyBtnDisabled]}
@@ -165,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    marginBottom: 48,
+    marginBottom: 12,
   },
   fieldInput: {
     fontFamily: FONTS.regular,
@@ -173,12 +195,33 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     padding: 0,
   },
+  termsText: {
+    fontFamily: FONTS.regular,
+    fontSize: 10,
+    lineHeight: 18,
+    color: COLORS.textSecondary,
+    marginBottom: 24,
+  },
+  termsLink: {
+    fontFamily: FONTS.semiBold,
+    color: COLORS.primary,
+  },
+  errorText: {
+    fontFamily: FONTS.medium,
+    fontSize: 13,
+    color: "#D14343",
+    textAlign: "center",
+    marginBottom: 16,
+  },
   verifyBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
     marginBottom: 20,
+  },
+  verifyBtnDisabled: {
+    opacity: 0.5,
   },
   verifyBtnText: {
     fontFamily: FONTS.semiBold,

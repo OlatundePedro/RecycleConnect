@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { FONTS } from "../../constants/typography";
 import { supabase } from "../../lib/supabase";
 
@@ -92,9 +91,11 @@ export default function HouseholdHome() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, []),
+  );
 
   const loadProfile = async () => {
     try {
@@ -169,8 +170,7 @@ export default function HouseholdHome() {
     );
   }
 
-  const firstName =
-    profile?.first_name || profile?.full_name?.split(" ")[0] || "User";
+  const displayName = profile?.full_name || "User";
 
   const referenceCode =
     profile?.reference_code || profile?.referenceCode || "N/A";
@@ -204,7 +204,7 @@ export default function HouseholdHome() {
 
             <View>
               <Text style={styles.greeting}>Hello,</Text>
-              <Text style={styles.nameText}>{firstName}!</Text>
+              <Text style={styles.nameText}>{displayName}!</Text>
             </View>
           </View>
 

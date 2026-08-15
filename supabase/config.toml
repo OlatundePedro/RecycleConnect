@@ -1,0 +1,5 @@
+[functions.withdraw]
+entrypoint = './functions/withdraw/index.js'
+
+[functions.delete-account]
+entrypoint = './functions/delete-account/index.js'

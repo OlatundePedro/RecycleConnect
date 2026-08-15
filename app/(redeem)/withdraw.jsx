@@ -3,6 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Alert,
   Image,
   ScrollView,
   StatusBar,
@@ -15,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BANK_LOGOS } from "../../constants/bankLogos";
 import { FONTS } from "../../constants/typography";
+import { supabase } from "../../lib/supabase";
 import { getLinkedBank, maskAccountNumber } from "../../linkedbankstore";
 
 const COLORS = {
@@ -43,6 +45,7 @@ export default function Withdraw() {
   const router = useRouter();
   const [amount, setAmount] = useState("");
   const [linkedBank, setLinkedBankState] = useState(getLinkedBank());
+  const [withdrawing, setWithdrawing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,19 +72,125 @@ export default function Withdraw() {
   const canWithdraw =
     numericAmount > 0 && numericAmount <= WALLET_BALANCE && !!linkedBank;
 
-  const handleWithdraw = () => {
-    if (!canWithdraw) return;
+  const handleWithdraw = async () => {
+    if (!canWithdraw || withdrawing) {
+      return;
+    }
 
-    router.replace({
-      pathname: "/withdrawal-success",
-      params: {
-        amount: numericAmount.toFixed(2),
-        bankName: linkedBank.name,
-        bankLogo: linkedBank.logoKey,
-        accountName: linkedBank.accountName,
-        accountNumber: linkedBank.accountNumber,
-      },
-    });
+    try {
+      setWithdrawing(true);
+
+      // --------------------------------------------------
+      // GET CURRENT SESSION
+      // --------------------------------------------------
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      if (!session) {
+        Alert.alert("Session Expired", "Please log in again.");
+        return;
+      }
+
+      // --------------------------------------------------
+      // CONFIRM WITHDRAWAL
+      // --------------------------------------------------
+
+      Alert.alert(
+        "Confirm Withdrawal",
+        `Are you sure you want to withdraw ₦${numericAmount.toLocaleString()} to ${linkedBank.accountName}?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              setWithdrawing(false);
+            },
+          },
+          {
+            text: "Withdraw",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                const response = await fetch(
+                  `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/withdraw`,
+                  {
+                    method: "POST",
+
+                    headers: {
+                      "Content-Type": "application/json",
+
+                      Authorization: `Bearer ${session.access_token}`,
+                    },
+
+                    body: JSON.stringify({
+                      amount: numericAmount,
+
+                      bankCode: linkedBank.bankCode || linkedBank.key,
+
+                      accountNumber: linkedBank.accountNumber,
+
+                      accountName: linkedBank.accountName,
+                    }),
+                  },
+                );
+
+                const result = await response.json();
+
+                console.log("WITHDRAW RESPONSE:", result);
+
+                if (!response.ok || !result.success) {
+                  throw new Error(result.message || "Withdrawal failed.");
+                }
+
+                // --------------------------------------------------
+                // SUCCESS
+                // --------------------------------------------------
+
+                router.replace({
+                  pathname: "/withdrawal-success",
+
+                  params: {
+                    amount: numericAmount.toFixed(2),
+
+                    bankName: linkedBank.name,
+
+                    bankLogo: linkedBank.logoKey,
+
+                    accountName: linkedBank.accountName,
+
+                    accountNumber: linkedBank.accountNumber,
+
+                    reference: result.data?.reference || "",
+                  },
+                });
+              } catch (error) {
+                console.log("WITHDRAW ERROR:", error);
+
+                Alert.alert(
+                  "Withdrawal Failed",
+                  error?.message || "Unable to process your withdrawal.",
+                );
+              } finally {
+                setWithdrawing(false);
+              }
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      console.log("WITHDRAW SESSION ERROR:", error);
+
+      setWithdrawing(false);
+
+      Alert.alert("Error", error?.message || "Unable to process withdrawal.");
+    }
   };
 
   const logo = linkedBank && BANK_LOGOS[linkedBank.logoKey];
@@ -212,13 +321,15 @@ export default function Withdraw() {
         <TouchableOpacity
           style={[
             styles.withdrawBtn,
-            !canWithdraw && styles.withdrawBtnDisabled,
+            (!canWithdraw || withdrawing) && styles.withdrawBtnDisabled,
           ]}
           activeOpacity={0.85}
-          disabled={!canWithdraw}
+          disabled={!canWithdraw || withdrawing}
           onPress={handleWithdraw}
         >
-          <Text style={styles.withdrawBtnText}>Withdraw</Text>
+          <Text style={styles.withdrawBtnText}>
+            {withdrawing ? "Processing..." : "Withdraw"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.securedRow}>

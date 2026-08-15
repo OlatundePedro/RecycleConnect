@@ -21,7 +21,7 @@ export default function SecurityPin() {
   const [biometricEnabled, setBiometricEnabled] = useState(true);
 
   const handleChangePin = () => {
-    // router.push("/reset-pin");
+    router.push("/change-pin");
   };
 
   return (
@@ -67,7 +67,7 @@ export default function SecurityPin() {
               <Text style={styles.cardTitle}>Change PIN</Text>
 
               <Text style={styles.cardSubtitle}>
-                Update your 4-digit security code
+                Update your 6-digit security code
               </Text>
             </View>
           </View>
@@ -118,7 +118,7 @@ export default function SecurityPin() {
             <Text style={styles.infoTitle}>
               Your account is secured with a{" "}
               <Text style={styles.highlightText}>
-                4-digit Personal Identification Number (PIN).
+                6-digit Personal Identification Number (PIN).
               </Text>
             </Text>
 

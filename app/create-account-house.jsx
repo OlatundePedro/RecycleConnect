@@ -108,6 +108,27 @@ export default function CreateAccount() {
           />
         </View>
 
+        <Text style={styles.termsText}>
+          By completing the sign up, you agree to our{" "}
+          <Text style={styles.termsLink} onPress={() => router.push("/terms")}>
+            Terms
+          </Text>
+          ,{" "}
+          <Text
+            style={styles.termsLink}
+            onPress={() => router.push("/privacy-policy")}
+          >
+            Privacy Policies
+          </Text>{" "}
+          &{" "}
+          <Text
+            style={styles.termsLink}
+            onPress={() => router.push("/cookies-policy")}
+          >
+            Cookies Policies
+          </Text>
+        </Text>
+
         {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
@@ -183,7 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    marginBottom: 24,
+    marginBottom: 12,
   },
 
   fieldInput: {
@@ -191,6 +212,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textPrimary,
     padding: 0,
+  },
+
+  termsText: {
+    fontFamily: FONTS.regular,
+    fontSize: 10,
+    lineHeight: 18,
+    color: COLORS.textSecondary,
+    marginBottom: 24,
+  },
+
+  termsLink: {
+    fontFamily: FONTS.semiBold,
+    color: COLORS.primary,
   },
 
   errorText: {
