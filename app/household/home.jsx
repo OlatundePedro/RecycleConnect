@@ -100,8 +100,6 @@ export default function HouseholdHome() {
   const loadProfile = async () => {
     try {
       setLoading(true);
-
-      // Get currently logged-in Supabase user
       const {
         data: { user },
         error: userError,
@@ -120,7 +118,6 @@ export default function HouseholdHome() {
 
       console.log("AUTH USER:", user);
 
-      // Get profile information from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select(
@@ -145,11 +142,8 @@ export default function HouseholdHome() {
       setProfile({
         ...profileData,
 
-        // Email comes from profiles if available,
-        // otherwise use Supabase Auth email
         email: profileData?.email || user.email || "",
 
-        // Profile picture comes from profiles.avatar_url
         avatar_url: profileData?.avatar_url || null,
       });
     } catch (error) {
@@ -210,7 +204,7 @@ export default function HouseholdHome() {
 
           <TouchableOpacity
             style={styles.bellButton}
-            onPress={() => router.push("/(profile)/notification")}
+            onPress={() => router.push("/(pickup)/confirm-rewards")}
           >
             <Ionicons
               name="notifications-outline"
@@ -252,7 +246,6 @@ export default function HouseholdHome() {
           </View>
         </View>
 
-        {/* COLLECTION PARTNER CARD */}
         <View style={styles.partnerCard}>
           <View style={styles.partnerHeaderRow}>
             <View style={styles.partnerStarBadge}>
@@ -280,7 +273,6 @@ export default function HouseholdHome() {
           </Text>
         </View>
 
-        {/* MARK AS READY */}
         <View style={styles.readyCard}>
           <Text style={styles.readyLabel}>Mark your materials as</Text>
           <Text style={styles.readyTitle}>Ready for Collection</Text>

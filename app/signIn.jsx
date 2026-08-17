@@ -25,11 +25,8 @@ export default function Login() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-
   const [pin, setPin] = useState(Array(PIN_LENGTH).fill(""));
-
   const [rememberMe, setRememberMe] = useState(true);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -61,9 +58,7 @@ export default function Login() {
       return next;
     });
 
-    if (error) {
-      setError("");
-    }
+    if (error) setError("");
 
     if (char && index < PIN_LENGTH - 1) {
       pinRefs.current[index + 1]?.focus();
@@ -106,15 +101,12 @@ export default function Login() {
 
       if (loginError) {
         console.log("LOGIN ERROR:", loginError);
-
         setError("Invalid email or PIN.");
-
         return;
       }
 
       if (!authData?.user) {
         setError("Unable to find your account.");
-
         return;
       }
 
@@ -128,15 +120,30 @@ export default function Login() {
 
       if (profileError) {
         console.log("PROFILE FETCH ERROR:", profileError);
-
         setError("Unable to load your profile.");
-
         return;
       }
 
       if (!profile) {
         setError("Your account profile has not been completed.");
+        return;
+      }
 
+      // Reject logins from the wrong account type.
+      // Both household and collector share the same `profiles` table,
+      // so a valid email + PIN alone isn't enough to tell them apart.
+      if (profile.account_type !== "household") {
+        console.log(
+          "WRONG ACCOUNT TYPE:",
+          profile.account_type,
+          "expected household",
+        );
+
+        await supabase.auth.signOut();
+
+        setError(
+          "This account is registered as a collector. Please use the collector login instead.",
+        );
         return;
       }
 
@@ -155,7 +162,6 @@ export default function Login() {
       router.replace("/household/home");
     } catch (err) {
       console.log("LOGIN EXCEPTION:", err);
-
       setError(err?.message || "Unable to sign in.");
     } finally {
       setLoading(false);
@@ -172,7 +178,6 @@ export default function Login() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Welcome Back</Text>
-
         <Text style={styles.subtitle}>Sign in to continue</Text>
 
         <View style={styles.illustrationWrap}>
@@ -191,10 +196,7 @@ export default function Login() {
             value={email}
             onChangeText={(value) => {
               setEmail(value);
-
-              if (error) {
-                setError("");
-              }
+              if (error) setError("");
             }}
             placeholder="yourname@example.com"
             placeholderTextColor={COLORS.muted}
@@ -238,7 +240,6 @@ export default function Login() {
               <Ionicons name="checkmark" size={14} color={COLORS.white} />
             )}
           </View>
-
           <Text style={styles.rememberText}>Remember me</Text>
         </TouchableOpacity>
 
@@ -261,9 +262,7 @@ export default function Login() {
           onPress={() =>
             router.push({
               pathname: "/forget-password",
-              params: {
-                type: "household",
-              },
+              params: { type: "household" },
             })
           }
           disabled={loading}
@@ -276,17 +275,8 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-
-  scroll: {
-    paddingHorizontal: 24,
-    paddingTop: 85,
-    paddingBottom: 32,
-  },
-
+  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  scroll: { paddingHorizontal: 24, paddingTop: 85, paddingBottom: 32 },
   title: {
     fontFamily: FONTS.bold,
     fontSize: 28,
@@ -294,7 +284,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
   },
-
   subtitle: {
     fontFamily: FONTS.regular,
     fontSize: 14,
@@ -302,17 +291,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 36,
   },
-
-  illustrationWrap: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-
-  illustration: {
-    width: 250,
-    height: 220,
-  },
-
+  illustrationWrap: { alignItems: "center", marginBottom: 24 },
+  illustration: { width: 250, height: 220 },
   fieldLabel: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
@@ -321,7 +301,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginLeft: 20,
   },
-
   fieldWrap: {
     borderWidth: 1,
     borderColor: COLORS.primary,
@@ -332,14 +311,12 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
-
   fieldInput: {
     fontFamily: FONTS.regular,
     fontSize: 16,
     color: COLORS.textPrimary,
     padding: 0,
   },
-
   pinRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -347,7 +324,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: "90%",
   },
-
   pinBox: {
     width: 48,
     height: 60,
@@ -358,11 +334,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: COLORS.textPrimary,
   },
-
-  pinBoxFilled: {
-    backgroundColor: COLORS.white,
-  },
-
+  pinBoxFilled: { backgroundColor: COLORS.white },
   rememberRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -370,7 +342,6 @@ const styles = StyleSheet.create({
     width: "90%",
     marginBottom: 20,
   },
-
   checkbox: {
     width: 20,
     height: 20,
@@ -381,17 +352,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
-
-  checkboxChecked: {
-    backgroundColor: COLORS.primary,
-  },
-
+  checkboxChecked: { backgroundColor: COLORS.primary },
   rememberText: {
     fontFamily: FONTS.medium,
     fontSize: 14,
     color: COLORS.textPrimary,
   },
-
   errorText: {
     fontFamily: FONTS.medium,
     fontSize: 13,
@@ -399,7 +365,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-
   loginBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -409,17 +374,12 @@ const styles = StyleSheet.create({
     width: "95%",
     alignSelf: "center",
   },
-
-  loginBtnDisabled: {
-    opacity: 0.5,
-  },
-
+  loginBtnDisabled: { opacity: 0.5 },
   loginBtnText: {
     fontFamily: FONTS.semiBold,
     fontSize: 16,
     color: COLORS.white,
   },
-
   forgotBottom: {
     fontFamily: FONTS.semiBold,
     fontSize: 15,
