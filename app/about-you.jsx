@@ -48,7 +48,6 @@ export default function AboutYou() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={26} color={COLORS.textPrimary} />

@@ -39,9 +39,6 @@ export default function ForgetPassword() {
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: formattedEmail,
         options: {
-          // Don't create a new account for a "forgot PIN" flow —
-          // if there's no existing user with this email, this
-          // should fail rather than silently sign someone up.
           shouldCreateUser: false,
         },
       });

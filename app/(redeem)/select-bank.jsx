@@ -31,12 +31,6 @@ const COLORS = {
   white: "#FFFFFF",
 };
 
-/**
- * Popular banks
- *
- * These use the same key/logoKey structure
- * as NIGERIAN_BANKS and BANK_LOGOS.
- */
 const POPULAR_BANKS = [
   {
     key: "access-bank",
@@ -89,28 +83,12 @@ export default function SelectBank() {
   const [moreBanksVisible, setMoreBanksVisible] = useState(false);
   const [moreBanksQuery, setMoreBanksQuery] = useState("");
 
-  // --------------------------------------------------
-  // SEARCH POPULAR BANKS
-  // --------------------------------------------------
-
   const filteredBanks = POPULAR_BANKS.filter((bank) =>
     bank.name.toLowerCase().includes(query.trim().toLowerCase()),
   );
-
-  // --------------------------------------------------
-  // SEARCH ALL BANKS
-  //
-  // IMPORTANT:
-  // NIGERIAN_BANKS contains OBJECTS, not strings.
-  // --------------------------------------------------
-
   const filteredAllBanks = NIGERIAN_BANKS.filter((bank) =>
     bank.name.toLowerCase().includes(moreBanksQuery.trim().toLowerCase()),
   );
-
-  // --------------------------------------------------
-  // GO TO LINK BANK ACCOUNT
-  // --------------------------------------------------
 
   const goToLinkAccount = (bankKey, bankName, bankLogoKey, bankCode) => {
     router.push({
@@ -124,16 +102,9 @@ export default function SelectBank() {
     });
   };
 
-  // --------------------------------------------------
-  // POPULAR BANK
-  // --------------------------------------------------
-
   const handleSelectBank = (bank) => {
     goToLinkAccount(bank.key, bank.name, bank.key, bank.bankCode);
   };
-  // --------------------------------------------------
-  // BANK FROM "SEE MORE"
-  // --------------------------------------------------
 
   const handleSelectFromAllBanks = (bank) => {
     setMoreBanksVisible(false);
@@ -144,8 +115,6 @@ export default function SelectBank() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
-
-      {/* HEADER */}
 
       <View style={styles.header}>
         <TouchableOpacity
@@ -166,8 +135,6 @@ export default function SelectBank() {
       >
         <Text style={styles.title}>Select Your Bank</Text>
 
-        {/* SEARCH */}
-
         <View style={styles.searchWrap}>
           <Ionicons
             name="search"
@@ -184,8 +151,6 @@ export default function SelectBank() {
             style={styles.searchInput}
           />
         </View>
-
-        {/* POPULAR BANKS */}
 
         <Text style={styles.sectionLabel}>Popular Banks</Text>
 
@@ -215,8 +180,6 @@ export default function SelectBank() {
           );
         })}
 
-        {/* SEE MORE */}
-
         <TouchableOpacity
           style={styles.bankRow}
           activeOpacity={0.7}
@@ -240,8 +203,6 @@ export default function SelectBank() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* ALL BANKS MODAL */}
-
       <Modal
         visible={moreBanksVisible}
         animationType="slide"
@@ -250,8 +211,6 @@ export default function SelectBank() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
-            {/* MODAL HEADER */}
-
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Your Bank</Text>
 
@@ -262,8 +221,6 @@ export default function SelectBank() {
                 <Ionicons name="close" size={22} color={COLORS.textPrimary} />
               </TouchableOpacity>
             </View>
-
-            {/* MODAL SEARCH */}
 
             <View style={styles.modalSearchWrap}>
               <Ionicons
@@ -282,8 +239,6 @@ export default function SelectBank() {
                 autoFocus
               />
             </View>
-
-            {/* ALL BANKS */}
 
             <FlatList
               data={filteredAllBanks}

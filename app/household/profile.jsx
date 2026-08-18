@@ -71,10 +71,6 @@ export default function HouseholdProfile() {
 
   const { avatar, setAvatar } = useProfile();
 
-  // --------------------------------------------------
-  // LOAD USER + PROFILE
-  // --------------------------------------------------
-
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -107,7 +103,6 @@ export default function HouseholdProfile() {
           ...profile,
         });
 
-        // Load saved avatar
         if (profile?.avatar_url) {
           setAvatar(profile.avatar_url);
         }
@@ -119,10 +114,6 @@ export default function HouseholdProfile() {
     loadUser();
   }, []);
 
-  // --------------------------------------------------
-  // USER INFORMATION
-  // --------------------------------------------------
-
   const fullName =
     user?.full_name ||
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
@@ -130,13 +121,8 @@ export default function HouseholdProfile() {
 
   const email = user?.email || "No email address";
 
-  // --------------------------------------------------
-  // PICK + UPLOAD PROFILE PICTURE
-  // --------------------------------------------------
-
   const handleEditAvatar = async () => {
     try {
-      // Ask for permission
       const permission =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -148,7 +134,6 @@ export default function HouseholdProfile() {
         return;
       }
 
-      // Open gallery
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
@@ -156,7 +141,6 @@ export default function HouseholdProfile() {
         quality: 0.8,
       });
 
-      // User cancelled
       if (result.canceled) {
         return;
       }
@@ -170,7 +154,6 @@ export default function HouseholdProfile() {
 
       setUploading(true);
 
-      // Get current logged-in user
       const {
         data: { user: authUser },
         error: authError,
@@ -180,10 +163,6 @@ export default function HouseholdProfile() {
         throw new Error("You must be logged in to upload a profile picture.");
       }
 
-      // --------------------------------------------------
-      // FETCH IMAGE
-      // --------------------------------------------------
-
       const response = await fetch(image.uri);
 
       if (!response.ok) {
@@ -192,18 +171,10 @@ export default function HouseholdProfile() {
 
       const arrayBuffer = await response.arrayBuffer();
 
-      // --------------------------------------------------
-      // FILE NAME
-      // --------------------------------------------------
-
       const fileExtension =
         image.fileName?.split(".").pop()?.toLowerCase() || "jpg";
 
       const filePath = `${authUser.id}/profile.${fileExtension}`;
-
-      // --------------------------------------------------
-      // UPLOAD TO SUPABASE STORAGE
-      // --------------------------------------------------
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -217,10 +188,6 @@ export default function HouseholdProfile() {
         throw uploadError;
       }
 
-      // --------------------------------------------------
-      // GET PUBLIC URL
-      // --------------------------------------------------
-
       const { data: publicUrlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
@@ -231,15 +198,7 @@ export default function HouseholdProfile() {
         throw new Error("Unable to generate image URL.");
       }
 
-      // --------------------------------------------------
-      // ADD CACHE BUSTER
-      // --------------------------------------------------
-
       const avatarUrl = `${publicUrl}?t=${Date.now()}`;
-
-      // --------------------------------------------------
-      // SAVE URL TO PROFILES TABLE
-      // --------------------------------------------------
 
       const { error: updateError } = await supabase
         .from("profiles")
@@ -252,10 +211,6 @@ export default function HouseholdProfile() {
         console.log("SAVE AVATAR URL ERROR:", updateError);
         throw updateError;
       }
-
-      // --------------------------------------------------
-      // UPDATE SCREEN
-      // --------------------------------------------------
 
       setAvatar(avatarUrl);
 
@@ -277,25 +232,15 @@ export default function HouseholdProfile() {
     }
   };
 
-  // --------------------------------------------------
-  // LOGOUT
-  // --------------------------------------------------
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
 
     router.replace("/signIn");
   };
 
-  // --------------------------------------------------
-  // UI
-  // --------------------------------------------------
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.headerBg} />
-
-      {/* HEADER */}
 
       <View style={styles.header}>
         <TouchableOpacity
@@ -313,8 +258,6 @@ export default function HouseholdProfile() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* PROFILE */}
-
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
             <Image
@@ -325,8 +268,6 @@ export default function HouseholdProfile() {
               }
               style={styles.avatar}
             />
-
-            {/* EDIT BUTTON */}
 
             <TouchableOpacity
               style={styles.editBadge}
@@ -346,8 +287,6 @@ export default function HouseholdProfile() {
 
           <Text style={styles.email}>{email}</Text>
         </View>
-
-        {/* IMPACT CARD */}
 
         <View style={styles.impactCard}>
           <View style={styles.impactTopRow}>

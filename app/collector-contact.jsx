@@ -55,8 +55,6 @@ export default function CollectionApplication() {
     }
   };
 
-  // Uploads a picked image into the private collector-documents
-  // bucket under the current user's own folder, returns the storage path.
   const uploadDocument = async (userId, image, label) => {
     if (!image?.uri) return null;
 
@@ -111,7 +109,6 @@ export default function CollectionApplication() {
         );
       }
 
-      // Upload whichever documents were provided
       const [governmentIdPath, businessPhotoPath, storagePhotoPath] =
         await Promise.all([
           uploadDocument(user.id, governmentId, "government-id"),

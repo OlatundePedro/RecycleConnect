@@ -145,8 +145,6 @@ export default function HouseholdProfile() {
       setLatitude(position.coords.latitude);
       setLongitude(position.coords.longitude);
 
-      // Best-effort reverse geocode to prefill state/area — falls back
-      // silently to just having lat/long if it fails.
       try {
         const [place] = await Location.reverseGeocodeAsync({
           latitude: position.coords.latitude,

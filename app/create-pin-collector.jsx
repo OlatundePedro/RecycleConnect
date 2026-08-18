@@ -157,14 +157,6 @@ export default function CreatePin() {
 
       console.log("AUTH USER:", user.id);
 
-      /*
-       * IMPORTANT:
-       *
-       * The 6-digit PIN is stored as the
-       * Supabase Auth password.
-       *
-       * It is NOT stored in profiles.
-       */
       const { error: passwordError } = await supabase.auth.updateUser({
         password: pinCode,
       });

@@ -60,10 +60,6 @@ export default function ChangePin() {
   const newRefs = useRef([]);
   const confirmRefs = useRef([]);
 
-  // --------------------------------------------------
-  // PIN INPUT
-  // --------------------------------------------------
-
   const createChangeHandler = (setDigits, refs) => {
     return (index, value) => {
       const char = value.slice(-1).replace(/[^0-9]/g, "");
@@ -83,10 +79,6 @@ export default function ChangePin() {
       }
     };
   };
-
-  // --------------------------------------------------
-  // BACKSPACE
-  // --------------------------------------------------
 
   const createKeyPressHandler = (digits, setDigits, refs) => {
     return (index, event) => {
@@ -126,10 +118,6 @@ export default function ChangePin() {
     confirmRefs,
   );
 
-  // --------------------------------------------------
-  // PIN CODES
-  // --------------------------------------------------
-
   const currentPinCode = currentPin.join("");
   const newPinCode = newPin.join("");
   const confirmPinCode = confirmPin.join("");
@@ -140,10 +128,6 @@ export default function ChangePin() {
     confirmPinCode.length === PIN_LENGTH &&
     !loading;
 
-  // --------------------------------------------------
-  // CHANGE PIN
-  // --------------------------------------------------
-
   const handleChangePin = async () => {
     if (!canSubmit) {
       return;
@@ -151,7 +135,6 @@ export default function ChangePin() {
 
     setError("");
 
-    // Make sure new PINs match
     if (newPinCode !== confirmPinCode) {
       setError("New PINs do not match.");
 
@@ -164,7 +147,6 @@ export default function ChangePin() {
       return;
     }
 
-    // Make sure new PIN is different
     if (currentPinCode === newPinCode) {
       setError("Your new PIN must be different from your current PIN.");
 
@@ -174,10 +156,6 @@ export default function ChangePin() {
     setLoading(true);
 
     try {
-      // ----------------------------------------------
-      // GET CURRENT USER
-      // ----------------------------------------------
-
       const {
         data: { user },
         error: userError,
@@ -194,10 +172,6 @@ export default function ChangePin() {
       const email = user.email.trim().toLowerCase();
 
       console.log("VERIFYING CURRENT PIN FOR:", email);
-
-      // ----------------------------------------------
-      // VERIFY CURRENT PIN
-      // ----------------------------------------------
 
       const { error: verifyError } = await supabase.auth.signInWithPassword({
         email,
@@ -217,10 +191,6 @@ export default function ChangePin() {
 
         return;
       }
-
-      // ----------------------------------------------
-      // UPDATE SUPABASE AUTH PASSWORD
-      // ----------------------------------------------
 
       console.log("UPDATING SUPABASE AUTH PASSWORD...");
 
@@ -268,8 +238,6 @@ export default function ChangePin() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.scroll}
       >
-        {/* HEADER */}
-
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} disabled={loading}>
             <Ionicons name="chevron-back" size={24} color={COLORS.primary} />
@@ -279,16 +247,11 @@ export default function ChangePin() {
 
           <View style={{ width: 24 }} />
         </View>
-
-        {/* TITLE */}
-
         <Text style={styles.title}>Update your PIN</Text>
 
         <Text style={styles.subtitle}>
           Enter your current PIN and create a new 6-digit PIN.
         </Text>
-
-        {/* CURRENT PIN */}
 
         <Text style={styles.fieldLabel}>Current PIN</Text>
 
@@ -300,8 +263,6 @@ export default function ChangePin() {
           disabled={loading}
         />
 
-        {/* NEW PIN */}
-
         <Text style={styles.fieldLabel}>New PIN</Text>
 
         <PinRow
@@ -311,9 +272,6 @@ export default function ChangePin() {
           refs={newRefs}
           disabled={loading}
         />
-
-        {/* CONFIRM PIN */}
-
         <Text style={styles.fieldLabel}>Confirm New PIN</Text>
 
         <PinRow
@@ -323,12 +281,7 @@ export default function ChangePin() {
           refs={confirmRefs}
           disabled={loading}
         />
-
-        {/* ERROR */}
-
         {!!error && <Text style={styles.errorText}>{error}</Text>}
-
-        {/* BUTTON */}
 
         <TouchableOpacity
           style={[

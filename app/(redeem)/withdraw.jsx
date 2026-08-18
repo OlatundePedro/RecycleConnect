@@ -80,10 +80,6 @@ export default function Withdraw() {
     try {
       setWithdrawing(true);
 
-      // --------------------------------------------------
-      // GET CURRENT SESSION
-      // --------------------------------------------------
-
       const {
         data: { session },
         error: sessionError,
@@ -97,10 +93,6 @@ export default function Withdraw() {
         Alert.alert("Session Expired", "Please log in again.");
         return;
       }
-
-      // --------------------------------------------------
-      // CONFIRM WITHDRAWAL
-      // --------------------------------------------------
 
       Alert.alert(
         "Confirm Withdrawal",
@@ -148,10 +140,6 @@ export default function Withdraw() {
                 if (!response.ok || !result.success) {
                   throw new Error(result.message || "Withdrawal failed.");
                 }
-
-                // --------------------------------------------------
-                // SUCCESS
-                // --------------------------------------------------
 
                 router.replace({
                   pathname: "/withdrawal-success",

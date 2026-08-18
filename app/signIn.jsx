@@ -129,9 +129,6 @@ export default function Login() {
         return;
       }
 
-      // Reject logins from the wrong account type.
-      // Both household and collector share the same `profiles` table,
-      // so a valid email + PIN alone isn't enough to tell them apart.
       if (profile.account_type !== "household") {
         console.log(
           "WRONG ACCOUNT TYPE:",

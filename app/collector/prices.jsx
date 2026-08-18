@@ -16,17 +16,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the logged-in collector's real data.
 const COLLECTOR = {
   avatar: require("../../assets/images/profile.png"),
 };
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// Price step used by the +/- buttons, in Naira.
 const PRICE_STEP = 1;
 
-// Buying: what the collector pays households for materials.
 const INITIAL_BUYING_MATERIALS = [
   { id: "pet", label: "PET Plastic (Clear)", price: 128 },
   { id: "hdpe", label: "HDPE Plastic", price: 95 },
@@ -36,7 +33,6 @@ const INITIAL_BUYING_MATERIALS = [
   { id: "glass", label: "Glass Bottles", price: 25 },
 ];
 
-// Selling: what the collector charges buyers/recyclers for materials.
 const INITIAL_SELLING_MATERIALS = [
   { id: "pet", label: "PET Plastic (Clear)", price: 185 },
   { id: "hdpe", label: "HDPE Plastic", price: 140 },
@@ -114,8 +110,7 @@ export default function PricesAndSchedule() {
 
   const scheduleSummary = useMemo(() => {
     if (selectedDays.length === 0) return null;
-    // Placeholder count — swap for the real number of households that
-    // requested this day/time combo once that data exists.
+
     return `1 households said ${selectedDays[0]} ${fromTime}–${toTime}`;
   }, [selectedDays, fromTime, toTime]);
 
@@ -130,7 +125,6 @@ export default function PricesAndSchedule() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.eyebrow}>Visible To Households</Text>
@@ -146,7 +140,6 @@ export default function PricesAndSchedule() {
           </Text>
         </View>
 
-        {/* Scheduled collection */}
         <View style={styles.scheduleCard}>
           <View style={styles.scheduleTopRow}>
             <View style={styles.scheduleTopLeft}>
@@ -224,7 +217,6 @@ export default function PricesAndSchedule() {
           )}
         </View>
 
-        {/* Drop-off */}
         <View style={styles.dropoffRow}>
           <View style={styles.scheduleTopLeft}>
             <View style={styles.iconWrap}>
@@ -279,7 +271,6 @@ export default function PricesAndSchedule() {
           </>
         )}
 
-        {/* Buying prices — what you pay households */}
         <View style={styles.pricesHeaderRow}>
           <Text style={styles.pricesHeading}>Buying Prices</Text>
           <Text style={styles.pricesUnit}>₦ per kg</Text>
@@ -294,7 +285,6 @@ export default function PricesAndSchedule() {
           />
         ))}
 
-        {/* Selling prices — what you charge buyers/recyclers */}
         <View style={[styles.pricesHeaderRow, styles.sellingHeaderRow]}>
           <Text style={styles.pricesHeading}>Selling Prices</Text>
           <Text style={styles.pricesUnit}>₦ per kg</Text>

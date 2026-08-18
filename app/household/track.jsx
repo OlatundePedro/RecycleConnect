@@ -114,14 +114,11 @@ function HistoryIcon({ icon, color, size = 22 }) {
   return <Ionicons name={icon.name} size={size} color={color} />;
 }
 
-// Rewards isn't live yet — this is the waitlist promo shown instead of
-// a normal (empty) list whenever the Rewards filter is selected.
 function RewardsComingSoon() {
   const [email, setEmail] = useState("");
 
   const handleGetEarlyAccess = () => {
     if (!email.trim()) return;
-    // Wire this up to your actual waitlist/signup endpoint.
   };
 
   return (

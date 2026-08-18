@@ -13,7 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/typography";
 
-// Swap for the logged-in collector's real data.
 const COLLECTOR = {
   avatar: require("../../assets/images/profile.png"),
   areaLabel: "Surulere, Lagos Mainland",

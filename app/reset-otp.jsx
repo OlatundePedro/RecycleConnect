@@ -56,9 +56,6 @@ export default function ResetOtp() {
 
   const inputRefs = useRef([]);
 
-  /**
-   * Countdown timer
-   */
   useEffect(() => {
     if (secondsLeft <= 0) {
       return;
@@ -73,9 +70,6 @@ export default function ResetOtp() {
 
   const formattedTimer = `00:${String(secondsLeft).padStart(2, "0")}`;
 
-  /**
-   * OTP input
-   */
   const handleChangeDigit = (index, value) => {
     const char = value.slice(-1).replace(/[^0-9]/g, "");
 
@@ -92,9 +86,6 @@ export default function ResetOtp() {
     }
   };
 
-  /**
-   * Backspace
-   */
   const handleKeyPress = (index, event) => {
     if (event.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -107,9 +98,6 @@ export default function ResetOtp() {
     }
   };
 
-  /**
-   * Resend OTP
-   */
   const handleResend = async () => {
     if (secondsLeft > 0 || resending || !email) {
       return;
@@ -141,9 +129,6 @@ export default function ResetOtp() {
     }
   };
 
-  /**
-   * Verify OTP
-   */
   const code = digits.join("");
 
   const canContinue = code.length === OTP_LENGTH && !verifying;
@@ -165,11 +150,6 @@ export default function ResetOtp() {
 
       console.log("OTP VERIFIED SUCCESSFULLY");
 
-      /**
-       * OTP is now verified.
-       *
-       * Send email + OTP to ResetPin.
-       */
       router.replace({
         pathname: "/reset-pin",
         params: {

@@ -216,7 +216,6 @@ export default function HouseholdHome() {
 
         <Text style={styles.sectionPrompt}>What would you like to do?</Text>
 
-        {/* HOUSEHOLD CODE CARD */}
         <View style={styles.codeCard}>
           <Text style={styles.codeLabel}>YOUR HOUSEHOLD CODE</Text>
           <Text style={styles.codeValue}>{referenceCode}</Text>
@@ -225,7 +224,6 @@ export default function HouseholdHome() {
           </Text>
         </View>
 
-        {/* NEXT COLLECTION */}
         <View style={styles.nextCollectionRow}>
           <View style={styles.calendarIcon}>
             <Ionicons
@@ -289,7 +287,6 @@ export default function HouseholdHome() {
           </TouchableOpacity>
         </View>
 
-        {/* DROP-OFF */}
         <Text style={styles.dropoffTitle}>Find a Drop-off Location</Text>
         <Text style={styles.dropoffSubtitle}>
           Drop-off your materials at a nearby collection hub
@@ -303,7 +300,6 @@ export default function HouseholdHome() {
           <Text style={styles.dropoffBtnText}>Find Drop-off hub</Text>
         </TouchableOpacity>
 
-        {/* BUYING PRICES */}
         <View style={styles.pricesHeaderRow}>
           <Text style={styles.sectionTitle}>Today's buying prices</Text>
           <Text style={styles.pricesUpdated}>UPDATED 1H AGO</Text>
@@ -328,7 +324,6 @@ export default function HouseholdHome() {
           ))}
         </View>
 
-        {/* RECENT ACTIVITY */}
         <View style={styles.activityHeaderRow}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
 
